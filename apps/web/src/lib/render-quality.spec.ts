@@ -13,4 +13,8 @@ describe('render quality', () => {
   it('reduces geometry on narrow screens', () => {
     expect(pointBudget(selectRenderQuality(390, false))).toBe(15_000);
   });
+
+  it('uses a balanced budget for tablets and compact laptops', () => {
+    expect(pointBudget(selectRenderQuality(1024, false))).toBe(90_000);
+  });
 });
