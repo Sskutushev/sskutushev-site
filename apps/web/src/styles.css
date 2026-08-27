@@ -854,6 +854,84 @@ footer small {
   color: var(--muted);
   margin-top: 40px;
 }
+.github-activity {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 28px;
+  padding: 0 0 28px;
+  border-bottom: 1px solid var(--line);
+}
+.github-activity header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.github-activity header small,
+.github-activity header strong {
+  display: block;
+  font-family: var(--mono);
+}
+.github-activity header small {
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+}
+.github-activity header strong {
+  font-size: 11px;
+}
+.github-activity header > span {
+  flex: 0 0 auto;
+  padding: 5px 7px;
+  border: 1px solid color-mix(in srgb, #63de91, transparent 55%);
+  border-radius: 999px;
+  color: #63de91;
+  font: 8px var(--mono);
+}
+.github-activity header > span.is-stale {
+  color: var(--hot);
+  border-color: color-mix(in srgb, var(--hot), transparent 55%);
+}
+.github-activity > a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.github-activity > a:hover {
+  border-color: var(--cold);
+  transform: translateX(-3px);
+}
+.github-activity > a strong {
+  overflow: hidden;
+  font: 10px var(--mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.github-activity > a span {
+  grid-column: 1;
+  color: var(--muted);
+  font: 8px var(--mono);
+}
+.github-activity > a b {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+  color: var(--cold);
+  font: 12px var(--mono);
+}
+.github-activity > p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font: 9px/1.6 var(--mono);
+}
 .assistant-chat {
   padding: 28px 0 0;
   border-top: 1px solid var(--line);
@@ -1107,6 +1185,15 @@ footer small {
   .segmented button {
     min-width: 28px;
     padding-inline: 6px;
+  }
+  .drawer {
+    padding: 22px 18px;
+  }
+  .github-activity header {
+    gap: 8px;
+  }
+  .github-activity > a {
+    padding-inline: 10px;
   }
   section {
     padding: 76px 16px;

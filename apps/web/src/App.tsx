@@ -4,6 +4,7 @@ import { motion, useScroll, useSpring } from 'motion/react';
 import { CapabilityGrid, ContactPanel, ExperienceTimeline } from './components/ProfileSections';
 import { RotatingSignal } from './components/RotatingSignal';
 import { AssistantChat } from './components/AssistantChat';
+import { GithubActivity } from './components/GithubActivity';
 import { SiteControls } from './components/SiteControls';
 import { fallbackPortfolio } from './lib/fallback-portfolio';
 import { fetchPortfolio, type Locale } from './lib/portfolio';
@@ -293,6 +294,7 @@ export default function App(): React.JSX.Element {
             </div>
           </dl>
           <p>Runtime values are shown as measured state. No invented CI metrics.</p>
+          <GithubActivity locale={locale} />
           <AssistantChat locale={locale} />
         </aside>
       )}

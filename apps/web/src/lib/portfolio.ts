@@ -97,3 +97,39 @@ export async function askProfile(question: string, locale: Locale): Promise<Assi
   );
   return data.askProfile;
 }
+
+export type GithubActivity = {
+  owner: string;
+  capturedAt: string;
+  stale: boolean;
+  repositories: Array<{
+    name: string;
+    url: string;
+    stars: number;
+    forks: number;
+    openIssues: number;
+    pushedAt: string | null;
+  }>;
+};
+
+export async function fetchGithubActivity(): Promise<GithubActivity> {
+  const client = new GraphQLClient(endpoint);
+  const data = await client.request<{ githubActivity: GithubActivity }>(gql`
+    query GithubActivity {
+      githubActivity {
+        owner
+        capturedAt
+        stale
+        repositories {
+          name
+          url
+          stars
+          forks
+          openIssues
+          pushedAt
+        }
+      }
+    }
+  `);
+  return data.githubActivity;
+}

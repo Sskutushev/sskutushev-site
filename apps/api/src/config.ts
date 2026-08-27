@@ -12,6 +12,11 @@ const schema = z.object({
   S3_SECRET_KEY: z.string().min(1),
   WEB_ORIGIN: z.string().url(),
   GITHUB_OWNER: z.string().min(1).default('Sskutushev'),
+  GITHUB_TOKEN: z.string().min(20).optional(),
+  ENABLE_WORKERS: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
   ENABLE_MUTATIONS: z.enum(['true', 'false']).default('false'),
   GEMINI_API_KEY: z.string().min(20).optional(),
   GEMINI_MODEL: z.string().min(1).default('gemini-2.5-flash'),

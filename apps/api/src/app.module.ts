@@ -7,6 +7,7 @@ import { CacheModule } from './cache/cache.module';
 import { validateConfig } from './config';
 import { PrismaModule } from './database/prisma.module';
 import { HealthModule } from './modules/health/health.module';
+import { GithubModule } from './modules/github/github.module';
 import { AssetsModule } from './modules/assets/assets.module';
 import { AssistantModule } from './modules/assistant/assistant.module';
 import { PortfolioModule } from './modules/portfolio/portfolio.module';
@@ -29,6 +30,7 @@ import { StorageModule } from './storage/storage.module';
     PortfolioModule,
     AssetsModule,
     AssistantModule,
+    GithubModule,
     HealthModule,
   ],
 })
