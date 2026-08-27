@@ -1,0 +1,92 @@
+name: CI and Delivery
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  quality:
+    name: Quality Pipeline
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://root@localhost:26257/portfolio?sslmode=disable
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check formatting
+        run: pnpm format:check
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
+      - name: Generate Prisma client
+        run: pnpm prisma:generate
+      - name: Validate Prisma schema
+        run: pnpm prisma:validate
+      - name: Verify migrations exist
+        run: test -f prisma/migrations/migration_lock.toml && test -n "$(find prisma/migrations -name migration.sql -print -quit)"
+      - name: Audit production dependencies
+        run: pnpm audit --prod --audit-level high
+      - name: Build
+        env:
+          VITE_GRAPHQL_URL: ${{ vars.PUBLIC_GRAPHQL_URL }}
+          VITE_BASE_PATH: /sskutushev-site/
+        run: pnpm build
+      - name: Upload web artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with: { path: apps/web/dist }
+  publish-pages:
+    name: Publish GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: quality
+    runs-on: ubuntu-latest
+    permissions: { pages: write, id-token: write }
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+  publish-images:
+    name: Publish container images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: quality
+    runs-on: ubuntu-latest
+    permissions: { contents: read, packages: write }
+    strategy:
+      matrix:
+        include:
+          - { image: api, dockerfile: infrastructure/docker/api.Dockerfile }
+          - { image: web, dockerfile: infrastructure/docker/web.Dockerfile }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          {
+            registry: ghcr.io,
+            username: '${{ github.actor }}',
+            password: '${{ secrets.GITHUB_TOKEN }}',
+          }
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ghcr.io/sskutushev/sskutushev-site-${{ matrix.image }}:${{ github.sha }}
+            ghcr.io/sskutushev/sskutushev-site-${{ matrix.image }}:main
