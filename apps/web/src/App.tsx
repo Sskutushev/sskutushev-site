@@ -8,6 +8,8 @@ import { fetchPortfolio, type Locale } from './lib/portfolio';
 import { pointBudget, selectRenderQuality } from './lib/render-quality';
 
 const PointField = lazy(() => import('./scenes/PointField'));
+const RankingScene = lazy(() => import('./scenes/RankingScene'));
+const PipelineScene = lazy(() => import('./scenes/PipelineScene'));
 const copy = {
   RU: {
     skip: 'К проектам',
@@ -186,6 +188,22 @@ export default function App(): React.JSX.Element {
           </div>
         </section>
 
+        {!reduced && (
+          <section className="ranking-section" aria-label="Interactive ranking projection">
+            <div className="section-head">
+              <p className="section-no">03 / DATA HONESTY</p>
+              <p>
+                ONE DATASET
+                <br />
+                THREE EXPLICIT PROJECTIONS
+              </p>
+            </div>
+            <Suspense fallback={<div className="visual-fallback" />}>
+              <RankingScene />
+            </Suspense>
+          </section>
+        )}
+
         <CapabilityGrid skills={data.skills} locale={locale} />
         <ExperienceTimeline items={data.experience} locale={locale} />
 
@@ -196,6 +214,11 @@ export default function App(): React.JSX.Element {
             <br />
             <span>{text.architectureAccent}</span>
           </h2>
+          {!reduced && (
+            <Suspense fallback={<div className="visual-fallback" />}>
+              <PipelineScene />
+            </Suspense>
+          )}
           <div className="pipeline">
             {[
               'REACT + R3F',
