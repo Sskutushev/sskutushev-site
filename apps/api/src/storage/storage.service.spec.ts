@@ -2,18 +2,30 @@ import { ConfigService } from '@nestjs/config';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { StorageService } from './storage.service';
 
-const aws = vi.hoisted(() => ({ send: vi.fn(), getSignedUrl: vi.fn() }));
+const aws = vi.hoisted(() => ({
+  send: vi.fn(),
+  getSignedUrl: vi.fn<(client: unknown, command: unknown, options: unknown) => Promise<string>>(),
+  putInputs: [] as unknown[],
+  signedOptions: [] as unknown[],
+}));
 
 vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: vi.fn(() => ({ send: aws.send })),
   PutObjectCommand: class {
-    constructor(readonly input: unknown) {}
+    constructor(readonly input: unknown) {
+      aws.putInputs.push(input);
+    }
   },
   HeadObjectCommand: class {
     constructor(readonly input: unknown) {}
   },
 }));
-vi.mock('@aws-sdk/s3-request-presigner', () => ({ getSignedUrl: aws.getSignedUrl }));
+vi.mock('@aws-sdk/s3-request-presigner', () => ({
+  getSignedUrl: (client: unknown, command: unknown, options: unknown) => {
+    aws.signedOptions.push(options);
+    return aws.getSignedUrl(client, command, options);
+  },
+}));
 
 const config = {
   getOrThrow: (key: string) =>
@@ -37,13 +49,12 @@ describe('StorageService', () => {
       'https://storage.example/upload',
     );
     expect(aws.getSignedUrl).toHaveBeenCalledOnce();
-    const [, command, options] = aws.getSignedUrl.mock.calls[0]!;
-    expect(command.input).toEqual({
+    expect(aws.putInputs.at(-1)).toEqual({
       Bucket: 'portfolio',
       Key: 'resume/file.pdf',
       ContentType: 'application/pdf',
     });
-    expect(options).toEqual({ expiresIn: 300 });
+    expect(aws.signedOptions.at(-1)).toEqual({ expiresIn: 300 });
   });
 
   it('fails closed when object metadata is incomplete', async () => {
