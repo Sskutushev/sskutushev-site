@@ -10,3 +10,5 @@ runs:
         cache: pnpm
     - shell: bash
       run: pnpm install --frozen-lockfile
+    - shell: bash
+      run: pnpm prisma:generate
