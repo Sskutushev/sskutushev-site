@@ -7,9 +7,10 @@ A production-shaped digital portfolio for a Senior+ Fullstack / Product Engineer
 1. Open the web UI and toggle **ENG** to inspect truthful runtime state.
 2. Query `portfolioData(locale: RU)` at `/graphql` in development.
 3. Open **Engineering Mode** and ask the grounded Gemini assistant about verified experience.
-4. Read the [architecture overview](docs/architecture/overview.md) and the ADRs.
-5. Inspect the ordered CI chain from dependency install through publishing.
-6. Run the full local stack with `docker compose up --build`.
+4. Inspect the live GitHub activity snapshot and its explicit stale/offline states.
+5. Read the [architecture overview](docs/architecture/overview.md) and the ADRs.
+6. Inspect the ordered CI chain from dependency install through publishing.
+7. Run the full local stack with `docker compose up --build`.
 
 ## Local setup
 
@@ -26,6 +27,10 @@ pnpm dev
 Web: `http://localhost:3000`; GraphQL: `http://localhost:4000/graphql`.
 
 Set `GEMINI_API_KEY` server-side to enable generated answers. Without it, `askProfile` remains available as a cited extractive fallback; the key is never included in the web bundle.
+
+Set the optional server-side `GITHUB_TOKEN` to increase GitHub API limits. `ENABLE_WORKERS=false`
+keeps background refresh disabled by default; public reads still refresh through the Redis-backed
+stale-while-revalidate path.
 
 ## Useful commands
 

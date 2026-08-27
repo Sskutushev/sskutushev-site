@@ -5,6 +5,8 @@
 - DTO validation rejects non-allowlisted input.
 - Provider errors and storage keys are not part of the public contract.
 - Secrets live in environment variables and `.env` is ignored.
+- The optional GitHub token is server-only; the adapter requests public repository metadata with a
+  six-second timeout and never exposes provider errors or credentials through GraphQL.
 - Public production mutations are deferred and therefore expose no accidental write surface.
 
 Before public deployment, request rate limiting and GraphQL depth/complexity limits are required at both edge and application layers.

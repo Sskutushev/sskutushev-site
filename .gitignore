@@ -15,6 +15,8 @@ photo_*.jpg
 *.pdf
 !apps/web/public/sergey-kutushev-resume.pdf
 FINAL_DEVELOPER_COMPETENCY_ASSESSMENT_*.md
+FINAL_IMPLEMENTATION_REPORT*.md
+docs/operations/implementation-status.md
 schema.graphql
 apps/api/schema.graphql
 .runtime-*.log

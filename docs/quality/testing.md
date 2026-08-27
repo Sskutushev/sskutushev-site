@@ -6,6 +6,7 @@ Verification is organized around risk rather than mirroring source files:
 - GraphQL schema and public error contracts;
 - CockroachDB constraints, transactions and migrations;
 - Redis cache miss, stale fallback and in-flight deduplication;
+- GitHub response mapping, timeout/provider failure, stale state and snapshot persistence;
 - S3 presigned upload and idempotent confirmation;
 - accessible UI states and browser journeys;
 - WebGL performance and reduced-motion behavior.
