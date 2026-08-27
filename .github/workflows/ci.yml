@@ -83,10 +83,29 @@ jobs:
           VITE_GRAPHQL_URL: ${{ vars.PUBLIC_GRAPHQL_URL }}
           VITE_BASE_PATH: /sskutushev-site/
         run: pnpm build
+      - name: Start runtime dependencies
+        shell: bash
+        run: |
+          docker run --detach --name portfolio-cockroach \
+            --publish 26257:26257 \
+            cockroachdb/cockroach:v25.2.3 start-single-node --insecure
+          docker run --detach --name portfolio-redis \
+            --publish 6379:6379 \
+            redis:7.4.5-alpine
+          for attempt in {1..30}; do
+            if docker exec portfolio-cockroach cockroach sql --insecure \
+              --execute 'SELECT 1' > /dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+          docker exec portfolio-cockroach cockroach sql --insecure --execute 'SELECT 1'
+          docker exec portfolio-redis redis-cli ping
       - name: Runtime boot and GraphQL smoke
         env:
           NODE_ENV: test
           PORT: 4417
+          DATABASE_URL: postgresql://root@localhost:26257/defaultdb?sslmode=disable
           REDIS_URL: redis://localhost:6379
           S3_ENDPOINT: http://localhost:9000
           S3_REGION: us-east-1
