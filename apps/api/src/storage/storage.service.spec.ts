@@ -1,0 +1,57 @@
+import { ConfigService } from '@nestjs/config';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { StorageService } from './storage.service';
+
+const aws = vi.hoisted(() => ({ send: vi.fn(), getSignedUrl: vi.fn() }));
+
+vi.mock('@aws-sdk/client-s3', () => ({
+  S3Client: vi.fn(() => ({ send: aws.send })),
+  PutObjectCommand: class {
+    constructor(readonly input: unknown) {}
+  },
+  HeadObjectCommand: class {
+    constructor(readonly input: unknown) {}
+  },
+}));
+vi.mock('@aws-sdk/s3-request-presigner', () => ({ getSignedUrl: aws.getSignedUrl }));
+
+const config = {
+  getOrThrow: (key: string) =>
+    ({
+      S3_BUCKET: 'portfolio',
+      S3_ENDPOINT: 'http://localhost:9000',
+      S3_REGION: 'us-east-1',
+      S3_ACCESS_KEY: 'access',
+      S3_SECRET_KEY: 'secret',
+    })[key],
+} as ConfigService;
+
+describe('StorageService', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('creates a short-lived upload URL with an explicit content type', async () => {
+    aws.getSignedUrl.mockResolvedValue('https://storage.example/upload');
+    const storage = new StorageService(config);
+
+    await expect(storage.presignUpload('resume/file.pdf', 'application/pdf')).resolves.toBe(
+      'https://storage.example/upload',
+    );
+    expect(aws.getSignedUrl).toHaveBeenCalledOnce();
+    const [, command, options] = aws.getSignedUrl.mock.calls[0]!;
+    expect(command.input).toEqual({
+      Bucket: 'portfolio',
+      Key: 'resume/file.pdf',
+      ContentType: 'application/pdf',
+    });
+    expect(options).toEqual({ expiresIn: 300 });
+  });
+
+  it('fails closed when object metadata is incomplete', async () => {
+    aws.send.mockResolvedValue({ ContentLength: 42 });
+    const storage = new StorageService(config);
+
+    await expect(storage.inspect('broken-object')).rejects.toThrow(
+      'Stored object metadata is incomplete',
+    );
+  });
+});
