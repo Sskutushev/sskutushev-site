@@ -691,6 +691,27 @@ footer {
   color: var(--muted);
   font: 9px var(--mono);
 }
+.resume-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+.contact-actions .resume-actions a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  color: white;
+  background: var(--hot);
+  border-color: var(--hot);
+  font: 9px var(--mono);
+}
+.contact-actions .resume-actions a:last-child {
+  color: var(--text);
+  background: transparent;
+  border-color: var(--line);
+}
 .copyright {
   grid-column: 1/-1;
   margin-top: 80px;
@@ -975,6 +996,9 @@ footer small {
   }
   footer {
     padding-inline: 16px;
+  }
+  .resume-actions {
+    grid-template-columns: 1fr;
   }
 }
 @media (prefers-reduced-motion: reduce) {
