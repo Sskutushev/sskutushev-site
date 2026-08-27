@@ -1,0 +1,34 @@
+{
+  "name": "@sskutushev/web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@react-three/fiber": "^9.1.2",
+    "@tanstack/react-query": "^5.75.4",
+    "graphql-request": "^7.1.2",
+    "motion": "^12.10.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "three": "^0.176.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@types/three": "^0.176.0",
+    "@vitejs/plugin-react": "^4.4.1",
+    "eslint": "^9.25.1",
+    "jsdom": "^26.1.0",
+    "typescript-eslint": "^8.31.1",
+    "vite": "^6.3.5",
+    "vitest": "^3.1.3"
+  }
+}
