@@ -71,6 +71,7 @@ const common = {
     { type: 'Email', url: 'mailto:sskutushev@gmail.com' },
     { type: 'Telegram', url: 'https://t.me/sskutushev' },
     { type: 'GitHub', url: 'https://github.com/Sskutushev' },
+    { type: 'LinkedIn', url: 'https://www.linkedin.com/in/sskutushev/' },
   ],
   stale: true,
 };

@@ -13,4 +13,7 @@ plan.md
 photo_*.jpg
 204996450.jpg
 *.pdf
+!apps/web/public/sergey-skutushev-resume.pdf
 FINAL_DEVELOPER_COMPETENCY_ASSESSMENT_*.md
+schema.graphql
+apps/api/schema.graphql

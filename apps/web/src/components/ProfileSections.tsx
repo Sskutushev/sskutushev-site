@@ -11,6 +11,8 @@ const copy = {
     experienceAccent: 'К PRODUCTION OWNERSHIP.',
     contact: 'СОЗДАДИМ СИСТЕМУ,',
     contactAccent: 'КОТОРАЯ ВЫДЕРЖИТ.',
+    resumeOpen: 'ОТКРЫТЬ РЕЗЮМЕ',
+    resumeDownload: 'СКАЧАТЬ PDF',
   },
   EN: {
     capability: 'CAPABILITY MAP',
@@ -21,6 +23,8 @@ const copy = {
     experienceAccent: 'TO PRODUCTION OWNERSHIP.',
     contact: "LET'S BUILD SOMETHING",
     contactAccent: 'THAT HOLDS.',
+    resumeOpen: 'OPEN RESUME',
+    resumeDownload: 'DOWNLOAD PDF',
   },
 } as const;
 
@@ -110,6 +114,7 @@ export function ExperienceTimeline({
 
 export function ContactPanel({ locale }: { locale: Locale }): React.JSX.Element {
   const text = copy[locale];
+  const resumeUrl = `${import.meta.env.BASE_URL}sergey-skutushev-resume.pdf`;
   return (
     <footer id="contact">
       <Reveal>
@@ -132,6 +137,18 @@ export function ContactPanel({ locale }: { locale: Locale }): React.JSX.Element 
           GITHUB <span>↗</span>
           <small>/Sskutushev</small>
         </a>
+        <a href="https://www.linkedin.com/in/sskutushev/" target="_blank" rel="noreferrer">
+          LINKEDIN <span>↗</span>
+          <small>/in/sskutushev</small>
+        </a>
+        <div className="resume-actions">
+          <a href={resumeUrl} target="_blank" rel="noreferrer">
+            {text.resumeOpen} <span>↗</span>
+          </a>
+          <a href={resumeUrl} download="sergey-skutushev-resume.pdf">
+            {text.resumeDownload} <span>↓</span>
+          </a>
+        </div>
       </div>
       <small className="copyright">© 2026 SERGEY SKUTUSHEV · SAINT PETERSBURG · UTC+3</small>
     </footer>

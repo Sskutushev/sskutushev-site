@@ -159,6 +159,7 @@ async function main(): Promise<void> {
           { type: 'Email', url: 'mailto:sskutushev@gmail.com', sortOrder: 1 },
           { type: 'Telegram', url: 'https://t.me/sskutushev', sortOrder: 2 },
           { type: 'GitHub', url: 'https://github.com/Sskutushev', sortOrder: 3 },
+          { type: 'LinkedIn', url: 'https://www.linkedin.com/in/sskutushev/', sortOrder: 4 },
         ],
       },
       experiences: {
