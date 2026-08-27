@@ -11,6 +11,13 @@ export interface Portfolio {
     yearsExperience: number;
   };
   skills: { name: string; category: string }[];
+  experience: {
+    company: string;
+    role: string;
+    period: string;
+    summary: string;
+    highlights: string[];
+  }[];
   caseStudies: {
     slug: string;
     title: string;
@@ -37,6 +44,13 @@ const query = gql`
       skills {
         name
         category
+      }
+      experience {
+        company
+        role
+        period
+        summary
+        highlights
       }
       caseStudies {
         slug

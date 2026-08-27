@@ -17,6 +17,10 @@ export class PortfolioService {
         include: {
           skills: { orderBy: { priority: 'asc' } },
           socialLinks: { orderBy: { sortOrder: 'asc' } },
+          experiences: {
+            orderBy: { sortOrder: 'asc' },
+            include: { highlights: { orderBy: { sortOrder: 'asc' } } },
+          },
           caseStudies: {
             orderBy: { sortOrder: 'asc' },
             include: {
@@ -36,6 +40,13 @@ export class PortfolioService {
           yearsExperience: profile.yearsExperience,
         },
         skills: profile.skills.map(({ name, category }) => ({ name, category })),
+        experience: profile.experiences.map((item) => ({
+          company: item.companyLabel,
+          role: item.role,
+          period: `${item.startDate.getUTCFullYear()} — ${item.endDate?.getUTCFullYear() ?? 'NOW'}`,
+          summary: item.summary,
+          highlights: item.highlights.map(({ title, description }) => `${title}: ${description}`),
+        })),
         socialLinks: profile.socialLinks.map(({ type, url }) => ({ type, url })),
         caseStudies: profile.caseStudies.flatMap((item) => {
           const translation = item.translations[0];

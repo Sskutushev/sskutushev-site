@@ -38,6 +38,14 @@ body {
     background 0.5s,
     color 0.5s;
 }
+.scroll-progress {
+  position: fixed;
+  z-index: 60;
+  inset: 0 0 auto;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--cold), var(--hot));
+}
 a {
   color: inherit;
   text-decoration: none;
@@ -92,15 +100,52 @@ button {
 .nav nav a:hover {
   color: var(--hot);
 }
-.controls {
+.site-controls {
   display: flex;
   align-items: center;
+  gap: 6px;
 }
-.controls button {
-  height: 34px;
-  min-width: 42px;
+.icon-control,
+.segmented {
   border: 1px solid var(--line);
-  font: 10px var(--mono);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel), transparent 25%);
+}
+.icon-control {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 8px;
+}
+.icon-control svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.segmented {
+  display: flex;
+  padding: 3px;
+}
+.segmented button {
+  min-width: 32px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.segmented button.active {
+  color: var(--bg);
+  background: var(--text);
+}
+.icon-control:hover {
+  color: var(--hot);
+  border-color: var(--hot);
+  transform: rotate(5deg);
 }
 section {
   position: relative;
@@ -213,9 +258,53 @@ h2 span {
 }
 .manifesto-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8vw;
-  margin-left: 25%;
+  grid-template-columns: minmax(180px, 0.72fr) 1fr 1fr;
+  gap: clamp(2rem, 5vw, 7rem);
+  align-items: end;
+}
+.portrait {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 28px;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 3px,
+    color-mix(in srgb, var(--cold), transparent 94%) 4px
+  );
+  mix-blend-mode: screen;
+}
+.portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: saturate(0.7) contrast(1.08) brightness(0.88);
+  transition:
+    filter 0.5s,
+    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+:root[data-theme='blueprint'] .portrait img {
+  filter: sepia(0.12) saturate(0.78) contrast(0.96) brightness(1.03);
+}
+.portrait:hover img {
+  transform: scale(1.025);
+}
+.portrait figcaption {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 10px;
+  border-top: 1px solid var(--line);
+  font: 8px var(--mono);
+  color: var(--muted);
 }
 .manifesto-grid > p {
   font-size: 20px;
@@ -296,6 +385,103 @@ h2 span {
 .architecture {
   background: var(--panel);
 }
+.capabilities {
+  background: var(--bg);
+  overflow: hidden;
+}
+.capability-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 70px;
+}
+.capability-card {
+  position: relative;
+  min-height: 280px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--panel), transparent 5%),
+    color-mix(in srgb, var(--bg), transparent 20%)
+  );
+  transition:
+    transform 0.35s,
+    border-color 0.35s;
+}
+.capability-card:hover {
+  transform: translateY(-8px);
+  border-color: color-mix(in srgb, var(--hot), var(--line) 50%);
+}
+.capability-card small {
+  font: 9px var(--mono);
+  color: var(--hot);
+}
+.capability-card h3 {
+  margin: 58px 0 24px;
+  font-size: clamp(24px, 3vw, 42px);
+  letter-spacing: -0.05em;
+}
+.capability-card div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.capability-card span {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.capability-card:first-child {
+  grid-column: span 2;
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      color-mix(in srgb, var(--hot), transparent 78%),
+      transparent 42%
+    ),
+    var(--panel);
+}
+.experience {
+  background: var(--panel);
+}
+.timeline {
+  border-top: 1px solid var(--line);
+}
+.timeline-item {
+  display: grid;
+  grid-template-columns: 70px minmax(240px, 0.8fr) 1.2fr;
+  gap: 3vw;
+  padding: 42px 0;
+  border-bottom: 1px solid var(--line);
+}
+.timeline-index,
+.timeline-item span {
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.timeline-item h3 {
+  margin: 10px 0 6px;
+  font-size: clamp(25px, 3vw, 42px);
+  letter-spacing: -0.045em;
+}
+.timeline-item strong {
+  color: var(--hot);
+  font: 10px var(--mono);
+  font-weight: 400;
+}
+.timeline-item p,
+.timeline-item li {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.timeline-item ul {
+  margin: 16px 0 0;
+  padding-left: 18px;
+}
 .pipeline {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -336,6 +522,38 @@ footer {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: end;
+}
+.contact-actions {
+  display: grid;
+  gap: 8px;
+  min-width: min(390px, 100%);
+}
+.contact-actions a {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  transition:
+    background 0.25s,
+    transform 0.25s;
+}
+.contact-actions a:hover {
+  background: var(--hot);
+  color: white;
+  transform: translateX(-6px);
+}
+.contact-actions small {
+  grid-column: 1/-1;
+  color: var(--muted);
+  font: 9px var(--mono);
+}
+.copyright {
+  grid-column: 1/-1;
+  margin-top: 80px;
+  color: var(--muted);
+  font: 9px var(--mono);
 }
 footer > p {
   font-size: clamp(48px, 8vw, 120px);
@@ -405,6 +623,9 @@ footer small {
     grid-template-columns: 1fr;
     margin-left: 0;
   }
+  .portrait {
+    max-width: 320px;
+  }
   .section-head > p:last-child {
     display: none;
   }
@@ -424,6 +645,18 @@ footer small {
   .pipeline small {
     margin-bottom: 30px;
   }
+  .capability-grid {
+    grid-template-columns: 1fr;
+  }
+  .capability-card:first-child {
+    grid-column: auto;
+  }
+  .timeline-item {
+    grid-template-columns: 34px 1fr;
+  }
+  .timeline-item > div:last-child {
+    grid-column: 2;
+  }
   footer {
     padding: 80px 22px 30px;
     grid-template-columns: 1fr;
@@ -431,6 +664,9 @@ footer small {
   footer > a {
     margin-top: 40px;
     width: max-content;
+  }
+  .contact-actions {
+    margin-top: 40px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
