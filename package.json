@@ -35,6 +35,9 @@
       "@prisma/engines",
       "esbuild",
       "prisma"
-    ]
+    ],
+    "overrides": {
+      "deepmerge-ts": "^8.0.0"
+    }
   }
 }

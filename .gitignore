@@ -10,3 +10,4 @@ test-results/
 *.tsbuildinfo
 .DS_Store
 plan.md
+photo_*.jpg

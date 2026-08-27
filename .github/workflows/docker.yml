@@ -1,9 +1,0 @@
-name: Docker
-on: [pull_request]
-jobs:
-  images:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: docker build -f infrastructure/docker/api.Dockerfile .
-      - run: docker build -f infrastructure/docker/web.Dockerfile .
