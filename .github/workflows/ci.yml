@@ -76,6 +76,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+      - name: Generate Prisma client
+        run: pnpm prisma:generate
       - name: Build applications
         env:
           VITE_GRAPHQL_URL: ${{ vars.PUBLIC_GRAPHQL_URL }}
@@ -103,7 +105,10 @@ jobs:
             fi
             sleep 1
           done
-          curl --fail --silent http://127.0.0.1:4417/health/live
+          if ! curl --fail --silent http://127.0.0.1:4417/health/live; then
+            cat api-smoke.log
+            exit 1
+          fi
           curl --fail --silent http://127.0.0.1:4417/graphql \
             --header 'content-type: application/json' \
             --data '{"query":"query { __typename }"}'
