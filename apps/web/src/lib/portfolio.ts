@@ -1,5 +1,7 @@
 import { GraphQLClient, gql } from 'graphql-request';
 
+const endpoint = import.meta.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql';
+
 export type Locale = 'RU' | 'EN';
 export interface Portfolio {
   profile: {
@@ -70,9 +72,28 @@ const query = gql`
 `;
 
 export async function fetchPortfolio(locale: Locale): Promise<Portfolio> {
-  const client = new GraphQLClient(
-    import.meta.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql',
-  );
+  const client = new GraphQLClient(endpoint);
   const response = await client.request<{ portfolioData: Portfolio }>(query, { locale });
   return response.portfolioData;
+}
+
+export type AssistantAnswer = {
+  answer: string;
+  generated: boolean;
+  sources: Array<{ label: string; excerpt: string }>;
+};
+
+export async function askProfile(question: string, locale: Locale): Promise<AssistantAnswer> {
+  const client = new GraphQLClient(endpoint);
+  const data = await client.request<{ askProfile: AssistantAnswer }>(
+    `query AskProfile($question: String!, $locale: Locale!) {
+      askProfile(question: $question, locale: $locale) {
+        answer
+        generated
+        sources { label excerpt }
+      }
+    }`,
+    { question, locale },
+  );
+  return data.askProfile;
 }

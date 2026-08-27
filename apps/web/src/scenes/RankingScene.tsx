@@ -103,15 +103,16 @@ export default function RankingScene(): React.JSX.Element {
 
   return (
     <div className="ranking-visual" ref={container}>
-      <Canvas
-        aria-hidden
-        frameloop={visible ? 'always' : 'never'}
-        dpr={[1, 1.35]}
-        camera={{ position: [0, 0, 10], fov: 48 }}
-        gl={{ antialias: false, powerPreference: 'high-performance' }}
-      >
-        <MorphPoints mode={mode} count={count} />
-      </Canvas>
+      {visible && (
+        <Canvas
+          aria-hidden
+          dpr={[1, 1.35]}
+          camera={{ position: [0, 0, 10], fov: 48 }}
+          gl={{ antialias: false, powerPreference: 'high-performance' }}
+        >
+          <MorphPoints mode={mode} count={count} />
+        </Canvas>
+      )}
       <div className="scene-label">RANKING V3 / SAME ENTITIES · DIFFERENT BASIS</div>
       <div className="scene-tabs" aria-label="Ranking projection">
         {labels.map((label, index) => (

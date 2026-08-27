@@ -70,15 +70,16 @@ export default function PipelineScene(): React.JSX.Element {
   const { container, visible } = useSceneVisibility();
   return (
     <div className="pipeline-visual" ref={container}>
-      <Canvas
-        aria-hidden
-        frameloop={visible ? 'always' : 'never'}
-        dpr={[1, 1.25]}
-        camera={{ position: [0, 0, 10], fov: 48 }}
-        gl={{ antialias: false, powerPreference: 'high-performance' }}
-      >
-        <DataFlow count={window.innerWidth < 760 ? 4_000 : 14_000} />
-      </Canvas>
+      {visible && (
+        <Canvas
+          aria-hidden
+          dpr={[1, 1.25]}
+          camera={{ position: [0, 0, 10], fov: 48 }}
+          gl={{ antialias: false, powerPreference: 'high-performance' }}
+        >
+          <DataFlow count={window.innerWidth < 760 ? 4_000 : 14_000} />
+        </Canvas>
+      )}
       <span className="scene-label">REQUEST → CONTRACT → DOMAIN → DATA → RESPONSE</span>
     </div>
   );

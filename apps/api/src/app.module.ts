@@ -8,6 +8,7 @@ import { validateConfig } from './config';
 import { PrismaModule } from './database/prisma.module';
 import { HealthModule } from './modules/health/health.module';
 import { AssetsModule } from './modules/assets/assets.module';
+import { AssistantModule } from './modules/assistant/assistant.module';
 import { PortfolioModule } from './modules/portfolio/portfolio.module';
 import { StorageModule } from './storage/storage.module';
 
@@ -27,6 +28,7 @@ import { StorageModule } from './storage/storage.module';
     StorageModule,
     PortfolioModule,
     AssetsModule,
+    AssistantModule,
     HealthModule,
   ],
 })

@@ -140,12 +140,14 @@ const cases = [
 ] as const;
 
 async function main(): Promise<void> {
-  await prisma.profile.deleteMany({ where: { slug: 'sergey-skutushev' } });
+  await prisma.profile.deleteMany({
+    where: { slug: { in: ['sergey-skutushev', 'sergey-kutushev'] } },
+  });
   const profile = await prisma.profile.create({
     data: {
-      slug: 'sergey-skutushev',
+      slug: 'sergey-kutushev',
       fullName: 'Сергей Кутушев',
-      headline: 'Backend-oriented Senior+ Fullstack / Product Engineer',
+      headline: 'Senior+ Fullstack / Product Engineer · Backend 60% / Frontend 40%',
       summary:
         'Веду сложные продуктовые вертикали от доменной модели и базы данных до React-интерфейса, интеграций и production rollout.',
       location: 'Санкт-Петербург · Remote · UTC+3',

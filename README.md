@@ -1,14 +1,15 @@
 # sskutushev-site
 
-A production-shaped digital portfolio for a backend-oriented TypeScript Product Engineer. It is a real vertical slice, not a static mock: React/R3F reads portfolio content from a NestJS code-first GraphQL API backed by Prisma and CockroachDB. Redis provides cache resilience; S3-compatible storage is an explicit asset boundary.
+A production-shaped digital portfolio for a Senior+ Fullstack / Product Engineer with 60% backend and 40% frontend focus, plus strong data, DevOps, security and production ownership. It is a real vertical slice, not a static mock: React/R3F reads portfolio content from a NestJS code-first GraphQL API backed by Prisma and CockroachDB. Redis provides cache resilience; S3-compatible storage is an explicit asset boundary.
 
 ## Reviewer in 10 minutes
 
 1. Open the web UI and toggle **ENG** to inspect truthful runtime state.
 2. Query `portfolioData(locale: RU)` at `/graphql` in development.
-3. Read the [architecture overview](docs/architecture/overview.md) and the ADRs.
-4. Inspect the ordered CI chain from dependency install through publishing.
-5. Run the full local stack with `docker compose up --build`.
+3. Open **Engineering Mode** and ask the grounded Gemini assistant about verified experience.
+4. Read the [architecture overview](docs/architecture/overview.md) and the ADRs.
+5. Inspect the ordered CI chain from dependency install through publishing.
+6. Run the full local stack with `docker compose up --build`.
 
 ## Local setup
 
@@ -23,6 +24,8 @@ pnpm dev
 ```
 
 Web: `http://localhost:3000`; GraphQL: `http://localhost:4000/graphql`.
+
+Set `GEMINI_API_KEY` server-side to enable generated answers. Without it, `askProfile` remains available as a cited extractive fallback; the key is never included in the web bundle.
 
 ## Useful commands
 

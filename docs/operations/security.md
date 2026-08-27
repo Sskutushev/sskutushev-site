@@ -8,3 +8,5 @@
 - Public production mutations are deferred and therefore expose no accidental write surface.
 
 Before public deployment, request rate limiting and GraphQL depth/complexity limits are required at both edge and application layers.
+
+The profile assistant treats questions as untrusted input, limits them to 500 characters, retrieves only public portfolio evidence and sends a bounded prompt to Gemini with an eight-second timeout. Provider keys remain server-side. Responses expose citations and whether Gemini or the extractive fallback produced the answer; provider errors and credentials are never returned to clients.

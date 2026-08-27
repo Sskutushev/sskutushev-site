@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { motion, useScroll, useSpring } from 'motion/react';
 import { CapabilityGrid, ContactPanel, ExperienceTimeline } from './components/ProfileSections';
 import { RotatingSignal } from './components/RotatingSignal';
+import { AssistantChat } from './components/AssistantChat';
 import { SiteControls } from './components/SiteControls';
 import { fallbackPortfolio } from './lib/fallback-portfolio';
 import { fetchPortfolio, type Locale } from './lib/portfolio';
@@ -18,7 +19,7 @@ const copy = {
     skip: 'К проектам',
     nav: ['Кейсы', 'Система', 'Контакт'],
     status: 'СИСТЕМА В СЕТИ',
-    hero: ['BACKEND', 'С ПОСЛЕДСТВИЯМИ.'],
+    hero: ['FULLSTACK', 'С ГЛУБИНОЙ В BACKEND.'],
     explore: 'ИССЛЕДОВАТЬ СИСТЕМУ',
     position: 'ПОЗИЦИОНИРОВАНИЕ',
     positionTitle: 'СОЗДАЮ СИСТЕМЫ, КОТОРЫЕ',
@@ -34,7 +35,7 @@ const copy = {
     skip: 'Skip to work',
     nav: ['Cases', 'System', 'Contact'],
     status: 'SYSTEM ONLINE',
-    hero: ['BACKEND', 'WITH CONSEQUENCE.'],
+    hero: ['FULLSTACK', 'BUILT BACKEND-DEEP.'],
     explore: 'EXPLORE THE SYSTEM',
     position: 'POSITION',
     positionTitle: 'I BUILD SYSTEMS THAT',
@@ -144,7 +145,7 @@ export default function App(): React.JSX.Element {
                 width="512"
                 height="512"
                 loading="lazy"
-                alt="Сергей Скутушев, TypeScript backend engineer"
+                alt="Сергей Кутушев, Senior+ Fullstack Product Engineer"
               />
               <figcaption>
                 <span>SS / PORTRAIT</span>
@@ -214,7 +215,7 @@ export default function App(): React.JSX.Element {
         <ExperienceTimeline items={data.experience} locale={locale} />
 
         <section className="architecture">
-          <p className="section-no">05 / {text.architecture}</p>
+          <p className="section-no">06 / {text.architecture}</p>
           <h2>
             {text.architectureTitle}
             <br />
@@ -225,6 +226,23 @@ export default function App(): React.JSX.Element {
               <PipelineScene />
             </Suspense>
           )}
+          <div className="pipeline-console">
+            <div>
+              <small>READ PATH</small>
+              <strong>GraphQL aggregate</strong>
+              <span>Typed · localized · cached</span>
+            </div>
+            <div>
+              <small>RESILIENCE</small>
+              <strong>Redis SWR</strong>
+              <span>Fresh → stale → honest fallback</span>
+            </div>
+            <div>
+              <small>DATA / ASSETS</small>
+              <strong>Cockroach + S3</strong>
+              <span>Source of truth · direct upload</span>
+            </div>
+          </div>
           <div className="pipeline">
             {[
               'REACT + R3F',
@@ -275,6 +293,7 @@ export default function App(): React.JSX.Element {
             </div>
           </dl>
           <p>Runtime values are shown as measured state. No invented CI metrics.</p>
+          <AssistantChat locale={locale} />
         </aside>
       )}
     </>

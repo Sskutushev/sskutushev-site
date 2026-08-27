@@ -13,6 +13,8 @@ const schema = z.object({
   WEB_ORIGIN: z.string().url(),
   GITHUB_OWNER: z.string().min(1).default('Sskutushev'),
   ENABLE_MUTATIONS: z.enum(['true', 'false']).default('false'),
+  GEMINI_API_KEY: z.string().min(20).optional(),
+  GEMINI_MODEL: z.string().min(1).default('gemini-2.5-flash'),
 });
 
 export type AppConfig = z.infer<typeof schema>;
