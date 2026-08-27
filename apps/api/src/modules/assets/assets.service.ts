@@ -16,7 +16,7 @@ export class AssetsService {
   async createUpload(input: CreateAssetUploadInput): Promise<AssetUploadModel> {
     this.assertMutationsEnabled();
     const profile = await this.prisma.profile.findUniqueOrThrow({
-      where: { slug: 'sergey-skutushev' },
+      where: { slug: 'sergey-kutushev' },
       select: { id: true },
     });
     const extension =

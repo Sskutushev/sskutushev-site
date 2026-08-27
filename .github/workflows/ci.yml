@@ -81,6 +81,32 @@ jobs:
           VITE_GRAPHQL_URL: ${{ vars.PUBLIC_GRAPHQL_URL }}
           VITE_BASE_PATH: /sskutushev-site/
         run: pnpm build
+      - name: Runtime boot and GraphQL smoke
+        env:
+          NODE_ENV: test
+          PORT: 4417
+          REDIS_URL: redis://localhost:6379
+          S3_ENDPOINT: http://localhost:9000
+          S3_REGION: us-east-1
+          S3_BUCKET: portfolio
+          S3_ACCESS_KEY: smoke-access
+          S3_SECRET_KEY: smoke-secret
+          WEB_ORIGIN: http://localhost:3417
+        shell: bash
+        run: |
+          pnpm --filter @sskutushev/api start > api-smoke.log 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:4417/health/live > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4417/health/live
+          curl --fail --silent http://127.0.0.1:4417/graphql \
+            --header 'content-type: application/json' \
+            --data '{"query":"query { __typename }"}'
       - name: Upload Pages artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3

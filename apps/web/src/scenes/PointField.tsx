@@ -80,15 +80,16 @@ export default function PointField(): React.JSX.Element {
   const { container, visible } = useSceneVisibility();
   return (
     <div className="scene-canvas" ref={container}>
-      <Canvas
-        aria-hidden
-        frameloop={visible ? 'always' : 'never'}
-        dpr={[1, 1.5]}
-        camera={{ position: [0, 4.2, 17], fov: 52 }}
-        gl={{ antialias: false, powerPreference: 'high-performance' }}
-      >
-        <Particles count={count} />
-      </Canvas>
+      {visible && (
+        <Canvas
+          aria-hidden
+          dpr={[1, 1.5]}
+          camera={{ position: [0, 4.2, 17], fov: 52 }}
+          gl={{ antialias: false, powerPreference: 'high-performance' }}
+        >
+          <Particles count={count} />
+        </Canvas>
+      )}
     </div>
   );
 }

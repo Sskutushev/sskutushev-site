@@ -13,7 +13,7 @@ export class PortfolioService {
   async getPortfolio(locale: Locale): Promise<PortfolioModel> {
     const result = await this.cache.getOrLoad(`portfolio:v2:${locale}`, 60, 3600, async () => {
       const profile = await this.prisma.profile.findUniqueOrThrow({
-        where: { slug: 'sergey-skutushev' },
+        where: { slug: 'sergey-kutushev' },
         include: {
           skills: { orderBy: { priority: 'asc' } },
           socialLinks: { orderBy: { sortOrder: 'asc' } },
