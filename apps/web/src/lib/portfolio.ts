@@ -1,0 +1,64 @@
+import { GraphQLClient, gql } from 'graphql-request';
+
+export type Locale = 'RU' | 'EN';
+export interface Portfolio {
+  profile: {
+    fullName: string;
+    headline: string;
+    summary: string;
+    location: string;
+    availability: string;
+    yearsExperience: number;
+  };
+  skills: { name: string; category: string }[];
+  caseStudies: {
+    slug: string;
+    title: string;
+    problem: string;
+    approach: string;
+    result: string;
+    technologies: string[];
+  }[];
+  socialLinks: { type: string; url: string }[];
+  stale: boolean;
+}
+
+const query = gql`
+  query Portfolio($locale: Locale!) {
+    portfolioData(locale: $locale) {
+      profile {
+        fullName
+        headline
+        summary
+        location
+        availability
+        yearsExperience
+      }
+      skills {
+        name
+        category
+      }
+      caseStudies {
+        slug
+        title
+        problem
+        approach
+        result
+        technologies
+      }
+      socialLinks {
+        type
+        url
+      }
+      stale
+    }
+  }
+`;
+
+export async function fetchPortfolio(locale: Locale): Promise<Portfolio> {
+  const client = new GraphQLClient(
+    import.meta.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql',
+  );
+  const response = await client.request<{ portfolioData: Portfolio }>(query, { locale });
+  return response.portfolioData;
+}
