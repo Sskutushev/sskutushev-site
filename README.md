@@ -7,7 +7,7 @@ A production-shaped digital portfolio for a backend-oriented TypeScript Product 
 1. Open the web UI and toggle **ENG** to inspect truthful runtime state.
 2. Query `portfolioData(locale: RU)` at `/graphql` in development.
 3. Read the [architecture overview](docs/architecture/overview.md) and the ADRs.
-4. Inspect the independent quality, security and Docker workflows.
+4. Inspect the ordered CI chain from dependency install through publishing.
 5. Run the full local stack with `docker compose up --build`.
 
 ## Local setup
@@ -33,6 +33,8 @@ docker compose up --build
 ```
 
 No performance number is advertised until CI measures it. If the API is unavailable, the UI shows a clearly marked static fallback instead of presenting invented live data.
+
+The fallback is an explicit checked-in portfolio snapshot for static GitHub Pages hosting. CockroachDB remains the source of truth whenever the API is connected; the UI marks fallback data as stale.
 
 ## Documentation
 

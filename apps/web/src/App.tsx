@@ -1,38 +1,61 @@
 import { useQuery } from '@tanstack/react-query';
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { motion, useScroll, useSpring } from 'motion/react';
+import { CapabilityGrid, ContactPanel, ExperienceTimeline } from './components/ProfileSections';
+import { SiteControls } from './components/SiteControls';
+import { fallbackPortfolio } from './lib/fallback-portfolio';
 import { fetchPortfolio, type Locale } from './lib/portfolio';
 import { pointBudget, selectRenderQuality } from './lib/render-quality';
 
 const PointField = lazy(() => import('./scenes/PointField'));
-const fallback = {
-  profile: {
-    fullName: 'Сергей Скутушев',
-    headline: 'TypeScript Backend / Product Engineer',
-    summary:
-      'Проектирую надежные продуктовые системы — от инвариантов и API-контрактов до production rollout.',
-    location: 'Remote · UTC+3',
-    availability: 'Open to meaningful backend work',
-    yearsExperience: 3,
+const copy = {
+  RU: {
+    skip: 'К проектам',
+    nav: ['Кейсы', 'Система', 'Контакт'],
+    status: 'СИСТЕМА В СЕТИ',
+    hero: ['BACKEND', 'С ПОСЛЕДСТВИЯМИ.'],
+    explore: 'ИССЛЕДОВАТЬ СИСТЕМУ',
+    position: 'ПОЗИЦИОНИРОВАНИЕ',
+    positionTitle: 'СОЗДАЮ СИСТЕМЫ, КОТОРЫЕ',
+    positionAccent: 'ОСТАЮТСЯ ЧЕСТНЫМИ ПОД НАГРУЗКОЙ.',
+    positionBody:
+      'Не коллекционирую технологии. Проектирую границы, где каждая зависимость решает конкретную эксплуатационную задачу.',
+    cases: 'ВЫБРАННЫЕ СИСТЕМЫ',
+    architecture: 'ЖИВАЯ АРХИТЕКТУРА',
+    architectureTitle: 'НЕ МАКЕТ.',
+    architectureAccent: 'РАБОТАЮЩИЙ ВЕРТИКАЛЬНЫЙ СРЕЗ.',
   },
-  skills: ['TypeScript', 'NestJS', 'GraphQL', 'CockroachDB', 'Prisma', 'Docker', 'Redis', 'S3'].map(
-    (name) => ({ name, category: 'Engineering' }),
-  ),
-  caseStudies: [],
-  socialLinks: [{ type: 'GitHub', url: 'https://github.com/Sskutushev' }],
-  stale: true,
-};
-
+  EN: {
+    skip: 'Skip to work',
+    nav: ['Cases', 'System', 'Contact'],
+    status: 'SYSTEM ONLINE',
+    hero: ['BACKEND', 'WITH CONSEQUENCE.'],
+    explore: 'EXPLORE THE SYSTEM',
+    position: 'POSITION',
+    positionTitle: 'I BUILD SYSTEMS THAT',
+    positionAccent: 'STAY TRUE UNDER PRESSURE.',
+    positionBody:
+      'I do not collect technologies. I design boundaries where every dependency solves a concrete operational problem.',
+    cases: 'SELECTED SYSTEMS',
+    architecture: 'LIVE ARCHITECTURE',
+    architectureTitle: 'NOT A MOCKUP.',
+    architectureAccent: 'A RUNNING VERTICAL SLICE.',
+  },
+} as const;
 export default function App(): React.JSX.Element {
   const [locale, setLocale] = useState<Locale>('RU');
   const [theme, setTheme] = useState<'thermal' | 'blueprint'>('thermal');
   const [engineering, setEngineering] = useState(false);
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const quality = selectRenderQuality(window.innerWidth, reduced);
-  const { data = fallback, isError } = useQuery({
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.3 });
+  const { data = fallbackPortfolio[locale], isError } = useQuery({
     queryKey: ['portfolio', locale],
     queryFn: () => fetchPortfolio(locale),
     retry: 1,
   });
+  const text = copy[locale];
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -40,28 +63,26 @@ export default function App(): React.JSX.Element {
 
   return (
     <>
+      <motion.div className="scroll-progress" style={{ scaleX }} />
       <a className="skip" href="#work">
-        К проектам
+        {text.skip}
       </a>
       <header className="nav">
         <a className="mark" href="#top">
           SS<span>/</span>26
         </a>
         <nav aria-label="Главная навигация">
-          <a href="#work">Кейсы</a>
-          <a href="#system">Система</a>
-          <a href="#contact">Контакт</a>
+          <a href="#work">{text.nav[0]}</a>
+          <a href="#system">{text.nav[1]}</a>
+          <a href="#contact">{text.nav[2]}</a>
         </nav>
-        <div className="controls">
-          <button onClick={() => setEngineering(!engineering)}>ENG</button>
-          <button onClick={() => setLocale(locale === 'RU' ? 'EN' : 'RU')}>{locale}</button>
-          <button
-            aria-label="Сменить тему"
-            onClick={() => setTheme(theme === 'thermal' ? 'blueprint' : 'thermal')}
-          >
-            ◐
-          </button>
-        </div>
+        <SiteControls
+          locale={locale}
+          theme={theme}
+          onEngineering={() => setEngineering(!engineering)}
+          onLocale={() => setLocale(locale === 'RU' ? 'EN' : 'RU')}
+          onTheme={() => setTheme(theme === 'thermal' ? 'blueprint' : 'thermal')}
+        />
       </header>
       <main id="top">
         <section className="hero">
@@ -73,17 +94,21 @@ export default function App(): React.JSX.Element {
             </div>
           )}
           <div className="eyebrow">
-            <i /> SYSTEM ONLINE <span>UTC+3 / REMOTE</span>
+            <i /> {text.status} <span>UTC+3 / REMOTE</span>
           </div>
-          <h1>
-            BACKEND
+          <motion.h1
+            initial={reduced ? false : { opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {text.hero[0]}
             <br />
-            <em>WITH CONSEQUENCE.</em>
-          </h1>
+            <em>{text.hero[1]}</em>
+          </motion.h1>
           <p className="lede">{data.profile.summary}</p>
           <div className="hero-actions">
             <a className="primary" href="#work">
-              EXPLORE THE SYSTEM ↘
+              {text.explore} ↘
             </a>
             <a href="https://github.com/Sskutushev" rel="noreferrer" target="_blank">
               VIEW SOURCE ↗
@@ -98,17 +123,27 @@ export default function App(): React.JSX.Element {
         </section>
 
         <section className="manifesto" id="system">
-          <p className="section-no">01 / POSITION</p>
+          <p className="section-no">01 / {text.position}</p>
           <h2>
-            I BUILD SYSTEMS THAT
+            {text.positionTitle}
             <br />
-            <span>STAY TRUE UNDER PRESSURE.</span>
+            <span>{text.positionAccent}</span>
           </h2>
           <div className="manifesto-grid">
-            <p>
-              Не коллекционирую технологии. Проектирую границы, где каждая зависимость решает
-              конкретную эксплуатационную задачу.
-            </p>
+            <figure className="portrait">
+              <img
+                src={`${import.meta.env.BASE_URL}profile.jpg`}
+                width="512"
+                height="512"
+                loading="lazy"
+                alt="Сергей Скутушев, TypeScript backend engineer"
+              />
+              <figcaption>
+                <span>SS / PORTRAIT</span>
+                <span>UTC+3</span>
+              </figcaption>
+            </figure>
+            <p>{text.positionBody}</p>
             <dl>
               <div>
                 <dt>PRIMARY</dt>
@@ -128,7 +163,7 @@ export default function App(): React.JSX.Element {
 
         <section className="work" id="work">
           <div className="section-head">
-            <p className="section-no">02 / SELECTED SYSTEMS</p>
+            <p className="section-no">02 / {text.cases}</p>
             <p>
               REAL CONSTRAINTS
               <br />
@@ -136,35 +171,7 @@ export default function App(): React.JSX.Element {
             </p>
           </div>
           <div className="cases">
-            {(data.caseStudies.length
-              ? data.caseStudies
-              : [
-                  {
-                    slug: 'money',
-                    title: 'Money & Entitlement',
-                    problem: 'Деньги и доступ не терпят оптимистичных допущений.',
-                    approach: 'Idempotency · ledger · fail-closed grant',
-                    result: 'Replay-safe state machine',
-                    technologies: ['NestJS', 'CockroachDB'],
-                  },
-                  {
-                    slug: 'ranking',
-                    title: 'Ranking / Data Honesty',
-                    problem: 'Unknown не должен превращаться в ноль.',
-                    approach: 'Cohorts · confidence · explicit basis',
-                    result: 'Explainable projections',
-                    technologies: ['TypeScript', 'GraphQL'],
-                  },
-                  {
-                    slug: 'cache',
-                    title: 'Search / Cache Reliability',
-                    problem: 'Падение provider не должно ронять продукт.',
-                    approach: 'SWR · in-flight dedupe · stale truth',
-                    result: 'Graceful degradation',
-                    technologies: ['Redis', 'BullMQ'],
-                  },
-                ]
-            ).map((item, index) => (
+            {data.caseStudies.map((item, index) => (
               <article className="case" key={item.slug}>
                 <span>0{index + 1}</span>
                 <div>
@@ -179,12 +186,15 @@ export default function App(): React.JSX.Element {
           </div>
         </section>
 
+        <CapabilityGrid skills={data.skills} locale={locale} />
+        <ExperienceTimeline items={data.experience} locale={locale} />
+
         <section className="architecture">
-          <p className="section-no">03 / LIVE ARCHITECTURE</p>
+          <p className="section-no">05 / {text.architecture}</p>
           <h2>
-            NOT A MOCKUP.
+            {text.architectureTitle}
             <br />
-            <span>A RUNNING VERTICAL SLICE.</span>
+            <span>{text.architectureAccent}</span>
           </h2>
           <div className="pipeline">
             {[
@@ -212,15 +222,7 @@ export default function App(): React.JSX.Element {
           </p>
         </section>
       </main>
-      <footer id="contact">
-        <p>
-          LET'S BUILD SOMETHING
-          <br />
-          <em>THAT HOLDS.</em>
-        </p>
-        <a href="https://github.com/Sskutushev">GITHUB ↗</a>
-        <small>© 2026 SERGEY SKUTUSHEV · UTC+3</small>
-      </footer>
+      <ContactPanel locale={locale} />
       {engineering && (
         <aside className="drawer">
           <button onClick={() => setEngineering(false)}>CLOSE ×</button>

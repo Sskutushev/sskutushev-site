@@ -23,6 +23,15 @@ export class SkillModel {
 }
 
 @ObjectType()
+export class ExperienceModel {
+  @Field() company!: string;
+  @Field() role!: string;
+  @Field() period!: string;
+  @Field() summary!: string;
+  @Field(() => [String]) highlights!: string[];
+}
+
+@ObjectType()
 export class CaseStudyModel {
   @Field() slug!: string;
   @Field() title!: string;
@@ -42,6 +51,7 @@ export class SocialLinkModel {
 export class PortfolioModel {
   @Field(() => ProfileModel) profile!: ProfileModel;
   @Field(() => [SkillModel]) skills!: SkillModel[];
+  @Field(() => [ExperienceModel]) experience!: ExperienceModel[];
   @Field(() => [CaseStudyModel]) caseStudies!: CaseStudyModel[];
   @Field(() => [SocialLinkModel]) socialLinks!: SocialLinkModel[];
   @Field() stale!: boolean;
