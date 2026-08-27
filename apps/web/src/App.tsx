@@ -2,10 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { motion, useScroll, useSpring } from 'motion/react';
 import { CapabilityGrid, ContactPanel, ExperienceTimeline } from './components/ProfileSections';
+import { RotatingSignal } from './components/RotatingSignal';
 import { SiteControls } from './components/SiteControls';
 import { fallbackPortfolio } from './lib/fallback-portfolio';
 import { fetchPortfolio, type Locale } from './lib/portfolio';
 import { pointBudget, selectRenderQuality } from './lib/render-quality';
+import { usePointerGlow } from './lib/use-pointer-glow';
+import { useSmoothScroll } from './lib/use-smooth-scroll';
 
 const PointField = lazy(() => import('./scenes/PointField'));
 const RankingScene = lazy(() => import('./scenes/RankingScene'));
@@ -50,6 +53,8 @@ export default function App(): React.JSX.Element {
   const [engineering, setEngineering] = useState(false);
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const quality = selectRenderQuality(window.innerWidth, reduced);
+  usePointerGlow(reduced);
+  useSmoothScroll(reduced);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.3 });
   const { data = fallbackPortfolio[locale], isError } = useQuery({
@@ -108,6 +113,7 @@ export default function App(): React.JSX.Element {
             <em>{text.hero[1]}</em>
           </motion.h1>
           <p className="lede">{data.profile.summary}</p>
+          <RotatingSignal />
           <div className="hero-actions">
             <a className="primary" href="#work">
               {text.explore} ↘
