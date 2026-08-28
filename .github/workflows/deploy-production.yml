@@ -5,6 +5,13 @@ on:
       image-sha:
         type: string
         required: true
+    secrets:
+      DEPLOY_HOST:
+        required: true
+      DEPLOY_USER:
+        required: true
+      DEPLOY_SSH_KEY:
+        required: true
 permissions: { contents: read, packages: read }
 jobs:
   deploy:

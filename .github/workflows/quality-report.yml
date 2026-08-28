@@ -1,5 +1,13 @@
 name: Quality Report
-on: [workflow_call]
+on:
+  workflow_call:
+    secrets:
+      QUALITY_S3_ACCESS_KEY:
+        required: false
+      QUALITY_S3_SECRET_KEY:
+        required: false
+      QUALITY_IMPORT_TOKEN:
+        required: false
 permissions: { contents: read }
 jobs:
   measure:
@@ -28,6 +36,8 @@ jobs:
       S3_ACCESS_KEY: minioadmin
       S3_SECRET_KEY: minioadmin
       WEB_ORIGIN: http://localhost:4173
+      QUALITY_S3_ACCESS_KEY: ${{ secrets.QUALITY_S3_ACCESS_KEY }}
+      QUALITY_IMPORT_TOKEN: ${{ secrets.QUALITY_IMPORT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -90,7 +100,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with: { name: quality-report, path: artifacts/quality-report.json }
       - name: Upload report to S3
-        if: ${{ secrets.QUALITY_S3_ACCESS_KEY != '' }}
+        if: env.QUALITY_S3_ACCESS_KEY != ''
         env:
           AWS_ACCESS_KEY_ID: '${{ secrets.QUALITY_S3_ACCESS_KEY }}'
           AWS_SECRET_ACCESS_KEY: '${{ secrets.QUALITY_S3_SECRET_KEY }}'
@@ -100,7 +110,7 @@ jobs:
           "s3://${{ vars.QUALITY_S3_BUCKET }}/quality/${GITHUB_SHA}.json"
           --endpoint-url "${{ vars.QUALITY_S3_ENDPOINT }}"
       - name: Import measured dashboard data
-        if: ${{ secrets.QUALITY_IMPORT_TOKEN != '' }}
+        if: env.QUALITY_IMPORT_TOKEN != ''
         env:
           QUALITY_IMPORT_URL: '${{ vars.QUALITY_IMPORT_URL }}'
           QUALITY_IMPORT_TOKEN: '${{ secrets.QUALITY_IMPORT_TOKEN }}'
