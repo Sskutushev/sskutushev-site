@@ -1,0 +1,33 @@
+name: Docker Images
+on:
+  push: { branches: [main] }
+permissions: { contents: read, packages: write }
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - { image: api, context: '.', dockerfile: infrastructure/docker/api.Dockerfile }
+          - { image: web, context: '.', dockerfile: infrastructure/docker/web.Dockerfile }
+          - {
+              image: semantic,
+              context: services/semantic,
+              dockerfile: services/semantic/Dockerfile,
+            }
+          - { image: probe, context: services/probe, dockerfile: services/probe/Dockerfile }
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: '${{ github.actor }}'
+          password: '${{ secrets.GITHUB_TOKEN }}'
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ghcr.io/sskutushev/sskutushev-site-${{ matrix.image }}:${{ github.sha }}
+            ghcr.io/sskutushev/sskutushev-site-${{ matrix.image }}:main

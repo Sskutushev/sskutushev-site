@@ -1,0 +1,16 @@
+name: Performance
+on:
+  pull_request:
+  schedule: [{ cron: '31 2 * * *' }]
+permissions: { contents: read }
+jobs:
+  web-budgets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter @sskutushev/web build
+      - uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./performance/lighthouse/lighthouserc.json
+          uploadArtifacts: true

@@ -32,6 +32,10 @@ Set the optional server-side `GITHUB_TOKEN` to increase GitHub API limits. `ENAB
 keeps background refresh disabled by default; public reads still refresh through the Redis-backed
 stale-while-revalidate path.
 
+Portfolio and asset mutations are fail-closed by default. Set `ENABLE_MUTATIONS=true` only in a
+trusted management environment; profile writes require an `expectedVersion`, update related social
+links in one transaction and return a named conflict for stale writers.
+
 ## Useful commands
 
 ```bash

@@ -1,0 +1,55 @@
+name: Quality Report
+on:
+  push: { branches: [main] }
+permissions: { contents: read }
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: mkdir -p artifacts/lighthouse
+      - run: pnpm --filter @sskutushev/api test:report
+      - run: pnpm --filter @sskutushev/web test:report
+      - run: pnpm --filter @sskutushev/web build
+      - run: pnpm --filter @sskutushev/web exec playwright install --with-deps chromium
+      - name: Browser measurements
+        env: { PLAYWRIGHT_JSON_OUTPUT_FILE: '../../artifacts/e2e-tests.json' }
+        run: pnpm --filter @sskutushev/web exec playwright test --reporter=json
+      - name: Runtime integration evidence
+        run: echo '{"integrationTests":0,"contractTests":0}' > artifacts/integration-tests.json
+      - name: Security evidence
+        shell: bash
+        run: |
+          set +e
+          pnpm audit --prod --json > artifacts/audit.json
+          audit_status=$?
+          set -e
+          node -e "const fs=require('fs');const a=require('./artifacts/audit.json');const v=a.metadata?.vulnerabilities??{};fs.writeFileSync('artifacts/security-tests.json',JSON.stringify({passed:['dependency-audit'],critical:v.critical??0,high:v.high??0}))"
+          test "$audit_status" -eq 0
+      - uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./performance/lighthouse/lighthouserc.json
+          uploadArtifacts: true
+      - name: Collect Lighthouse evidence
+        run: cp .lighthouseci/*.report.json artifacts/lighthouse/
+      - run: node scripts/build-quality-report.mjs
+      - uses: actions/upload-artifact@v4
+        with: { name: quality-report, path: artifacts/quality-report.json }
+      - name: Upload report to S3
+        if: ${{ secrets.QUALITY_S3_ACCESS_KEY != '' }}
+        env:
+          AWS_ACCESS_KEY_ID: '${{ secrets.QUALITY_S3_ACCESS_KEY }}'
+          AWS_SECRET_ACCESS_KEY: '${{ secrets.QUALITY_S3_SECRET_KEY }}'
+          AWS_DEFAULT_REGION: '${{ vars.QUALITY_S3_REGION }}'
+        run: >-
+          aws s3 cp artifacts/quality-report.json
+          "s3://${{ vars.QUALITY_S3_BUCKET }}/quality/${GITHUB_SHA}.json"
+          --endpoint-url "${{ vars.QUALITY_S3_ENDPOINT }}"
+      - name: Import measured dashboard data
+        if: ${{ secrets.QUALITY_IMPORT_TOKEN != '' }}
+        env:
+          QUALITY_IMPORT_URL: '${{ vars.QUALITY_IMPORT_URL }}'
+          QUALITY_IMPORT_TOKEN: '${{ secrets.QUALITY_IMPORT_TOKEN }}'
+          QUALITY_ENVIRONMENT: production
+        run: node scripts/import-quality-report.mjs

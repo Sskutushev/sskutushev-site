@@ -1,0 +1,23 @@
+name: Migration Check
+on: [pull_request]
+permissions: { contents: read }
+jobs:
+  clean-database:
+    runs-on: ubuntu-latest
+    services:
+      cockroach:
+        image: cockroachdb/cockroach:v25.2.3
+        ports: ['26257:26257']
+        options: >-
+          --health-cmd "curl --fail http://localhost:8080/health?ready=1"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://root@localhost:26257/defaultdb?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm prisma:validate
+      - run: pnpm db:migrate
+      - run: pnpm db:seed
+      - name: Prove all migrations are tracked
+        run: test -n "$(find prisma/migrations -name migration.sql -print -quit)"

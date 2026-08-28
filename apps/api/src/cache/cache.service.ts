@@ -46,6 +46,32 @@ export class CacheService implements OnModuleDestroy {
     }
   }
 
+  async delete(...keys: string[]): Promise<void> {
+    if (!keys.length) return;
+    try {
+      if (this.redis.status === 'wait') await this.redis.connect();
+      await this.redis.del(...keys);
+    } catch {
+      // Cache invalidation is best-effort; versioned database reads remain authoritative.
+    }
+  }
+
+  async consumeLimit(key: string, limit: number, windowSeconds: number): Promise<boolean> {
+    try {
+      if (this.redis.status === 'wait') await this.redis.connect();
+      const count = await this.redis.eval(
+        "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],ARGV[1]) end; return n",
+        1,
+        key,
+        windowSeconds,
+      );
+      return Number(count) <= limit;
+    } catch {
+      // Rate-limit storage failure must not turn Redis into an API availability dependency.
+      return true;
+    }
+  }
+
   onModuleDestroy(): void {
     if (this.redis.status !== 'end') this.redis.disconnect();
   }

@@ -21,3 +21,25 @@ The `githubActivity` read path fetches public repository metadata through a boun
 stores successful observations as append-only CockroachDB snapshots and serves Redis-cached data
 with an explicit `stale` flag when the provider fails. A BullMQ repeat worker can refresh the same
 service when `ENABLE_WORKERS=true`; worker startup and runtime failures do not take down public reads.
+
+The management write path is disabled unless `ENABLE_MUTATIONS=true`. Profile updates use the
+client's `expectedVersion` in the database predicate, increment the version atomically, replace
+related social links inside the same transaction and invalidate both localized portfolio caches
+only after commit. Concurrent stale writers receive a named conflict instead of overwriting data.
+
+Asset uploads are short-lived presigned PUT requests bound to an explicit MIME type and SHA-256.
+Confirmation reads S3 metadata and moves the database record from `PENDING` to `READY` only when
+the type, checksum and configured size limit match. Invalid objects move to `FAILED`; repeated
+confirmation of an already-ready asset is idempotent.
+
+Quality metrics are never synthesized in the browser. CI imports a run tied to a deployment SHA;
+CockroachDB stores the measured test, coverage, Lighthouse, bundle and vulnerability values, and
+`latestQualityRun` exposes only the newest persisted observation.
+
+Public system events are persisted in CockroachDB before publication. GraphQL subscriptions use
+the `graphql-ws` protocol and Redis pub/sub fanout so multiple API instances observe the same feed;
+the bounded `systemEvents` query remains available when live fanout is interrupted.
+
+Every HTTP request emits structured Pino output with credential headers redacted. The `/metrics`
+endpoint exports measured request, 5xx and duration counters with bounded route labels; liveness
+and readiness remain separate operational signals.

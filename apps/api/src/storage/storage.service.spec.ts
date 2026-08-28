@@ -45,14 +45,15 @@ describe('StorageService', () => {
     aws.getSignedUrl.mockResolvedValue('https://storage.example/upload');
     const storage = new StorageService(config);
 
-    await expect(storage.presignUpload('resume/file.pdf', 'application/pdf')).resolves.toBe(
-      'https://storage.example/upload',
-    );
+    await expect(
+      storage.presignUpload('resume/file.pdf', 'application/pdf', 'checksum='),
+    ).resolves.toBe('https://storage.example/upload');
     expect(aws.getSignedUrl).toHaveBeenCalledOnce();
     expect(aws.putInputs.at(-1)).toEqual({
       Bucket: 'portfolio',
       Key: 'resume/file.pdf',
       ContentType: 'application/pdf',
+      ChecksumSHA256: 'checksum=',
     });
     expect(aws.signedOptions.at(-1)).toEqual({ expiresIn: 300 });
   });

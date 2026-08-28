@@ -12,6 +12,10 @@ import { AssetsModule } from './modules/assets/assets.module';
 import { AssistantModule } from './modules/assistant/assistant.module';
 import { PortfolioModule } from './modules/portfolio/portfolio.module';
 import { StorageModule } from './storage/storage.module';
+import { operationLimitsRule } from './common/graphql/operation-limits.rule';
+import { QualityModule } from './modules/quality/quality.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
+import { ObservabilityModule } from './observability/observability.module';
 
 @Module({
   imports: [
@@ -23,6 +27,8 @@ import { StorageModule } from './storage/storage.module';
       playground: process.env.NODE_ENV !== 'production',
       introspection: process.env.NODE_ENV !== 'production',
       csrfPrevention: true,
+      validationRules: [operationLimitsRule({ maxDepth: 10, maxFields: 200 })],
+      subscriptions: { 'graphql-ws': true },
     }),
     PrismaModule,
     CacheModule,
@@ -32,6 +38,9 @@ import { StorageModule } from './storage/storage.module';
     AssistantModule,
     GithubModule,
     HealthModule,
+    QualityModule,
+    RealtimeModule,
+    ObservabilityModule,
   ],
 })
 export class AppModule {}

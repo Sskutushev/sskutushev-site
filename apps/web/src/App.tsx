@@ -6,6 +6,7 @@ import { RotatingSignal } from './components/RotatingSignal';
 import { AssistantChat } from './components/AssistantChat';
 import { GithubActivity } from './components/GithubActivity';
 import { SiteControls } from './components/SiteControls';
+import { QualityDashboard } from './components/QualityDashboard';
 import { fallbackPortfolio } from './lib/fallback-portfolio';
 import { fetchPortfolio, type Locale } from './lib/portfolio';
 import { pointBudget, selectRenderQuality } from './lib/render-quality';
@@ -70,9 +71,13 @@ export default function App(): React.JSX.Element {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
+  useEffect(() => {
+    document.documentElement.lang = locale === 'RU' ? 'ru' : 'en';
+  }, [locale]);
+
   return (
     <>
-      <motion.div className="scroll-progress" style={{ scaleX }} />
+      <motion.div aria-hidden="true" className="scroll-progress" style={{ scaleX }} />
       <a className="skip" href="#work">
         {text.skip}
       </a>
@@ -272,9 +277,11 @@ export default function App(): React.JSX.Element {
       </main>
       <ContactPanel locale={locale} />
       {engineering && (
-        <aside className="drawer">
-          <button onClick={() => setEngineering(false)}>CLOSE ×</button>
-          <h2>ENGINEERING MODE</h2>
+        <aside aria-labelledby="engineering-title" className="drawer" role="dialog">
+          <button aria-label="Close engineering mode" onClick={() => setEngineering(false)}>
+            CLOSE ×
+          </button>
+          <h2 id="engineering-title">ENGINEERING MODE</h2>
           <dl>
             <div>
               <dt>POINTS</dt>
@@ -295,6 +302,7 @@ export default function App(): React.JSX.Element {
           </dl>
           <p>Runtime values are shown as measured state. No invented CI metrics.</p>
           <GithubActivity locale={locale} />
+          <QualityDashboard locale={locale} />
           <AssistantChat locale={locale} />
         </aside>
       )}

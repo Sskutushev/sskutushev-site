@@ -133,3 +133,49 @@ export async function fetchGithubActivity(): Promise<GithubActivity> {
   `);
   return data.githubActivity;
 }
+
+export type QualityRun = {
+  sha: string;
+  branch: string;
+  environment: string;
+  unitTests: number;
+  integrationTests: number;
+  contractTests: number;
+  e2eTests: number;
+  securityTests: number;
+  coverageLines: number;
+  coverageBranches: number;
+  lighthousePerformance: number;
+  lighthouseAccessibility: number;
+  bundleKb: number;
+  criticalVulnerabilities: number;
+  highVulnerabilities: number;
+  createdAt: string;
+};
+
+export async function fetchLatestQualityRun(): Promise<QualityRun | null> {
+  const client = new GraphQLClient(endpoint);
+  const data = await client.request<{ latestQualityRun: QualityRun | null }>(gql`
+    query LatestQualityRun {
+      latestQualityRun {
+        sha
+        branch
+        environment
+        unitTests
+        integrationTests
+        contractTests
+        e2eTests
+        securityTests
+        coverageLines
+        coverageBranches
+        lighthousePerformance
+        lighthouseAccessibility
+        bundleKb
+        criticalVulnerabilities
+        highVulnerabilities
+        createdAt
+      }
+    }
+  `);
+  return data.latestQualityRun;
+}

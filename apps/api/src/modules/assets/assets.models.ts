@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsIn, IsString, MaxLength } from 'class-validator';
+import { IsIn, IsString, Matches, MaxLength } from 'class-validator';
 
 const allowedTypes = ['image/avif', 'image/jpeg', 'image/png', 'application/pdf'] as const;
 
@@ -13,6 +13,10 @@ export class CreateAssetUploadInput {
   @Field()
   @IsIn(allowedTypes)
   contentType!: string;
+
+  @Field()
+  @Matches(/^[A-Za-z0-9+/]{43}=$/, { message: 'checksumSha256 must be base64 SHA-256' })
+  checksumSha256!: string;
 }
 
 @ObjectType()

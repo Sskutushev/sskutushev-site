@@ -1,0 +1,70 @@
+name: Backend Integration
+on: [pull_request]
+permissions: { contents: read }
+jobs:
+  runtime-contract:
+    runs-on: ubuntu-latest
+    services:
+      cockroach:
+        image: cockroachdb/cockroach:v25.2.3
+        ports: ['26257:26257']
+        options: >-
+          --health-cmd "curl --fail http://localhost:8080/health?ready=1"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7.4.5-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s
+          --health-timeout 3s --health-retries 20
+    env:
+      NODE_ENV: test
+      PORT: 4417
+      DATABASE_URL: postgresql://root@localhost:26257/defaultdb?sslmode=disable
+      REDIS_URL: redis://localhost:6379
+      S3_ENDPOINT: http://localhost:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: portfolio
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      WEB_ORIGIN: http://localhost:4173
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Start S3-compatible storage
+        run: >-
+          docker run -d --name minio -p 9000:9000
+          -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin
+          minio/minio:RELEASE.2025-04-22T22-12-26Z server /data
+      - name: Wait for storage
+        run: |
+          for attempt in {1..30}; do
+            curl --fail --silent http://localhost:9000/minio/health/live && break
+            sleep 1
+          done
+          curl --fail http://localhost:9000/minio/health/live
+      - run: pnpm prisma:generate
+      - run: pnpm db:migrate
+      - run: pnpm db:seed
+      - run: pnpm --filter @sskutushev/api build
+      - uses: grafana/setup-k6-action@v1
+      - name: Boot and verify contracts
+        shell: bash
+        run: |
+          pnpm --filter @sskutushev/api start > api.log 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            curl --fail --silent http://127.0.0.1:4417/health/ready && break
+            sleep 1
+          done
+          curl --fail http://127.0.0.1:4417/health/ready
+          curl --fail http://127.0.0.1:4417/metrics
+          curl --fail http://127.0.0.1:4417/graphql \
+            -H 'content-type: application/json' \
+            --data '{"query":"query { portfolioData(locale: EN) { profile { fullName version } } latestQualityRun { sha } systemEvents(limit: 1) { type } }"}'
+          K6_BASE_URL=http://127.0.0.1:4417 k6 run --summary-export=k6-summary.json performance/k6/api.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: k6-summary
+          path: k6-summary.json

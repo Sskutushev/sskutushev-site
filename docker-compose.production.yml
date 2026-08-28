@@ -1,0 +1,52 @@
+services:
+  semantic:
+    image: ghcr.io/sskutushev/sskutushev-site-semantic:${IMAGE_SHA:?IMAGE_SHA is required}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'python',
+          '-c',
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+  api:
+    image: ghcr.io/sskutushev/sskutushev-site-api:${IMAGE_SHA:?IMAGE_SHA is required}
+    env_file: .env.production
+    environment: { SEMANTIC_URL: 'http://semantic:8000' }
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:4000/health/live']
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      semantic: { condition: service_healthy }
+  web:
+    image: ghcr.io/sskutushev/sskutushev-site-web:${IMAGE_SHA:?IMAGE_SHA is required}
+    restart: unless-stopped
+  probe:
+    image: ghcr.io/sskutushev/sskutushev-site-probe:${IMAGE_SHA:?IMAGE_SHA is required}
+    environment:
+      SITE_URL: 'http://web'
+      API_URL: 'http://api:4000'
+      LISTEN_ADDR: ':9090'
+    depends_on:
+      api: { condition: service_healthy }
+      web: { condition: service_started }
+    restart: unless-stopped
+  caddy:
+    image: caddy:2.10-alpine
+    environment: { SITE_HOST: '${SITE_HOST:?SITE_HOST is required}' }
+    ports: ['80:80', '443:443']
+    volumes:
+      - ./infrastructure/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on:
+      api: { condition: service_healthy }
+      web: { condition: service_started }
+    restart: unless-stopped
+volumes: { caddy-data: {} }
