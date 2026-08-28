@@ -1,7 +1,7 @@
 # Production deployment and rollback
 
-Production uses immutable GHCR image tags equal to the verified commit SHA. The deployment job
-pulls those images, runs additive Prisma migrations as a preflight, starts the API before routing
+Production uses immutable GHCR image tags equal to the verified commit SHA for the web, API,
+semantic ranker, and synthetic probe. The deployment job pulls those images, runs additive Prisma migrations as a preflight, starts the API before routing
 traffic, then verifies readiness and a public GraphQL portfolio query over HTTPS.
 
 The VPS keeps the previous `IMAGE_SHA`. Rollback means restoring that value and running

@@ -29,4 +29,4 @@ jobs:
             docker compose -f docker-compose.production.yml run --rm api pnpm db:migrate
             docker compose -f docker-compose.production.yml up -d --remove-orphans
             curl --fail --retry 12 --retry-delay 5 "https://${SITE_HOST}/health/ready"
-            curl --fail "https://${SITE_HOST}/graphql" -H 'content-type: application/json' --data '{"query":"query { portfolio(locale: EN) { profile { fullName } } }"}'
+            curl --fail "https://${SITE_HOST}/graphql" -H 'content-type: application/json' --data '{"query":"query { portfolioData(locale: EN) { profile { fullName } } }"}'

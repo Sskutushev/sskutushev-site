@@ -8,14 +8,24 @@ flowchart LR
   API -->|SWR cache| Redis
   API -->|presigned assets| S3[MinIO / S3 compatible]
   API -->|grounded evidence| Gemini
+  API -->|bounded semantic ranking| Semantic[Python / FastAPI]
   API -->|public repository metadata| GitHub[GitHub REST API]
+  Probe[Go synthetic probe] -->|HTTP + GraphQL + WebSocket contracts| API
+  Probe --> Browser
 ```
 
 CockroachDB is the source of truth. Redis is disposable and API availability does not depend on a successful cache write. The browser never proxies asset bytes through NestJS. The WebGL layer contains no essential text and can be removed without losing functionality.
 
 The `portfolioData` aggregate returns profile, grouped skills, experience with ordered highlights, translated case studies and social links in one read path. Static hosting uses a versioned in-repository snapshot only when the API cannot be reached and labels that state as stale; it is not presented as live database data.
 
-The profile assistant ranks compact evidence from the portfolio aggregate before invoking Gemini. Provider failure returns a cited extractive answer instead of making the profile unavailable. The API remains one deployable service. Optional vector search and synthetic probing are intentionally deferred until their production contracts and operational value are implemented; they are not placeholder services.
+The profile assistant ranks compact evidence from the portfolio aggregate before invoking Gemini.
+The optional Python service performs deterministic Unicode-aware TF-IDF ranking behind a bounded
+HTTP contract; timeout, malformed output, or service absence falls back to the local TypeScript
+ranker. Provider failure returns a cited extractive answer instead of making the profile unavailable.
+
+The dependency-free Go probe continuously checks the public document, API readiness, GraphQL
+portfolio contract, and `graphql-transport-ws` upgrade. It exports bounded Prometheus metrics and
+is deliberately outside the request path, so probe failure cannot affect site readiness.
 
 The `githubActivity` read path fetches public repository metadata through a bounded GitHub adapter,
 stores successful observations as append-only CockroachDB snapshots and serves Redis-cached data

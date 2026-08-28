@@ -11,5 +11,6 @@ FROM node:22-alpine
 RUN corepack enable
 WORKDIR /app
 COPY --from=build /app /app
+USER node
 EXPOSE 4000
 CMD ["pnpm", "--filter", "@sskutushev/api", "start"]
