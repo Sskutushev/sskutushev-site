@@ -10,6 +10,7 @@ flowchart LR
   API -->|grounded evidence| Gemini
   API -->|bounded semantic ranking| Semantic[Python / FastAPI]
   API -->|public repository metadata| GitHub[GitHub REST API]
+  API -->|30 minute ambient cache| Weather[Open-Meteo]
   Probe[Go synthetic probe] -->|HTTP + GraphQL + WebSocket contracts| API
   Probe --> Browser
 ```
@@ -53,3 +54,14 @@ the bounded `systemEvents` query remains available when live fanout is interrupt
 Every HTTP request emits structured Pino output with credential headers redacted. The `/metrics`
 endpoint exports measured request, 5xx and duration counters with bounded route labels; liveness
 and readiness remain separate operational signals.
+
+The API is auto-instrumented with OpenTelemetry and exports OTLP traces to the local collector. The
+collector also scrapes API and synthetic-probe Prometheus metrics; Prometheus persists the bounded
+series and Grafana is provisioned with that datasource. Missing telemetry infrastructure never
+changes API readiness.
+
+The browser samples LCP, INP, CLS, and TTFB at 10% without storing a visitor identifier. A bounded
+REST endpoint persists only metric, value, rating, navigation type, and timestamp. Engineering mode
+shows measured frame time, FPS, draw calls, DPR, GraphQL resource timing, safe Server-Timing, and
+available Web Vitals. Ambient Saint Petersburg weather is cached for 30 minutes and disappears on
+provider failure rather than becoming a page dependency.

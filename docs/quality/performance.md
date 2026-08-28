@@ -16,3 +16,7 @@ The frontend build enforces compressed entry and lazy-chunk budgets. Lighthouse 
 production preview. The backend integration workflow runs the k6 portfolio-read scenario against a
 real migrated CockroachDB/Redis/MinIO stack and publishes `k6-summary.json`; p95 must remain below
 500 ms, p99 below 1 s, and failed requests below 1%.
+
+Production responses expose only aggregate `Server-Timing: app;dur=…`. The frontend records sampled
+LCP, INP, CLS, and TTFB without cookies, IP persistence, or a browser fingerprint. Runtime rendering
+telemetry is local to Engineering Mode and is not represented as CI evidence.

@@ -8,7 +8,7 @@ services:
           'CMD',
           'python',
           '-c',
-          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')",
         ]
       interval: 10s
       timeout: 3s
@@ -16,10 +16,17 @@ services:
   api:
     image: ghcr.io/sskutushev/sskutushev-site-api:${IMAGE_SHA:?IMAGE_SHA is required}
     env_file: .env.production
-    environment: { SEMANTIC_URL: 'http://semantic:8000' }
+    environment:
+      SEMANTIC_URL: 'http://semantic:8000'
+      NODE_OPTIONS: '--require @opentelemetry/auto-instrumentations-node/register'
+      OTEL_SERVICE_NAME: 'portfolio-api'
+      OTEL_TRACES_EXPORTER: 'otlp'
+      OTEL_METRICS_EXPORTER: 'none'
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://otel-collector:4318'
+      OTEL_EXPORTER_OTLP_PROTOCOL: 'http/protobuf'
     restart: unless-stopped
     healthcheck:
-      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:4000/health/live']
+      test: ['CMD', 'wget', '--spider', '-q', 'http://127.0.0.1:4000/health/live']
       interval: 10s
       timeout: 3s
       retries: 10
@@ -33,10 +40,35 @@ services:
     environment:
       SITE_URL: 'http://web'
       API_URL: 'http://api:4000'
-      LISTEN_ADDR: ':9090'
+      PROBE_ADDRESS: ':8080'
     depends_on:
       api: { condition: service_healthy }
       web: { condition: service_started }
+    restart: unless-stopped
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.135.0
+    command: ['--config=/etc/otelcol/config.yml']
+    volumes:
+      - ./infrastructure/observability/otel-collector.yml:/etc/otelcol/config.yml:ro
+    depends_on:
+      api: { condition: service_healthy }
+      probe: { condition: service_started }
+    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    command: ['--config.file=/etc/prometheus/prometheus.yml']
+    volumes:
+      - ./infrastructure/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    depends_on: [otel-collector]
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:12.1.1
+    environment: { GF_AUTH_ANONYMOUS_ENABLED: 'false' }
+    volumes:
+      - ./infrastructure/observability/grafana-datasource.yml:/etc/grafana/provisioning/datasources/default.yml:ro
+      - grafana-data:/var/lib/grafana
+    depends_on: [prometheus]
     restart: unless-stopped
   caddy:
     image: caddy:2.10-alpine
@@ -49,4 +81,4 @@ services:
       api: { condition: service_healthy }
       web: { condition: service_started }
     restart: unless-stopped
-volumes: { caddy-data: {} }
+volumes: { caddy-data: {}, prometheus-data: {}, grafana-data: {} }

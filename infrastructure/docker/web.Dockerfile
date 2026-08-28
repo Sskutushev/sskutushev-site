@@ -3,7 +3,8 @@ RUN corepack enable
 WORKDIR /app
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml tsconfig.base.json ./
 COPY apps/web/package.json apps/web/package.json
-RUN pnpm install --frozen-lockfile=false
+RUN --mount=type=cache,id=pnpm-web,target=/pnpm/store \
+  pnpm config set store-dir /pnpm/store && pnpm install --filter @sskutushev/web... --frozen-lockfile
 COPY apps/web apps/web
 ARG VITE_GRAPHQL_URL
 ENV VITE_GRAPHQL_URL=$VITE_GRAPHQL_URL

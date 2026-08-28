@@ -36,6 +36,10 @@ Portfolio and asset mutations are fail-closed by default. Set `ENABLE_MUTATIONS=
 trusted management environment; profile writes require an `expectedVersion`, update related social
 links in one transaction and return a named conflict for stale writers.
 
+`docker compose up --build` waits for CockroachDB and applies migrations before starting the API,
+semantic ranker, frontend, and synthetic probe. Seed a fresh database with
+`docker compose run --rm api pnpm db:seed`.
+
 ## Useful commands
 
 ```bash

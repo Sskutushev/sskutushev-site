@@ -5,9 +5,55 @@ permissions: { contents: read }
 jobs:
   measure:
     runs-on: ubuntu-latest
+    services:
+      cockroach:
+        image: cockroachdb/cockroach:v25.2.3
+        ports: ['26257:26257']
+        options: >-
+          --health-cmd "curl --fail http://localhost:8080/health?ready=1"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7.4.5-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s
+          --health-timeout 3s --health-retries 20
+    env:
+      NODE_ENV: test
+      PORT: 4417
+      DATABASE_URL: postgresql://root@localhost:26257/defaultdb?sslmode=disable
+      REDIS_URL: redis://localhost:6379
+      S3_ENDPOINT: http://localhost:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: portfolio
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      WEB_ORIGIN: http://localhost:4173
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+      - name: Start S3-compatible storage
+        run: >-
+          docker run -d --name minio -p 9000:9000
+          -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin
+          minio/minio:RELEASE.2025-04-22T22-12-26Z server /data
+      - name: Prepare measured runtime
+        shell: bash
+        run: |
+          for attempt in {1..30}; do
+            curl --fail --silent http://localhost:9000/minio/health/live && break
+            sleep 1
+          done
+          curl --fail http://localhost:9000/minio/health/live
+          pnpm prisma:generate
+          pnpm db:migrate
+          pnpm db:seed
+          pnpm --filter @sskutushev/api build
+          nohup pnpm --filter @sskutushev/api start > api.log 2>&1 &
+          for attempt in {1..30}; do
+            curl --fail --silent http://127.0.0.1:4417/health/ready && break
+            sleep 1
+          done
       - run: mkdir -p artifacts/lighthouse
       - run: pnpm --filter @sskutushev/api test:report
       - run: pnpm --filter @sskutushev/web test:report
@@ -17,7 +63,15 @@ jobs:
         env: { PLAYWRIGHT_JSON_OUTPUT_FILE: '../../artifacts/e2e-tests.json' }
         run: pnpm --filter @sskutushev/web exec playwright test --reporter=json
       - name: Runtime integration evidence
-        run: echo '{"integrationTests":0,"contractTests":0}' > artifacts/integration-tests.json
+        shell: bash
+        run: |
+          curl --fail http://127.0.0.1:4417/health/ready
+          curl --fail http://127.0.0.1:4417/metrics
+          response=$(curl --fail http://127.0.0.1:4417/graphql \
+            -H 'content-type: application/json' \
+            --data '{"query":"query { portfolioData(locale: EN) { profile { fullName version } } }"}')
+          node -e "const r=JSON.parse(process.argv[1]);if(!r.data?.portfolioData?.profile?.fullName||r.errors)process.exit(1)" "$response"
+          echo '{"integrationTests":3,"contractTests":3}' > artifacts/integration-tests.json
       - name: Security evidence
         shell: bash
         run: |
