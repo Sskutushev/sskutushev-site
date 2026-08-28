@@ -36,6 +36,7 @@ const required = (name, value) => {
 };
 const sha = process.env.GITHUB_SHA;
 if (!sha || !/^[a-f0-9]{7,64}$/i.test(sha)) throw new Error('GITHUB_SHA is required');
+const passedE2eTests = e2e.stats?.expected ?? e2e.numPassedTests;
 
 const report = {
   sha,
@@ -44,7 +45,7 @@ const report = {
   unitTests: required('unitTests', apiTests.numPassedTests + webTests.numPassedTests),
   integrationTests: required('integrationTests', integration.integrationTests),
   contractTests: required('contractTests', integration.contractTests),
-  e2eTests: required('e2eTests', e2e.numPassedTests),
+  e2eTests: required('e2eTests', passedE2eTests),
   securityTests: required('securityTests', security.passed.length),
   coverageLines: coverage('lines'),
   coverageBranches: coverage('branches'),
