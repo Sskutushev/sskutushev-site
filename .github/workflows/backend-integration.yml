@@ -1,5 +1,5 @@
 name: Backend Integration
-on: [pull_request]
+on: [workflow_call]
 permissions: { contents: read }
 jobs:
   runtime-contract:

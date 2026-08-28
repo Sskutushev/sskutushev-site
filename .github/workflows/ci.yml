@@ -5,6 +5,7 @@ on:
     branches: [main]
 permissions:
   contents: read
+  packages: write
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -135,10 +136,55 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
         with: { path: apps/web/dist }
-  publish-pages:
-    name: 09 · Publish Pages
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  backend-integration:
+    name: 09 · Backend integration
     needs: build
+    uses: ./.github/workflows/backend-integration.yml
+  frontend-quality:
+    name: 10 · Frontend quality
+    needs: build
+    uses: ./.github/workflows/frontend-quality.yml
+  migration-check:
+    name: 11 · Migration check
+    needs: build
+    uses: ./.github/workflows/migration-check.yml
+  service-quality:
+    name: 12 · Service quality
+    needs: build
+    uses: ./.github/workflows/services-quality.yml
+  performance:
+    name: 13 · Performance
+    needs: build
+    uses: ./.github/workflows/performance.yml
+  security-deep:
+    name: 14 · Security hardening
+    needs: build
+    permissions: { contents: read, security-events: write }
+    uses: ./.github/workflows/security.yml
+  quality-report:
+    name: 15 · Quality evidence
+    needs:
+      [
+        backend-integration,
+        frontend-quality,
+        migration-check,
+        service-quality,
+        performance,
+        security-deep,
+      ]
+    uses: ./.github/workflows/quality-report.yml
+    secrets: inherit
+  docker-quality:
+    name: 16 · Docker images
+    needs: quality-report
+    permissions: { contents: read, packages: write }
+    uses: ./.github/workflows/docker.yml
+    with:
+      push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+  publish-pages:
+    name: 17 · Publish Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: docker-quality
     runs-on: ubuntu-latest
     permissions: { pages: write, id-token: write }
     environment:
@@ -148,31 +194,12 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-  publish-images:
-    name: 10 · Publish ${{ matrix.image }} image
+  deploy-production:
+    name: 18 · Deploy production
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: publish-pages
-    runs-on: ubuntu-latest
-    permissions: { contents: read, packages: write }
-    strategy:
-      matrix:
-        include:
-          - { image: api, dockerfile: infrastructure/docker/api.Dockerfile }
-          - { image: web, dockerfile: infrastructure/docker/web.Dockerfile }
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          {
-            registry: ghcr.io,
-            username: '${{ github.actor }}',
-            password: '${{ secrets.GITHUB_TOKEN }}',
-          }
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ${{ matrix.dockerfile }}
-          push: true
-          tags: |
-            ghcr.io/sskutushev/sskutushev-site-${{ matrix.image }}:${{ github.sha }}
-            ghcr.io/sskutushev/sskutushev-site-${{ matrix.image }}:main
+    permissions: { contents: read, packages: read }
+    uses: ./.github/workflows/deploy-production.yml
+    with:
+      image-sha: ${{ github.sha }}
+    secrets: inherit

@@ -1,6 +1,10 @@
 name: Docker Images
 on:
-  push: { branches: [main] }
+  workflow_call:
+    inputs:
+      push:
+        type: boolean
+        required: true
 permissions: { contents: read, packages: write }
 jobs:
   build:
@@ -27,7 +31,7 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
-          push: true
+          push: ${{ inputs.push }}
           cache-from: type=gha,scope=${{ matrix.image }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image }}
           tags: |
