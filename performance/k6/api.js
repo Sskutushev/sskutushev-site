@@ -3,7 +3,14 @@ import { check } from 'k6';
 
 export const options = {
   scenarios: {
-    steady_read: { executor: 'constant-vus', vus: 5, duration: '20s' },
+    steady_read: {
+      executor: 'constant-arrival-rate',
+      rate: 20,
+      timeUnit: '1s',
+      duration: '20s',
+      preAllocatedVUs: 5,
+      maxVUs: 20,
+    },
   },
   thresholds: {
     http_req_failed: ['rate<0.01'],
@@ -28,11 +35,4 @@ export default function () {
       result.json('data.portfolioData.profile.fullName') !== undefined,
     'no GraphQL errors': (result) => result.json('errors') === undefined,
   });
-}
-
-export function handleSummary(data) {
-  return {
-    'k6-summary.json': JSON.stringify(data, null, 2),
-    stdout: 'k6 performance thresholds passed\n',
-  };
 }

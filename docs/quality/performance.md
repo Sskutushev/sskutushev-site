@@ -15,7 +15,10 @@ Targets are budgets, not claims: LCP below 2.5s, CLS below 0.1, accessibility at
 The frontend build enforces compressed entry and lazy-chunk budgets. Lighthouse CI checks the
 production preview. The backend integration workflow runs the k6 portfolio-read scenario against a
 real migrated CockroachDB/Redis/MinIO stack and publishes `k6-summary.json`; p95 must remain below
-500 ms, p99 below 1 s, and failed requests below 1%.
+500 ms, p99 below 1 s, and failed requests below 1% at a sustained 20 portfolio reads per second.
+The performance job raises its per-client rate-limit ceiling so it measures the application rather
+than the abuse-control response; Redis-backed rate limiting is verified independently by security
+middleware tests.
 
 Production responses expose only aggregate `Server-Timing: app;dur=…`. The frontend records sampled
 LCP, INP, CLS, and TTFB without cookies, IP persistence, or a browser fingerprint. Runtime rendering

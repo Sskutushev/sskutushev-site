@@ -15,6 +15,9 @@ jobs:
       S3_ACCESS_KEY: minioadmin
       S3_SECRET_KEY: minioadmin
       WEB_ORIGIN: http://localhost:4173
+      # The k6 job measures application throughput. Rate limiting is covered by
+      # dedicated middleware tests and must not turn this into a 429 test.
+      RATE_LIMIT_PER_MINUTE: 100000
     steps:
       - uses: actions/checkout@v4
       - name: Start database and cache
@@ -64,6 +67,7 @@ jobs:
             --data '{"query":"query { portfolioData(locale: EN) { profile { fullName version } } latestQualityRun { sha } systemEvents(limit: 1) { type } }"}'
           K6_BASE_URL=http://127.0.0.1:4417 k6 run --summary-export=k6-summary.json performance/k6/api.js
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: k6-summary
           path: k6-summary.json
