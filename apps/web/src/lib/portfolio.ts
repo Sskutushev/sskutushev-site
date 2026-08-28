@@ -1,6 +1,6 @@
 import { GraphQLClient, gql } from 'graphql-request';
 
-const endpoint = import.meta.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql';
+const endpoint = import.meta.env.VITE_GRAPHQL_URL || '/graphql';
 
 export type Locale = 'RU' | 'EN';
 export interface Portfolio {
@@ -30,6 +30,13 @@ export interface Portfolio {
   }[];
   socialLinks: { type: string; url: string }[];
   stale: boolean;
+  weather: {
+    city: string;
+    temperatureC: number;
+    condition: string;
+    observedAt: string;
+    stale: boolean;
+  } | null;
 }
 
 const query = gql`
@@ -68,13 +75,23 @@ const query = gql`
       }
       stale
     }
+    ambientWeather {
+      city
+      temperatureC
+      condition
+      observedAt
+      stale
+    }
   }
 `;
 
 export async function fetchPortfolio(locale: Locale): Promise<Portfolio> {
   const client = new GraphQLClient(endpoint);
-  const response = await client.request<{ portfolioData: Portfolio }>(query, { locale });
-  return response.portfolioData;
+  const response = await client.request<{
+    portfolioData: Portfolio;
+    ambientWeather: Portfolio['weather'];
+  }>(query, { locale });
+  return { ...response.portfolioData, weather: response.ambientWeather };
 }
 
 export type AssistantAnswer = {
@@ -132,4 +149,50 @@ export async function fetchGithubActivity(): Promise<GithubActivity> {
     }
   `);
   return data.githubActivity;
+}
+
+export type QualityRun = {
+  sha: string;
+  branch: string;
+  environment: string;
+  unitTests: number;
+  integrationTests: number;
+  contractTests: number;
+  e2eTests: number;
+  securityTests: number;
+  coverageLines: number;
+  coverageBranches: number;
+  lighthousePerformance: number;
+  lighthouseAccessibility: number;
+  bundleKb: number;
+  criticalVulnerabilities: number;
+  highVulnerabilities: number;
+  createdAt: string;
+};
+
+export async function fetchLatestQualityRun(): Promise<QualityRun | null> {
+  const client = new GraphQLClient(endpoint);
+  const data = await client.request<{ latestQualityRun: QualityRun | null }>(gql`
+    query LatestQualityRun {
+      latestQualityRun {
+        sha
+        branch
+        environment
+        unitTests
+        integrationTests
+        contractTests
+        e2eTests
+        securityTests
+        coverageLines
+        coverageBranches
+        lighthousePerformance
+        lighthouseAccessibility
+        bundleKb
+        criticalVulnerabilities
+        highVulnerabilities
+        createdAt
+      }
+    }
+  `);
+  return data.latestQualityRun;
 }

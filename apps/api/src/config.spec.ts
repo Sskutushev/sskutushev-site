@@ -13,10 +13,30 @@ const valid = {
 
 describe('validateConfig', () => {
   it('applies safe operational defaults', () => {
-    expect(validateConfig(valid)).toMatchObject({ PORT: 4000, NODE_ENV: 'development' });
+    expect(validateConfig(valid)).toMatchObject({
+      PORT: 4000,
+      RATE_LIMIT_PER_MINUTE: 60,
+      NODE_ENV: 'development',
+      ENABLE_MUTATIONS: false,
+      ENABLE_WORKERS: false,
+      ASSET_MAX_BYTES: 10_485_760,
+    });
   });
 
   it('fails closed when a required dependency is missing', () => {
     expect(() => validateConfig({ ...valid, DATABASE_URL: undefined })).toThrow();
+  });
+
+  it('requires a management credential whenever mutations are enabled', () => {
+    expect(() => validateConfig({ ...valid, ENABLE_MUTATIONS: 'true' })).toThrow(
+      'MANAGEMENT_TOKEN',
+    );
+    expect(
+      validateConfig({
+        ...valid,
+        ENABLE_MUTATIONS: 'true',
+        MANAGEMENT_TOKEN: 'a-secure-management-token-with-32-chars',
+      }),
+    ).toMatchObject({ ENABLE_MUTATIONS: true });
   });
 });

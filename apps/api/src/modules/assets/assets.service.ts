@@ -32,9 +32,14 @@ export class AssetsService {
         type: 'PORTFOLIO',
         storageKey,
         contentType: input.contentType,
+        checksum: input.checksumSha256,
       },
     });
-    const uploadUrl = await this.storage.presignUpload(storageKey, input.contentType);
+    const uploadUrl = await this.storage.presignUpload(
+      storageKey,
+      input.contentType,
+      input.checksumSha256,
+    );
     return { assetId: asset.id, uploadUrl, expiresAt: new Date(Date.now() + 300_000) };
   }
 
@@ -45,8 +50,15 @@ export class AssetsService {
     if (asset.status === 'READY')
       return { id: asset.id, status: asset.status, contentType: asset.contentType };
     const object = await this.storage.inspect(asset.storageKey);
-    if (object.contentType !== asset.contentType)
-      throw new ForbiddenException('Uploaded object type does not match the request');
+    const maxBytes = BigInt(this.config.getOrThrow<number>('ASSET_MAX_BYTES'));
+    if (
+      object.contentType !== asset.contentType ||
+      object.checksumSha256 !== asset.checksum ||
+      object.sizeBytes > maxBytes
+    ) {
+      await this.prisma.asset.update({ where: { id: asset.id }, data: { status: 'FAILED' } });
+      throw new ForbiddenException('Uploaded object does not match the request constraints');
+    }
     const ready = await this.prisma.asset.update({
       where: { id: asset.id },
       data: { status: 'READY', sizeBytes: object.sizeBytes },
@@ -55,7 +67,7 @@ export class AssetsService {
   }
 
   private assertMutationsEnabled(): void {
-    if (this.config.get<string>('ENABLE_MUTATIONS') !== 'true')
+    if (!this.config.get<boolean>('ENABLE_MUTATIONS'))
       throw new ForbiddenException('Mutations are disabled in this environment');
   }
 }

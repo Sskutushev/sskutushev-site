@@ -10,6 +10,8 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "test:coverage": "pnpm --filter @sskutushev/api test:report && pnpm --filter @sskutushev/web test:report",
+    "test:e2e": "pnpm --filter @sskutushev/web test:e2e",
     "lint": "pnpm -r lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -17,7 +19,8 @@
     "prisma:validate": "prisma validate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "verify:full": "pnpm verify && pnpm prisma:validate && pnpm test:coverage && pnpm test:e2e"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

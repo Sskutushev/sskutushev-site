@@ -2,6 +2,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useSceneVisibility } from './use-scene-visibility';
+import { RuntimeProfiler } from './RuntimeProfiler';
 
 const vertex = `
 uniform float uTime;
@@ -110,6 +111,7 @@ export default function RankingScene(): React.JSX.Element {
           camera={{ position: [0, 0, 10], fov: 48 }}
           gl={{ antialias: false, powerPreference: 'high-performance' }}
         >
+          <RuntimeProfiler />
           <MorphPoints mode={mode} count={count} />
         </Canvas>
       )}

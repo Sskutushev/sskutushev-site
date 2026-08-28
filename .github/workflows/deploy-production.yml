@@ -1,0 +1,40 @@
+name: Deploy Production
+on:
+  workflow_call:
+    inputs:
+      image-sha:
+        type: string
+        required: true
+    secrets:
+      DEPLOY_HOST:
+        required: true
+      DEPLOY_USER:
+        required: true
+      DEPLOY_SSH_KEY:
+        required: true
+permissions: { contents: read, packages: read }
+jobs:
+  deploy:
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy immutable image SHA
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          IMAGE_SHA: '${{ inputs.image-sha }}'
+          SITE_HOST: '${{ vars.SITE_HOST }}'
+        with:
+          host: '${{ secrets.DEPLOY_HOST }}'
+          username: '${{ secrets.DEPLOY_USER }}'
+          key: '${{ secrets.DEPLOY_SSH_KEY }}'
+          envs: IMAGE_SHA,SITE_HOST
+          script_stop: true
+          script: |
+            cd /opt/sskutushev-site
+            export IMAGE_SHA SITE_HOST
+            docker compose -f docker-compose.production.yml pull
+            docker compose -f docker-compose.production.yml run --rm api pnpm db:migrate
+            docker compose -f docker-compose.production.yml up -d --remove-orphans
+            curl --fail --retry 12 --retry-delay 5 "https://${SITE_HOST}/health/ready"
+            curl --fail "https://${SITE_HOST}/graphql" -H 'content-type: application/json' --data '{"query":"query { portfolioData(locale: EN) { profile { fullName } } }"}'

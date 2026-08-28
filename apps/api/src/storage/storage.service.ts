@@ -21,21 +21,32 @@ export class StorageService {
     });
   }
 
-  presignUpload(storageKey: string, contentType: string): Promise<string> {
+  presignUpload(storageKey: string, contentType: string, checksumSha256: string): Promise<string> {
     return getSignedUrl(
       this.client,
-      new PutObjectCommand({ Bucket: this.bucket, Key: storageKey, ContentType: contentType }),
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: storageKey,
+        ContentType: contentType,
+        ChecksumSHA256: checksumSha256,
+      }),
       { expiresIn: 300 },
     );
   }
 
-  async inspect(storageKey: string): Promise<{ sizeBytes: bigint; contentType: string }> {
+  async inspect(
+    storageKey: string,
+  ): Promise<{ sizeBytes: bigint; contentType: string; checksumSha256: string }> {
     const object = await this.client.send(
-      new HeadObjectCommand({ Bucket: this.bucket, Key: storageKey }),
+      new HeadObjectCommand({ Bucket: this.bucket, Key: storageKey, ChecksumMode: 'ENABLED' }),
     );
-    if (object.ContentLength === undefined || !object.ContentType) {
+    if (object.ContentLength === undefined || !object.ContentType || !object.ChecksumSHA256) {
       throw new Error('Stored object metadata is incomplete');
     }
-    return { sizeBytes: BigInt(object.ContentLength), contentType: object.ContentType };
+    return {
+      sizeBytes: BigInt(object.ContentLength),
+      contentType: object.ContentType,
+      checksumSha256: object.ChecksumSHA256,
+    };
   }
 }

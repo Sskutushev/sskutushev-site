@@ -1,15 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@400;500;600;700;800&display=swap');
-
 :root {
   --bg: #080b0e;
   --panel: #0d1115;
   --text: #f0eee8;
   --muted: #7d858b;
   --line: #252b30;
-  --hot: #ff4d16;
+  --hot: #ff6b3b;
+  --hot-surface: #a92e00;
   --cold: #25b6d2;
   --display: Inter, Arial, sans-serif;
-  --mono: 'DM Mono', monospace;
+  --mono: 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
   color-scheme: dark;
   --pointer-x: 70vw;
   --pointer-y: 30vh;
@@ -252,7 +251,7 @@ footer em {
   width: 1px;
   height: 14px;
   margin-left: 4px;
-  background: var(--hot);
+  background: var(--hot-surface);
   animation: cursor-blink 0.8s steps(1) infinite;
 }
 @keyframes cursor-blink {
@@ -274,7 +273,7 @@ footer em {
   border-color: var(--hot);
 }
 .hero-actions .primary {
-  background: var(--hot);
+  background: var(--hot-surface);
   color: #fff;
   border-color: var(--hot);
 }
@@ -519,8 +518,11 @@ h2 span {
 }
 .scene-tabs button.active {
   color: white;
-  background: var(--hot);
+  background: var(--hot-surface);
   transform: scale(1.02);
+}
+.scene-tabs button.active span {
+  opacity: 1;
 }
 .pipeline-visual {
   min-height: clamp(240px, 30vw, 360px);
@@ -785,7 +787,7 @@ footer {
     transform 0.25s;
 }
 .contact-actions a:hover {
-  background: var(--hot);
+  background: var(--hot-surface);
   color: white;
   transform: translateX(-6px);
 }
@@ -806,7 +808,7 @@ footer {
   align-items: center;
   padding: 14px 16px;
   color: white;
-  background: var(--hot);
+  background: var(--hot-surface);
   border-color: var(--hot);
   font: 9px var(--mono);
 }
@@ -854,12 +856,43 @@ footer small {
   color: var(--muted);
   margin-top: 40px;
 }
-.github-activity {
+.github-activity,
+.quality-dashboard {
   display: grid;
   gap: 8px;
   margin: 0 0 28px;
   padding: 0 0 28px;
   border-bottom: 1px solid var(--line);
+}
+.quality-dashboard header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.quality-dashboard header strong,
+.quality-dashboard header small {
+  display: block;
+}
+.quality-dashboard header small,
+.quality-dashboard dt,
+.quality-dashboard p {
+  color: var(--muted);
+  font: 9px var(--mono);
+}
+.quality-dashboard dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 16px 0;
+}
+.quality-dashboard dl div {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.quality-dashboard dd {
+  margin: 5px 0 0;
+  font: 14px var(--mono);
 }
 .github-activity header {
   display: flex;
@@ -988,7 +1021,7 @@ footer small {
   font: 10px var(--mono);
 }
 .assistant-chat form button {
-  background: var(--hot);
+  background: var(--hot-surface);
   color: white;
 }
 .assistant-answer {

@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './styles.css';
+import { startWebVitalsReporting } from './lib/web-vitals';
 
 const client = new QueryClient({ defaultOptions: { queries: { staleTime: 60_000 } } });
 createRoot(document.getElementById('root')!).render(
@@ -12,3 +13,5 @@ createRoot(document.getElementById('root')!).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+startWebVitalsReporting();

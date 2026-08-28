@@ -155,3 +155,61 @@ model GithubSnapshot {
 
   @@index([owner, capturedAt])
 }
+
+model Deployment {
+  id          String       @id @default(uuid())
+  sha         String
+  branch      String
+  environment String
+  status      String
+  startedAt   DateTime
+  finishedAt  DateTime?
+  qualityRuns QualityRun[]
+
+  @@unique([sha, environment])
+  @@index([environment, startedAt])
+}
+
+model QualityRun {
+  id                      String     @id @default(uuid())
+  deploymentId            String
+  sha                     String
+  unitTests               Int
+  integrationTests        Int
+  contractTests           Int
+  e2eTests                Int
+  securityTests           Int
+  coverageLines           Float
+  coverageBranches        Float
+  lighthousePerformance   Int
+  lighthouseAccessibility Int
+  bundleKb                Int
+  criticalVulnerabilities Int
+  highVulnerabilities     Int
+  createdAt               DateTime   @default(now())
+  deployment              Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([sha])
+}
+
+model SystemEvent {
+  id            String   @id @default(uuid())
+  type          String
+  severity      String
+  publicPayload Json
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model PerformanceSnapshot {
+  id             String   @id @default(uuid()) @db.Uuid
+  metric         String   @db.String(8)
+  value          Float
+  rating         String   @db.String(16)
+  navigationType String?  @db.String(32)
+  createdAt      DateTime @default(now())
+
+  @@index([metric, createdAt])
+}

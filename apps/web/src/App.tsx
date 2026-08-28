@@ -6,10 +6,12 @@ import { RotatingSignal } from './components/RotatingSignal';
 import { AssistantChat } from './components/AssistantChat';
 import { GithubActivity } from './components/GithubActivity';
 import { SiteControls } from './components/SiteControls';
+import { QualityDashboard } from './components/QualityDashboard';
 import { fallbackPortfolio } from './lib/fallback-portfolio';
 import { fetchPortfolio, type Locale } from './lib/portfolio';
 import { pointBudget, selectRenderQuality } from './lib/render-quality';
 import { usePointerGlow } from './lib/use-pointer-glow';
+import { useEngineeringMetrics } from './lib/use-engineering-metrics';
 import { useSmoothScroll } from './lib/use-smooth-scroll';
 
 const PointField = lazy(() => import('./scenes/PointField'));
@@ -53,8 +55,27 @@ export default function App(): React.JSX.Element {
   const [locale, setLocale] = useState<Locale>('RU');
   const [theme, setTheme] = useState<'thermal' | 'blueprint'>('thermal');
   const [engineering, setEngineering] = useState(false);
+  const [visualsReady, setVisualsReady] = useState(false);
+  const [now, setNow] = useState(() => new Date());
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const quality = selectRenderQuality(window.innerWidth, reduced);
+  const runtime = useEngineeringMetrics();
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  useEffect(() => {
+    if (reduced) return;
+    const timer = window.setTimeout(() => setVisualsReady(true), 1_500);
+    return () => window.clearTimeout(timer);
+  }, [reduced]);
+  const clock = (timeZone: string) =>
+    new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone,
+    }).format(now);
   usePointerGlow(reduced);
   useSmoothScroll(reduced);
   const { scrollYProgress } = useScroll();
@@ -70,9 +91,13 @@ export default function App(): React.JSX.Element {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
+  useEffect(() => {
+    document.documentElement.lang = locale === 'RU' ? 'ru' : 'en';
+  }, [locale]);
+
   return (
     <>
-      <motion.div className="scroll-progress" style={{ scaleX }} />
+      <motion.div aria-hidden="true" className="scroll-progress" style={{ scaleX }} />
       <a className="skip" href="#work">
         {text.skip}
       </a>
@@ -95,7 +120,7 @@ export default function App(): React.JSX.Element {
       </header>
       <main id="top">
         <section className="hero">
-          {!reduced && (
+          {visualsReady && (
             <div className="scene">
               <Suspense fallback={null}>
                 <PointField />
@@ -103,10 +128,15 @@ export default function App(): React.JSX.Element {
             </div>
           )}
           <div className="eyebrow">
-            <i /> {text.status} <span>UTC+3 / REMOTE</span>
+            <i /> {text.status}{' '}
+            <span>
+              {data.weather
+                ? `${data.weather.city} ${Math.round(data.weather.temperatureC)}°C ${data.weather.condition} · ${clock('Europe/Moscow')}`
+                : `SPB ${clock('Europe/Moscow')} · UTC ${clock('UTC')}`}
+            </span>
           </div>
           <motion.h1
-            initial={reduced ? false : { opacity: 0, y: 30 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
@@ -196,7 +226,7 @@ export default function App(): React.JSX.Element {
           </div>
         </section>
 
-        {!reduced && (
+        {visualsReady && (
           <section className="ranking-section" aria-label="Interactive ranking projection">
             <div className="section-head">
               <p className="section-no">03 / DATA HONESTY</p>
@@ -222,7 +252,7 @@ export default function App(): React.JSX.Element {
             <br />
             <span>{text.architectureAccent}</span>
           </h2>
-          {!reduced && (
+          {visualsReady && (
             <Suspense fallback={<div className="visual-fallback" />}>
               <PipelineScene />
             </Suspense>
@@ -272,21 +302,44 @@ export default function App(): React.JSX.Element {
       </main>
       <ContactPanel locale={locale} />
       {engineering && (
-        <aside className="drawer">
-          <button onClick={() => setEngineering(false)}>CLOSE ×</button>
-          <h2>ENGINEERING MODE</h2>
+        <aside aria-labelledby="engineering-title" className="drawer" role="dialog">
+          <button aria-label="Close engineering mode" onClick={() => setEngineering(false)}>
+            CLOSE ×
+          </button>
+          <h2 id="engineering-title">ENGINEERING MODE</h2>
           <dl>
+            <div>
+              <dt>FPS / FRAME</dt>
+              <dd>
+                {runtime.frameMs
+                  ? `${Math.round(1000 / runtime.frameMs)} / ${runtime.frameMs.toFixed(1)}MS`
+                  : '—'}
+              </dd>
+            </div>
             <div>
               <dt>POINTS</dt>
               <dd>{pointBudget(quality).toLocaleString('ru-RU') || 'STATIC'}</dd>
             </div>
             <div>
-              <dt>DPR CAP</dt>
-              <dd>1.5</dd>
+              <dt>DPR</dt>
+              <dd>{window.devicePixelRatio.toFixed(2)}</dd>
             </div>
             <div>
-              <dt>DRAW CALL</dt>
-              <dd>1</dd>
+              <dt>DRAW CALLS</dt>
+              <dd>{runtime.drawCalls || '—'}</dd>
+            </div>
+            <div>
+              <dt>GRAPHQL / SERVER</dt>
+              <dd>
+                {runtime.graphqlRttMs?.toFixed(0) ?? '—'} / {runtime.serverMs?.toFixed(0) ?? '—'} MS
+              </dd>
+            </div>
+            <div>
+              <dt>LCP / INP / CLS</dt>
+              <dd>
+                {runtime.vitals.LCP?.toFixed(0) ?? '—'} / {runtime.vitals.INP?.toFixed(0) ?? '—'} /{' '}
+                {runtime.vitals.CLS?.toFixed(3) ?? '—'}
+              </dd>
             </div>
             <div>
               <dt>DATA</dt>
@@ -295,6 +348,7 @@ export default function App(): React.JSX.Element {
           </dl>
           <p>Runtime values are shown as measured state. No invented CI metrics.</p>
           <GithubActivity locale={locale} />
+          <QualityDashboard locale={locale} />
           <AssistantChat locale={locale} />
         </aside>
       )}

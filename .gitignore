@@ -1,11 +1,14 @@
 node_modules/
 .pnpm-store/
+.tools/
 dist/
 coverage/
 .env
 .env.local
 playwright-report/
+.lighthouseci/
 test-results/
+artifacts/
 *.log
 *.tsbuildinfo
 .DS_Store

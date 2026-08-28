@@ -3,7 +3,8 @@ import { Locale } from '../portfolio/portfolio.models';
 import { PortfolioService } from '../portfolio/portfolio.service';
 import type { AssistantAnswerModel } from './assistant.models';
 import { GeminiService } from './gemini.service';
-import { isProfileRelated, retrieve, type KnowledgeChunk } from './retrieval';
+import { isProfileRelated, type KnowledgeChunk } from './retrieval';
+import { SemanticService } from './semantic.service';
 
 @Injectable()
 export class AssistantService {
@@ -12,6 +13,7 @@ export class AssistantService {
   constructor(
     private readonly portfolio: PortfolioService,
     private readonly gemini: GeminiService,
+    private readonly semantic: SemanticService,
   ) {}
 
   async ask(question: string, locale: Locale): Promise<AssistantAnswerModel> {
@@ -21,7 +23,7 @@ export class AssistantService {
     }
     this.consumeQuota();
     const portfolio = await this.portfolio.getPortfolio(locale);
-    const evidence = retrieve(normalized, this.toChunks(portfolio), 4);
+    const evidence = await this.semantic.rank(normalized, this.toChunks(portfolio), 4);
     const profileRelated = isProfileRelated(normalized);
     const generated = await this.gemini.answer(normalized, evidence, locale, profileRelated);
     return {

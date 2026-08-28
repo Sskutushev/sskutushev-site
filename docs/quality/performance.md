@@ -5,5 +5,26 @@
 - Desktop uses one `THREE.Points` draw call for 230,000 procedural points.
 - Narrow screens use 15,000 points and DPR is capped at 1.5.
 - Reduced-motion users receive the complete DOM experience with no animated canvas.
+- The production build fails when the initial application chunk exceeds 250 KB gzip or any lazy
+  chunk exceeds 300 KB gzip.
 
 Targets are budgets, not claims: LCP below 2.5s, CLS below 0.1, accessibility at least 95, and sustained desktop WebGL near 60 FPS. CI must measure them before the site displays them as achieved.
+
+# Performance gates
+
+The frontend build enforces compressed entry and lazy-chunk budgets. Lighthouse CI checks the
+production preview. The backend integration workflow runs the k6 portfolio-read scenario against a
+real migrated CockroachDB/Redis/MinIO stack and publishes `k6-summary.json`; p95 must remain below
+500 ms, p99 below 1 s, and failed requests below 1% at a sustained 20 portfolio reads per second.
+The performance job raises its per-client rate-limit ceiling so it measures the application rather
+than the abuse-control response; Redis-backed rate limiting is verified independently by security
+middleware tests.
+
+The dedicated performance workflow is the authoritative Lighthouse budget gate. The later quality
+evidence workflow repeats the measurement to populate the immutable report, but preserves that
+report when runner variance crosses a threshold instead of turning the same measurement into a
+second, conflicting gate.
+
+Production responses expose only aggregate `Server-Timing: app;dur=…`. The frontend records sampled
+LCP, INP, CLS, and TTFB without cookies, IP persistence, or a browser fingerprint. Runtime rendering
+telemetry is local to Engineering Mode and is not represented as CI evidence.
