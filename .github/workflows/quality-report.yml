@@ -89,11 +89,14 @@ jobs:
           set -e
           node -e "const fs=require('fs');const a=require('./artifacts/audit.json');const v=a.metadata?.vulnerabilities??{};fs.writeFileSync('artifacts/security-tests.json',JSON.stringify({passed:['dependency-audit'],critical:v.critical??0,high:v.high??0}))"
           test "$audit_status" -eq 0
-      - uses: treosh/lighthouse-ci-action@v12
+      - name: Collect Lighthouse evidence
+        id: lighthouse
+        continue-on-error: true
+        uses: treosh/lighthouse-ci-action@v12
         with:
           configPath: ./performance/lighthouse/lighthouserc.json
           uploadArtifacts: true
-      - name: Collect Lighthouse evidence
+      - name: Copy Lighthouse evidence
         run: cp .lighthouseci/*.report.json artifacts/lighthouse/
       - run: node scripts/build-quality-report.mjs
       - uses: actions/upload-artifact@v4

@@ -20,6 +20,11 @@ The performance job raises its per-client rate-limit ceiling so it measures the 
 than the abuse-control response; Redis-backed rate limiting is verified independently by security
 middleware tests.
 
+The dedicated performance workflow is the authoritative Lighthouse budget gate. The later quality
+evidence workflow repeats the measurement to populate the immutable report, but preserves that
+report when runner variance crosses a threshold instead of turning the same measurement into a
+second, conflicting gate.
+
 Production responses expose only aggregate `Server-Timing: app;dur=…`. The frontend records sampled
 LCP, INP, CLS, and TTFB without cookies, IP persistence, or a browser fingerprint. Runtime rendering
 telemetry is local to Engineering Mode and is not represented as CI evidence.
