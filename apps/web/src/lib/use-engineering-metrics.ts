@@ -1,0 +1,57 @@
+import { useEffect, useState } from 'react';
+import type { RenderMetrics } from '../scenes/RuntimeProfiler';
+
+export interface EngineeringMetrics extends RenderMetrics {
+  graphqlRttMs: number | null;
+  serverMs: number | null;
+  vitals: Partial<Record<'LCP' | 'INP' | 'CLS' | 'TTFB', number>>;
+}
+
+const initial: EngineeringMetrics = {
+  drawCalls: 0,
+  frameMs: 0,
+  graphqlRttMs: null,
+  serverMs: null,
+  vitals: {},
+};
+
+export function useEngineeringMetrics(): EngineeringMetrics {
+  const [metrics, setMetrics] = useState(initial);
+  useEffect(() => {
+    const render = (event: Event) => {
+      const detail = (event as CustomEvent<RenderMetrics>).detail;
+      setMetrics((current) => ({ ...current, ...detail }));
+    };
+    const vital = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{ name: keyof EngineeringMetrics['vitals']; value: number }>
+      ).detail;
+      setMetrics((current) => ({
+        ...current,
+        vitals: { ...current.vitals, [detail.name]: detail.value },
+      }));
+    };
+    const resource = new PerformanceObserver((list) => {
+      const resources = list
+        .getEntries()
+        .filter((entry) => entry.entryType === 'resource') as PerformanceResourceTiming[];
+      const graphql = resources.reverse().find((entry) => entry.name.includes('/graphql'));
+      if (!graphql) return;
+      const server = graphql.serverTiming.find((entry) => entry.name === 'app');
+      setMetrics((current) => ({
+        ...current,
+        graphqlRttMs: graphql.duration,
+        serverMs: server?.duration ?? null,
+      }));
+    });
+    window.addEventListener('portfolio-render-metrics', render);
+    window.addEventListener('portfolio-web-vital', vital);
+    resource.observe({ type: 'resource', buffered: true });
+    return () => {
+      window.removeEventListener('portfolio-render-metrics', render);
+      window.removeEventListener('portfolio-web-vital', vital);
+      resource.disconnect();
+    };
+  }, []);
+  return metrics;
+}

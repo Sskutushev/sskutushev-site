@@ -24,7 +24,7 @@ describe('httpSecurityMiddleware', () => {
     const response = responseDouble();
     const next = vi.fn() as NextFunction;
 
-    await httpSecurityMiddleware(cache as unknown as CacheService, 60)(
+    await httpSecurityMiddleware(cache as unknown as CacheService, 60, 'https://portfolio.example')(
       request as unknown as Request,
       response as unknown as Response,
       next,
@@ -32,6 +32,10 @@ describe('httpSecurityMiddleware', () => {
 
     expect(response.setHeader).toHaveBeenCalledWith('x-request-id', 'request-1');
     expect(response.setHeader).toHaveBeenCalledWith('x-content-type-options', 'nosniff');
+    expect(response.setHeader).toHaveBeenCalledWith(
+      'timing-allow-origin',
+      'https://portfolio.example',
+    );
     expect(next).toHaveBeenCalledOnce();
   });
 

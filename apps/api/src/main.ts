@@ -22,6 +22,7 @@ async function bootstrap(): Promise<void> {
     httpSecurityMiddleware(
       app.get(CacheService),
       config.getOrThrow<number>('RATE_LIMIT_PER_MINUTE'),
+      config.getOrThrow<string>('WEB_ORIGIN'),
     ),
   );
   app.enableCors({ origin: config.getOrThrow<string>('WEB_ORIGIN'), methods: ['GET', 'POST'] });

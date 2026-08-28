@@ -1,6 +1,6 @@
 import { GraphQLClient, gql } from 'graphql-request';
 
-const endpoint = import.meta.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql';
+const endpoint = import.meta.env.VITE_GRAPHQL_URL || '/graphql';
 
 export type Locale = 'RU' | 'EN';
 export interface Portfolio {
@@ -30,6 +30,13 @@ export interface Portfolio {
   }[];
   socialLinks: { type: string; url: string }[];
   stale: boolean;
+  weather: {
+    city: string;
+    temperatureC: number;
+    condition: string;
+    observedAt: string;
+    stale: boolean;
+  } | null;
 }
 
 const query = gql`
@@ -68,13 +75,23 @@ const query = gql`
       }
       stale
     }
+    ambientWeather {
+      city
+      temperatureC
+      condition
+      observedAt
+      stale
+    }
   }
 `;
 
 export async function fetchPortfolio(locale: Locale): Promise<Portfolio> {
   const client = new GraphQLClient(endpoint);
-  const response = await client.request<{ portfolioData: Portfolio }>(query, { locale });
-  return response.portfolioData;
+  const response = await client.request<{
+    portfolioData: Portfolio;
+    ambientWeather: Portfolio['weather'];
+  }>(query, { locale });
+  return { ...response.portfolioData, weather: response.ambientWeather };
 }
 
 export type AssistantAnswer = {

@@ -202,3 +202,14 @@ model SystemEvent {
 
   @@index([createdAt])
 }
+
+model PerformanceSnapshot {
+  id             String   @id @default(uuid()) @db.Uuid
+  metric         String   @db.String(8)
+  value          Float
+  rating         String   @db.String(16)
+  navigationType String?  @db.String(32)
+  createdAt      DateTime @default(now())
+
+  @@index([metric, createdAt])
+}

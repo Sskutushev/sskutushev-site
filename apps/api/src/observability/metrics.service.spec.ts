@@ -9,6 +9,9 @@ describe('MetricsService', () => {
     const output = metrics.render();
     expect(output).toContain('portfolio_http_requests_total{method="POST",route="/graphql"} 1');
     expect(output).toContain('portfolio_http_errors_total{method="GET",route="/other"} 1');
+    expect(output).toContain(
+      'portfolio_http_request_duration_seconds_count{method="POST",route="/graphql"} 1',
+    );
     expect(output).not.toContain('private-id');
   });
 });

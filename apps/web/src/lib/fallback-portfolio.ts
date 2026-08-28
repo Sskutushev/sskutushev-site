@@ -74,6 +74,7 @@ const common = {
     { type: 'LinkedIn', url: 'https://www.linkedin.com/in/sskutushev/' },
   ],
   stale: true,
+  weather: null,
 };
 
 export const fallbackPortfolio: Record<Locale, Portfolio> = {

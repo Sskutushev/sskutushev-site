@@ -3,6 +3,7 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { pointBudget, selectRenderQuality } from '../lib/render-quality';
 import { useSceneVisibility } from './use-scene-visibility';
+import { RuntimeProfiler } from './RuntimeProfiler';
 
 const vertex = `
 uniform float uTime;
@@ -87,6 +88,7 @@ export default function PointField(): React.JSX.Element {
           camera={{ position: [0, 4.2, 17], fov: 52 }}
           gl={{ antialias: false, powerPreference: 'high-performance' }}
         >
+          <RuntimeProfiler />
           <Particles count={count} />
         </Canvas>
       )}

@@ -19,6 +19,10 @@ export class MetricsService {
     const lines = [
       '# HELP portfolio_http_requests_total Completed HTTP requests.',
       '# TYPE portfolio_http_requests_total counter',
+      '# HELP portfolio_http_errors_total Completed HTTP 5xx responses.',
+      '# TYPE portfolio_http_errors_total counter',
+      '# HELP portfolio_http_request_duration_seconds HTTP request duration.',
+      '# TYPE portfolio_http_request_duration_seconds summary',
     ];
     for (const [key, metric] of this.metrics) {
       const [method, route] = key.split(' ', 2);
@@ -28,6 +32,7 @@ export class MetricsService {
       lines.push(
         `portfolio_http_request_duration_seconds_sum{${labels}} ${metric.durationSeconds}`,
       );
+      lines.push(`portfolio_http_request_duration_seconds_count{${labels}} ${metric.requests}`);
     }
     return `${lines.join('\n')}\n`;
   }

@@ -11,6 +11,7 @@ import { fallbackPortfolio } from './lib/fallback-portfolio';
 import { fetchPortfolio, type Locale } from './lib/portfolio';
 import { pointBudget, selectRenderQuality } from './lib/render-quality';
 import { usePointerGlow } from './lib/use-pointer-glow';
+import { useEngineeringMetrics } from './lib/use-engineering-metrics';
 import { useSmoothScroll } from './lib/use-smooth-scroll';
 
 const PointField = lazy(() => import('./scenes/PointField'));
@@ -54,8 +55,21 @@ export default function App(): React.JSX.Element {
   const [locale, setLocale] = useState<Locale>('RU');
   const [theme, setTheme] = useState<'thermal' | 'blueprint'>('thermal');
   const [engineering, setEngineering] = useState(false);
+  const [now, setNow] = useState(() => new Date());
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const quality = selectRenderQuality(window.innerWidth, reduced);
+  const runtime = useEngineeringMetrics();
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const clock = (timeZone: string) =>
+    new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone,
+    }).format(now);
   usePointerGlow(reduced);
   useSmoothScroll(reduced);
   const { scrollYProgress } = useScroll();
@@ -108,7 +122,12 @@ export default function App(): React.JSX.Element {
             </div>
           )}
           <div className="eyebrow">
-            <i /> {text.status} <span>UTC+3 / REMOTE</span>
+            <i /> {text.status}{' '}
+            <span>
+              {data.weather
+                ? `${data.weather.city} ${Math.round(data.weather.temperatureC)}°C ${data.weather.condition} · ${clock('Europe/Moscow')}`
+                : `SPB ${clock('Europe/Moscow')} · UTC ${clock('UTC')}`}
+            </span>
           </div>
           <motion.h1
             initial={reduced ? false : { opacity: 0, y: 30 }}
@@ -284,16 +303,37 @@ export default function App(): React.JSX.Element {
           <h2 id="engineering-title">ENGINEERING MODE</h2>
           <dl>
             <div>
+              <dt>FPS / FRAME</dt>
+              <dd>
+                {runtime.frameMs
+                  ? `${Math.round(1000 / runtime.frameMs)} / ${runtime.frameMs.toFixed(1)}MS`
+                  : '—'}
+              </dd>
+            </div>
+            <div>
               <dt>POINTS</dt>
               <dd>{pointBudget(quality).toLocaleString('ru-RU') || 'STATIC'}</dd>
             </div>
             <div>
-              <dt>DPR CAP</dt>
-              <dd>1.5</dd>
+              <dt>DPR</dt>
+              <dd>{window.devicePixelRatio.toFixed(2)}</dd>
             </div>
             <div>
-              <dt>DRAW CALL</dt>
-              <dd>1</dd>
+              <dt>DRAW CALLS</dt>
+              <dd>{runtime.drawCalls || '—'}</dd>
+            </div>
+            <div>
+              <dt>GRAPHQL / SERVER</dt>
+              <dd>
+                {runtime.graphqlRttMs?.toFixed(0) ?? '—'} / {runtime.serverMs?.toFixed(0) ?? '—'} MS
+              </dd>
+            </div>
+            <div>
+              <dt>LCP / INP / CLS</dt>
+              <dd>
+                {runtime.vitals.LCP?.toFixed(0) ?? '—'} / {runtime.vitals.INP?.toFixed(0) ?? '—'} /{' '}
+                {runtime.vitals.CLS?.toFixed(3) ?? '—'}
+              </dd>
             </div>
             <div>
               <dt>DATA</dt>

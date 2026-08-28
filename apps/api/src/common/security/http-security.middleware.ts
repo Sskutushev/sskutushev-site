@@ -4,7 +4,7 @@ import { CacheService } from '../../cache/cache.service';
 
 const requestIdPattern = /^[a-zA-Z0-9._-]{1,100}$/;
 
-export function httpSecurityMiddleware(cache: CacheService, limit: number) {
+export function httpSecurityMiddleware(cache: CacheService, limit: number, timingOrigin?: string) {
   return async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     const suppliedId = request.header('x-request-id');
     const requestId = suppliedId && requestIdPattern.test(suppliedId) ? suppliedId : randomUUID();
@@ -13,6 +13,7 @@ export function httpSecurityMiddleware(cache: CacheService, limit: number) {
     response.setHeader('referrer-policy', 'strict-origin-when-cross-origin');
     response.setHeader('permissions-policy', 'camera=(), microphone=(), geolocation=()');
     response.setHeader('cross-origin-resource-policy', 'same-site');
+    if (timingOrigin) response.setHeader('timing-allow-origin', timingOrigin);
 
     if (!request.path.startsWith('/health/')) {
       const client = createHash('sha256')
