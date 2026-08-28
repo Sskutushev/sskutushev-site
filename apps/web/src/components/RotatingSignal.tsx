@@ -24,9 +24,9 @@ export function RotatingSignal(): React.JSX.Element {
         <motion.strong
           aria-hidden
           key={signal}
-          initial={reduced ? false : { opacity: 0, y: 12, filter: 'blur(6px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          {...(reduced ? {} : { exit: { opacity: 0, y: -12, filter: 'blur(6px)' } })}
+          initial={reduced ? false : { y: 12, filter: 'blur(6px)' }}
+          animate={{ y: 0, filter: 'blur(0px)' }}
+          {...(reduced ? {} : { exit: { y: -12, filter: 'blur(6px)' } })}
           transition={{ duration: 0.35 }}
         >
           {signal}
