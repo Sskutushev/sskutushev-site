@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@400;500;600;700;800&display=swap');
-
 :root {
   --bg: #080b0e;
   --panel: #0d1115;
@@ -10,7 +8,7 @@
   --hot-surface: #a92e00;
   --cold: #25b6d2;
   --display: Inter, Arial, sans-serif;
-  --mono: 'DM Mono', monospace;
+  --mono: 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
   color-scheme: dark;
   --pointer-x: 70vw;
   --pointer-y: 30vh;

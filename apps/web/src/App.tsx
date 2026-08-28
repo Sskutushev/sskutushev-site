@@ -55,6 +55,7 @@ export default function App(): React.JSX.Element {
   const [locale, setLocale] = useState<Locale>('RU');
   const [theme, setTheme] = useState<'thermal' | 'blueprint'>('thermal');
   const [engineering, setEngineering] = useState(false);
+  const [visualsReady, setVisualsReady] = useState(false);
   const [now, setNow] = useState(() => new Date());
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const quality = selectRenderQuality(window.innerWidth, reduced);
@@ -63,6 +64,11 @@ export default function App(): React.JSX.Element {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
+  useEffect(() => {
+    if (reduced) return;
+    const timer = window.setTimeout(() => setVisualsReady(true), 1_500);
+    return () => window.clearTimeout(timer);
+  }, [reduced]);
   const clock = (timeZone: string) =>
     new Intl.DateTimeFormat('en-GB', {
       hour: '2-digit',
@@ -114,7 +120,7 @@ export default function App(): React.JSX.Element {
       </header>
       <main id="top">
         <section className="hero">
-          {!reduced && (
+          {visualsReady && (
             <div className="scene">
               <Suspense fallback={null}>
                 <PointField />
@@ -130,7 +136,7 @@ export default function App(): React.JSX.Element {
             </span>
           </div>
           <motion.h1
-            initial={reduced ? false : { opacity: 0, y: 30 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
@@ -220,7 +226,7 @@ export default function App(): React.JSX.Element {
           </div>
         </section>
 
-        {!reduced && (
+        {visualsReady && (
           <section className="ranking-section" aria-label="Interactive ranking projection">
             <div className="section-head">
               <p className="section-no">03 / DATA HONESTY</p>
@@ -246,7 +252,7 @@ export default function App(): React.JSX.Element {
             <br />
             <span>{text.architectureAccent}</span>
           </h2>
-          {!reduced && (
+          {visualsReady && (
             <Suspense fallback={<div className="visual-fallback" />}>
               <PipelineScene />
             </Suspense>
