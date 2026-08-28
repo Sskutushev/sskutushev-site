@@ -119,6 +119,8 @@ services:
     environment: { GF_AUTH_ANONYMOUS_ENABLED: 'true', GF_AUTH_ANONYMOUS_ORG_ROLE: 'Viewer' }
     volumes:
       - ./infrastructure/observability/grafana-datasource.yml:/etc/grafana/provisioning/datasources/default.yml:ro
+      - ./infrastructure/observability/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/default.yml:ro
+      - ./infrastructure/observability/dashboards:/var/lib/grafana/dashboards:ro
     ports: ['${GRAFANA_PORT:-3002}:3000']
     depends_on: [prometheus]
 volumes: { cockroach-data: {}, minio-data: {} }
