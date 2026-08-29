@@ -35,6 +35,11 @@ services:
   web:
     image: ghcr.io/sskutushev/sskutushev-site-web:${IMAGE_SHA:?IMAGE_SHA is required}
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://127.0.0.1/']
+      interval: 10s
+      timeout: 3s
+      retries: 10
   probe:
     image: ghcr.io/sskutushev/sskutushev-site-probe:${IMAGE_SHA:?IMAGE_SHA is required}
     environment:
@@ -67,6 +72,8 @@ services:
     environment: { GF_AUTH_ANONYMOUS_ENABLED: 'false' }
     volumes:
       - ./infrastructure/observability/grafana-datasource.yml:/etc/grafana/provisioning/datasources/default.yml:ro
+      - ./infrastructure/observability/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/default.yml:ro
+      - ./infrastructure/observability/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
     depends_on: [prometheus]
     restart: unless-stopped
