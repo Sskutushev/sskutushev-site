@@ -4,7 +4,7 @@ services:
     env_file: .env.production
     command: ['node', '/app/deployment/sync-resume.mjs']
     volumes:
-      - ./scripts/sync-resume.mjs:/app/deployment/sync-resume.mjs:ro
+      - ./apps/api/scripts/sync-resume.mjs:/app/deployment/sync-resume.mjs:ro
       - ./infrastructure/assets/sergey-kutushev-resume.pdf:/app/deployment/sergey-kutushev-resume.pdf:ro
     restart: 'no'
   semantic:

@@ -47,7 +47,8 @@ jobs:
           curl --fail http://localhost:9000/minio/health/live
       - name: Synchronize public resume asset
         env:
-          RESUME_FILE: infrastructure/assets/sergey-kutushev-resume.pdf
+          RESUME_FILE: ../../infrastructure/assets/sergey-kutushev-resume.pdf
+        working-directory: apps/api
         run: node scripts/sync-resume.mjs
       - run: pnpm prisma:generate
       - run: pnpm db:migrate
