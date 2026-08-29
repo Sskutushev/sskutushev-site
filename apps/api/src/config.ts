@@ -5,6 +5,7 @@ const schema = z
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PORT: z.coerce.number().int().positive().default(4000),
     RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(60),
+    DB_SLOW_QUERY_MS: z.coerce.number().int().nonnegative().default(250),
     DATABASE_URL: z.string().min(1),
     REDIS_URL: z.string().url(),
     S3_ENDPOINT: z.string().url(),

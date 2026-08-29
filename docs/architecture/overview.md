@@ -57,8 +57,10 @@ and readiness remain separate operational signals.
 
 The API is auto-instrumented with OpenTelemetry and exports OTLP traces to the local collector. The
 collector also scrapes API and synthetic-probe Prometheus metrics; Prometheus persists the bounded
-series and Grafana is provisioned with that datasource. Missing telemetry infrastructure never
-changes API readiness.
+series. Grafana provisions both the Prometheus datasource and the immutable `Portfolio Runtime`
+dashboard for request rate, 5xx ratio, duration, and exported spans. Prisma emits structured
+`database.slow_query` warnings above `DB_SLOW_QUERY_MS` without logging query parameters. Missing
+telemetry infrastructure never changes API readiness.
 
 The browser samples LCP, INP, CLS, and TTFB at 10% without storing a visitor identifier. A bounded
 REST endpoint persists only metric, value, rating, navigation type, and timestamp. Engineering mode

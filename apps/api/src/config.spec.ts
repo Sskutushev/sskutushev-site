@@ -16,6 +16,7 @@ describe('validateConfig', () => {
     expect(validateConfig(valid)).toMatchObject({
       PORT: 4000,
       RATE_LIMIT_PER_MINUTE: 60,
+      DB_SLOW_QUERY_MS: 250,
       NODE_ENV: 'development',
       ENABLE_MUTATIONS: false,
       ENABLE_WORKERS: false,
