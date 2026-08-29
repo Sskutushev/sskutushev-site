@@ -856,6 +856,24 @@ footer small {
   color: var(--muted);
   margin-top: 40px;
 }
+.drawer .websocket-metric {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+.websocket-metric svg {
+  overflow: visible;
+}
+.websocket-metric polyline {
+  fill: none;
+  stroke: var(--hot);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.websocket-metric small {
+  color: var(--muted);
+  font: 7px var(--mono);
+}
 .github-activity,
 .quality-dashboard {
   display: grid;
