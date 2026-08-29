@@ -10,3 +10,6 @@ Destructive migrations are not allowed in the same release that removes applicat
 
 Required protected-environment values are `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY` and
 `SITE_HOST`. Application secrets live only in `/opt/sskutushev-site/.env.production` on the host.
+Set the repository variable `PRODUCTION_DEPLOY_ENABLED=true` only after all protected production
+values and the target host are provisioned. Until then the production deployment job is explicitly
+skipped; a green CI run is not evidence of an external deployment.

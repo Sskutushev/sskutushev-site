@@ -196,7 +196,10 @@ jobs:
         uses: actions/deploy-pages@v4
   deploy-production:
     name: 18 · Deploy production
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.PRODUCTION_DEPLOY_ENABLED == 'true'
     needs: publish-pages
     permissions: { contents: read, packages: read }
     uses: ./.github/workflows/deploy-production.yml
