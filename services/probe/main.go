@@ -44,7 +44,14 @@ func main() {
 		slog.Error("invalid PROBE_INTERVAL")
 		os.Exit(2)
 	}
-	p.run(context.Background())
+	success := p.run(context.Background())
+	if environment("PROBE_ONCE", "false") == "true" {
+		if !success {
+			os.Exit(1)
+		}
+		slog.Info("synthetic smoke passed")
+		return
+	}
 	go func() {
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
@@ -65,13 +72,14 @@ func main() {
 	}
 }
 
-func (p *probe) run(ctx context.Context) {
+func (p *probe) run(ctx context.Context) bool {
 	checks := map[string]func(context.Context) error{
 		"public_http": func(ctx context.Context) error { return p.get(ctx, p.siteURL) },
 		"readiness":   func(ctx context.Context) error { return p.get(ctx, p.apiURL+"/health/ready") },
 		"graphql":     p.graphql,
 		"websocket":   p.websocket,
 	}
+	success := true
 	for name, check := range checks {
 		started := time.Now()
 		err := check(ctx)
@@ -79,9 +87,11 @@ func (p *probe) run(ctx context.Context) {
 		p.results[name] = result{success: err == nil, duration: time.Since(started), checked: time.Now()}
 		p.mu.Unlock()
 		if err != nil {
+			success = false
 			slog.Warn("synthetic check failed", "check", name, "error", err)
 		}
 	}
+	return success
 }
 
 func (p *probe) get(ctx context.Context, endpoint string) error {
@@ -101,7 +111,7 @@ func (p *probe) get(ctx context.Context, endpoint string) error {
 }
 
 func (p *probe) graphql(ctx context.Context) error {
-	body := bytes.NewBufferString(`{"query":"query SyntheticProbe { portfolioData(locale: EN) { profile { fullName } } }"}`)
+	body := bytes.NewBufferString(`{"query":"query SyntheticProbe { portfolioData(locale: EN) { profile { fullName } } githubActivity { source fetchedAt } latestQualityRun { sha environment } }"}`)
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, p.apiURL+"/graphql", body)
 	if err != nil {
 		return err
@@ -116,7 +126,11 @@ func (p *probe) graphql(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if response.StatusCode != http.StatusOK || !bytes.Contains(payload, []byte(`"portfolioData"`)) {
+	if response.StatusCode != http.StatusOK ||
+		!bytes.Contains(payload, []byte(`"portfolioData"`)) ||
+		!bytes.Contains(payload, []byte(`"githubActivity"`)) ||
+		!bytes.Contains(payload, []byte(`"latestQualityRun"`)) ||
+		bytes.Contains(payload, []byte(`"errors"`)) {
 		return fmt.Errorf("GraphQL contract failed with status %d", response.StatusCode)
 	}
 	return nil

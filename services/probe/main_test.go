@@ -18,7 +18,11 @@ func TestProbeContracts(t *testing.T) {
 		case r.URL.Path == "/health/ready":
 			writeJSON(w, 200, map[string]string{"status": "ready"})
 		case r.URL.Path == "/graphql" && r.Method == http.MethodPost:
-			writeJSON(w, 200, map[string]any{"data": map[string]any{"portfolioData": map[string]any{}}})
+			writeJSON(w, 200, map[string]any{"data": map[string]any{
+				"portfolioData":    map[string]any{},
+				"githubActivity":   map[string]any{},
+				"latestQualityRun": nil,
+			}})
 		default:
 			w.WriteHeader(200)
 		}
