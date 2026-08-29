@@ -12,6 +12,7 @@ import { fetchPortfolio, type Locale } from './lib/portfolio';
 import { pointBudget, selectRenderQuality } from './lib/render-quality';
 import { usePointerGlow } from './lib/use-pointer-glow';
 import { useEngineeringMetrics } from './lib/use-engineering-metrics';
+import { sparklinePoints } from './lib/graphql-websocket-metrics';
 import { useSmoothScroll } from './lib/use-smooth-scroll';
 
 const PointField = lazy(() => import('./scenes/PointField'));
@@ -59,7 +60,7 @@ export default function App(): React.JSX.Element {
   const [now, setNow] = useState(() => new Date());
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const quality = selectRenderQuality(window.innerWidth, reduced);
-  const runtime = useEngineeringMetrics();
+  const runtime = useEngineeringMetrics(engineering);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(timer);
@@ -332,6 +333,31 @@ export default function App(): React.JSX.Element {
               <dt>GRAPHQL / SERVER</dt>
               <dd>
                 {runtime.graphqlRttMs?.toFixed(0) ?? '—'} / {runtime.serverMs?.toFixed(0) ?? '—'} MS
+              </dd>
+            </div>
+            <div>
+              <dt>WEBSOCKET RTT</dt>
+              <dd className="websocket-metric">
+                <span>{runtime.websocket.rttMs?.toFixed(0) ?? '—'} MS</span>
+                <svg
+                  aria-label="WebSocket RTT, latest 30 samples"
+                  height="24"
+                  viewBox="0 0 120 24"
+                  width="120"
+                >
+                  <polyline points={sparklinePoints(runtime.websocket.samples)} />
+                </svg>
+                <small>
+                  {runtime.websocket.state.toUpperCase()} · {runtime.websocket.samples.length}/30 ·{' '}
+                  {runtime.websocket.reconnects} RECONNECTS
+                </small>
+              </dd>
+            </div>
+            <div>
+              <dt>SUBSCRIPTION</dt>
+              <dd>
+                {runtime.websocket.events} EVENTS ·{' '}
+                {runtime.websocket.lastEventType ?? 'AWAITING EVENT'}
               </dd>
             </div>
             <div>
