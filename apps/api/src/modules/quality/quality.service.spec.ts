@@ -1,10 +1,10 @@
 import { ForbiddenException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
 import { describe, expect, it, vi } from 'vitest';
-import { PrismaService } from '../../database/prisma.service';
+import type { PrismaService } from '../../database/prisma.service';
 import type { ImportQualityRunInput } from './quality.models';
 import { QualityService } from './quality.service';
-import { RealtimeService } from '../realtime/realtime.service';
+import type { RealtimeService } from '../realtime/realtime.service';
 
 const input: ImportQualityRunInput = {
   sha: 'abcdef1234567',

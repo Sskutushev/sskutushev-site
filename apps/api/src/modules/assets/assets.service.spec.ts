@@ -1,8 +1,8 @@
 import { ForbiddenException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PrismaService } from '../../database/prisma.service';
-import { StorageService } from '../../storage/storage.service';
+import type { PrismaService } from '../../database/prisma.service';
+import type { StorageService } from '../../storage/storage.service';
 import { AssetsService } from './assets.service';
 
 const checksum = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';

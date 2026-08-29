@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { MetricsService } from './metrics.service';
+import type { MetricsService } from './metrics.service';
 
 export function metricsMiddleware(metrics: MetricsService) {
   return (request: Request, response: Response, next: NextFunction): void => {

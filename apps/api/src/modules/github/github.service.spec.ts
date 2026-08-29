@@ -1,8 +1,8 @@
-import { ConfigService } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
 import { describe, expect, it, vi } from 'vitest';
-import { CacheService } from '../../cache/cache.service';
-import { PrismaService } from '../../database/prisma.service';
-import { GithubAdapter } from './github.adapter';
+import type { CacheService } from '../../cache/cache.service';
+import type { PrismaService } from '../../database/prisma.service';
+import type { GithubAdapter } from './github.adapter';
 import { GithubService } from './github.service';
 
 const repository = {

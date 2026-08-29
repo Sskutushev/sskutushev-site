@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import type { NextFunction, Request, Response } from 'express';
 import { describe, expect, it, vi } from 'vitest';
-import { MetricsService } from './metrics.service';
+import type { MetricsService } from './metrics.service';
 import { metricsMiddleware } from './metrics.middleware';
 
 describe('metricsMiddleware', () => {

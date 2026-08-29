@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { CacheService } from '../../cache/cache.service';
+import type { CacheService } from '../../cache/cache.service';
 import { WeatherService } from './weather.service';
 
 describe('WeatherService', () => {

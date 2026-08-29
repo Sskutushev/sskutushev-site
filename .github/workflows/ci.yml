@@ -43,6 +43,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - run: pnpm typecheck
+      - run: pnpm test:architecture
+      - run: pnpm quality:static
   test:
     name: 05 · Tests
     needs: typecheck

@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { describe, expect, it, vi } from 'vitest';
-import { CacheService } from '../../cache/cache.service';
+import type { CacheService } from '../../cache/cache.service';
 import { httpSecurityMiddleware } from './http-security.middleware';
 
 function responseDouble() {

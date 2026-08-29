@@ -12,6 +12,11 @@
     "test": "pnpm -r test",
     "test:coverage": "pnpm --filter @sskutushev/api test:report && pnpm --filter @sskutushev/web test:report",
     "test:e2e": "pnpm --filter @sskutushev/web test:e2e",
+    "test:architecture": "node scripts/check-architecture.mjs",
+    "quality:file-size": "node scripts/check-file-size.mjs",
+    "quality:duplicates": "jscpd apps services scripts --min-lines 10 --min-tokens 50 --threshold 5 --reporters console",
+    "quality:dead-code": "knip",
+    "quality:static": "pnpm quality:file-size && pnpm quality:duplicates && pnpm quality:dead-code",
     "lint": "pnpm -r lint",
     "check:repo": "node scripts/check-repository-hygiene.mjs",
     "format": "prettier --write .",
@@ -20,11 +25,13 @@
     "prisma:validate": "prisma validate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "verify": "pnpm check:repo && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "verify": "pnpm check:repo && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:architecture && pnpm quality:static && pnpm test && pnpm build",
     "verify:full": "pnpm verify && pnpm prisma:validate && pnpm test:coverage && pnpm test:e2e"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
+    "jscpd": "^5.0.16",
+    "knip": "^6.33.0",
     "prettier": "^3.5.3",
     "prisma": "^6.7.0",
     "tsx": "^4.19.3",
@@ -32,6 +39,31 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "knip": {
+    "ignore": [
+      "performance/k6/api.js"
+    ],
+    "workspaces": {
+      "apps/api": {
+        "entry": [
+          "src/main.ts",
+          "src/**/*.spec.ts"
+        ],
+        "ignoreDependencies": [
+          "@as-integrations/express5",
+          "@opentelemetry/api",
+          "@opentelemetry/auto-instrumentations-node",
+          "graphql-ws",
+          "ws"
+        ]
+      },
+      "apps/web": {
+        "entry": [
+          "tests/**/*.ts"
+        ]
+      }
+    }
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -8,6 +8,8 @@ export function GithubActivity({ locale }: { locale: Locale }): React.JSX.Elemen
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });
+  const stale = data ? data.stale : false;
+  const repositories = data ? data.repositories : [];
 
   return (
     <section className="github-activity" aria-label="GitHub activity">
@@ -16,11 +18,11 @@ export function GithubActivity({ locale }: { locale: Locale }): React.JSX.Elemen
           <small>GITHUB / LIVE SNAPSHOT</small>
           <strong>{locale === 'RU' ? 'ПУБЛИЧНАЯ АКТИВНОСТЬ' : 'PUBLIC ACTIVITY'}</strong>
         </div>
-        <span className={data?.stale ? 'is-stale' : ''}>
-          {isPending ? 'SYNCING' : isError ? 'OFFLINE' : data?.stale ? 'STALE' : 'LIVE'}
+        <span className={stale ? 'is-stale' : ''}>
+          {isPending ? 'SYNCING' : isError ? 'OFFLINE' : stale ? 'STALE' : 'LIVE'}
         </span>
       </header>
-      {data?.repositories.map((repository) => (
+      {repositories.map((repository) => (
         <a href={repository.url} target="_blank" rel="noreferrer" key={repository.name}>
           <strong>{repository.name}</strong>
           <span>

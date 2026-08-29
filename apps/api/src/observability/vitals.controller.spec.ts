@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
-import { PrismaService } from '../database/prisma.service';
+import type { PrismaService } from '../database/prisma.service';
 import { VitalsController } from './vitals.controller';
 
 describe('VitalsController', () => {

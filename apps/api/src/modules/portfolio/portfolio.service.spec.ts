@@ -1,8 +1,8 @@
 import { ForbiddenException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CacheService } from '../../cache/cache.service';
-import { PrismaService } from '../../database/prisma.service';
+import type { CacheService } from '../../cache/cache.service';
+import type { PrismaService } from '../../database/prisma.service';
 import { PortfolioService } from './portfolio.service';
 
 const storedProfile = {
