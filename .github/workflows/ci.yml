@@ -161,6 +161,23 @@ jobs:
     needs: build
     permissions: { contents: read, security-events: write }
     uses: ./.github/workflows/security.yml
+  production-contract:
+    name: 15 · Production delivery contract
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate immutable production Compose
+        env:
+          IMAGE_SHA: 0123456789abcdef0123456789abcdef01234567
+          SITE_HOST: portfolio.example.com
+        run: |
+          cp .env.example .env.production
+          docker compose -f docker-compose.production.yml config --quiet
+      - name: Verify deployment and rollback orchestration
+        run: sh scripts/test-production-deploy.sh
+      - name: Lint production shell contracts
+        run: shellcheck scripts/deploy-production.sh scripts/rollback-production.sh scripts/smoke-production.sh scripts/test-production-deploy.sh
   quality-report:
     name: 15 · Quality evidence
     needs:
@@ -171,6 +188,7 @@ jobs:
         service-quality,
         performance,
         security-deep,
+        production-contract,
       ]
     uses: ./.github/workflows/quality-report.yml
     secrets: inherit
