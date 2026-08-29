@@ -45,6 +45,10 @@ jobs:
             sleep 1
           done
           curl --fail http://localhost:9000/minio/health/live
+      - name: Synchronize public resume asset
+        env:
+          RESUME_FILE: infrastructure/assets/sergey-kutushev-resume.pdf
+        run: node scripts/sync-resume.mjs
       - run: pnpm prisma:generate
       - run: pnpm db:migrate
       - run: pnpm db:seed
@@ -62,6 +66,8 @@ jobs:
           done
           curl --fail http://127.0.0.1:4417/health/ready
           curl --fail http://127.0.0.1:4417/metrics
+          curl --fail --silent --show-error --output resume-smoke.pdf http://127.0.0.1:4417/assets/resume
+          test "$(wc -c < resume-smoke.pdf)" -gt 100000
           curl --fail http://127.0.0.1:4417/graphql \
             -H 'content-type: application/json' \
             --data '{"query":"query { portfolioData(locale: EN) { profile { fullName version } } latestQualityRun { sha } systemEvents(limit: 1) { type } }"}'

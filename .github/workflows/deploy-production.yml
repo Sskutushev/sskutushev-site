@@ -28,7 +28,7 @@ jobs:
           username: '${{ secrets.DEPLOY_USER }}'
           key: '${{ secrets.DEPLOY_SSH_KEY }}'
           fingerprint: '${{ secrets.DEPLOY_HOST_FINGERPRINT }}'
-          source: 'docker-compose.production.yml,infrastructure/caddy/Caddyfile,infrastructure/observability,scripts/deploy-production.sh,scripts/rollback-production.sh,scripts/smoke-production.sh'
+          source: 'docker-compose.production.yml,infrastructure/assets/sergey-kutushev-resume.pdf,infrastructure/caddy/Caddyfile,infrastructure/observability,scripts/deploy-production.sh,scripts/rollback-production.sh,scripts/smoke-production.sh,scripts/sync-resume.mjs'
           target: /opt/sskutushev-site
           overwrite: true
       - name: Deploy immutable image SHA

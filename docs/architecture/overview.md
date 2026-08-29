@@ -6,7 +6,7 @@ flowchart LR
   API -->|direct application queries| Prisma
   Prisma --> CockroachDB
   API -->|SWR cache| Redis
-  API -->|presigned assets| S3[MinIO / S3 compatible]
+  API -->|presigned uploads + bounded downloads| S3[MinIO / S3 compatible]
   API -->|grounded evidence| Gemini
   API -->|bounded semantic ranking| Semantic[Python / FastAPI]
   API -->|public repository metadata| GitHub[GitHub REST API]
@@ -15,7 +15,11 @@ flowchart LR
   Probe --> Browser
 ```
 
-CockroachDB is the source of truth. Redis is disposable and API availability does not depend on a successful cache write. The browser never proxies asset bytes through NestJS. The WebGL layer contains no essential text and can be removed without losing functionality.
+CockroachDB is the source of truth. Redis is disposable and API availability does not depend on a
+successful cache write. Uploads bypass NestJS through constrained presigned PUT requests; the fixed
+public resume is streamed through a same-origin API route after content-type and size validation so
+internal S3 endpoints are never exposed. The WebGL layer contains no essential text and can be
+removed without losing functionality.
 
 The `portfolioData` aggregate returns profile, grouped skills, experience with ordered highlights, translated case studies and social links in one read path. Static hosting uses a versioned in-repository snapshot only when the API cannot be reached and labels that state as stale; it is not presented as live database data.
 
@@ -42,6 +46,10 @@ Asset uploads are short-lived presigned PUT requests bound to an explicit MIME t
 Confirmation reads S3 metadata and moves the database record from `PENDING` to `READY` only when
 the type, checksum and configured size limit match. Invalid objects move to `FAILED`; repeated
 confirmation of an already-ready asset is idempotent.
+
+The versioned resume source is not part of the web image. Compose and production deployment run a
+required `resume-sync` preflight that writes it to a fixed S3 key before API startup. The Go probe
+downloads `/assets/resume` on every synthetic run, including the one-shot post-deploy smoke.
 
 Quality metrics are never synthesized in the browser. CI imports a run tied to a deployment SHA;
 CockroachDB stores the measured test, coverage, Lighthouse, bundle and vulnerability values, and

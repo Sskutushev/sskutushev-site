@@ -31,6 +31,7 @@ trap rollback EXIT INT TERM
 
 docker compose -f "$compose_file" pull
 docker compose -f "$compose_file" run --rm --no-deps api pnpm db:migrate
+docker compose -f "$compose_file" run --rm --no-deps resume-sync
 docker compose -f "$compose_file" up -d --wait semantic
 docker compose -f "$compose_file" up -d --wait --no-deps api
 docker compose -f "$compose_file" up -d --wait --no-deps web

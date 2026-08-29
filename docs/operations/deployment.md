@@ -6,7 +6,7 @@ traffic, then verifies readiness and a public GraphQL portfolio query over HTTPS
 
 The VPS records the last verified revision in `.image-sha.current` and copies it to
 `.image-sha.previous` before a rollout. `scripts/deploy-production.sh` pulls exact SHA-tagged images,
-runs the migration preflight, starts semantic/API/web in order, then the supporting services, and
+runs the migration and S3 resume synchronization preflights, starts semantic/API/web in order, then the supporting services, and
 accepts the revision only after the one-shot synthetic probe verifies public HTTP, readiness,
 GraphQL portfolio/quality/GitHub data, and the WebSocket upgrade.
 
