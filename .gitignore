@@ -9,6 +9,8 @@ playwright-report/
 .lighthouseci/
 test-results/
 artifacts/
+__pycache__/
+*.py[cod]
 *.log
 *.tsbuildinfo
 .DS_Store
@@ -16,7 +18,7 @@ plan.md
 photo_*.jpg
 204996450.jpg
 *.pdf
-!apps/web/public/sergey-kutushev-resume.pdf
+!infrastructure/assets/sergey-kutushev-resume.pdf
 FINAL_DEVELOPER_COMPETENCY_ASSESSMENT_*.md
 FINAL_IMPLEMENTATION_REPORT*.md
 docs/operations/implementation-status.md

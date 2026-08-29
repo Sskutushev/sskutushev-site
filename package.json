@@ -13,13 +13,14 @@
     "test:coverage": "pnpm --filter @sskutushev/api test:report && pnpm --filter @sskutushev/web test:report",
     "test:e2e": "pnpm --filter @sskutushev/web test:e2e",
     "lint": "pnpm -r lint",
+    "check:repo": "node scripts/check-repository-hygiene.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "verify": "pnpm check:repo && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "verify:full": "pnpm verify && pnpm prisma:validate && pnpm test:coverage && pnpm test:e2e"
   },
   "devDependencies": {

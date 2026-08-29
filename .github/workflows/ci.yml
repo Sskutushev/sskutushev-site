@@ -25,6 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+      - run: pnpm check:repo
       - run: pnpm format:check
   eslint:
     name: 03 · ESLint
