@@ -25,6 +25,7 @@ function createService(enabled = true) {
   };
   const storage = {
     presignUpload: vi.fn().mockResolvedValue('https://storage.example/upload'),
+    download: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3])),
     inspect: vi.fn().mockResolvedValue({
       contentType: 'application/pdf',
       checksumSha256: checksum,
@@ -59,6 +60,12 @@ describe('AssetsService', () => {
       }),
     ).rejects.toBeInstanceOf(ForbiddenException);
     expect(prisma.asset.create).not.toHaveBeenCalled();
+  });
+
+  it('returns a fresh signed URL for the fixed public resume object', async () => {
+    const { service, storage } = createService();
+    await expect(service.resumeDownload()).resolves.toEqual(new Uint8Array([1, 2, 3]));
+    expect(storage.download).toHaveBeenCalledWith('public/sergey-kutushev-resume.pdf');
   });
 
   it('binds the requested checksum to both metadata and the signed upload', async () => {

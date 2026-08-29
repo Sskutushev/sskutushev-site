@@ -6,6 +6,7 @@ const aws = vi.hoisted(() => ({
   send: vi.fn(),
   getSignedUrl: vi.fn<(client: unknown, command: unknown, options: unknown) => Promise<string>>(),
   putInputs: [] as unknown[],
+  getInputs: [] as unknown[],
   signedOptions: [] as unknown[],
 }));
 
@@ -14,6 +15,11 @@ vi.mock('@aws-sdk/client-s3', () => ({
   PutObjectCommand: class {
     constructor(readonly input: unknown) {
       aws.putInputs.push(input);
+    }
+  },
+  GetObjectCommand: class {
+    constructor(readonly input: unknown) {
+      aws.getInputs.push(input);
     }
   },
   HeadObjectCommand: class {
@@ -35,6 +41,7 @@ const config = {
       S3_REGION: 'us-east-1',
       S3_ACCESS_KEY: 'access',
       S3_SECRET_KEY: 'secret',
+      ASSET_MAX_BYTES: 10_485_760,
     })[key],
 } as ConfigService;
 
@@ -56,6 +63,38 @@ describe('StorageService', () => {
       ChecksumSHA256: 'checksum=',
     });
     expect(aws.signedOptions.at(-1)).toEqual({ expiresIn: 300 });
+  });
+
+  it('downloads only a valid PDF object', async () => {
+    const transformToByteArray = vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3]));
+    aws.send.mockResolvedValue({
+      Body: { transformToByteArray },
+      ContentType: 'application/pdf',
+      ContentLength: 3,
+    });
+    const storage = new StorageService(config);
+
+    await expect(storage.download('public/resume.pdf')).resolves.toEqual(new Uint8Array([1, 2, 3]));
+    expect(aws.getInputs.at(-1)).toEqual({
+      Bucket: 'portfolio',
+      Key: 'public/resume.pdf',
+    });
+    expect(transformToByteArray).toHaveBeenCalledOnce();
+  });
+
+  it('refuses an oversized public object before buffering it', async () => {
+    const transformToByteArray = vi.fn();
+    aws.send.mockResolvedValue({
+      Body: { transformToByteArray },
+      ContentType: 'application/pdf',
+      ContentLength: 10_485_761,
+    });
+    const storage = new StorageService(config);
+
+    await expect(storage.download('public/resume.pdf')).rejects.toThrow(
+      'Resume object is missing or has an invalid content type',
+    );
+    expect(transformToByteArray).not.toHaveBeenCalled();
   });
 
   it('fails closed when object metadata is incomplete', async () => {

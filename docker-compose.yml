@@ -50,6 +50,17 @@ services:
     restart: 'no'
     depends_on:
       cockroach: { condition: service_healthy }
+  resume-sync:
+    build: { context: ., dockerfile: infrastructure/docker/api.Dockerfile }
+    env_file: .env
+    environment: { S3_ENDPOINT: 'http://minio:9000' }
+    command: ['node', '/app/deployment/sync-resume.mjs']
+    volumes:
+      - ./apps/api/scripts/sync-resume.mjs:/app/deployment/sync-resume.mjs:ro
+      - ./infrastructure/assets/sergey-kutushev-resume.pdf:/app/deployment/sergey-kutushev-resume.pdf:ro
+    restart: 'no'
+    depends_on:
+      minio: { condition: service_healthy }
   api:
     build: { context: ., dockerfile: infrastructure/docker/api.Dockerfile }
     env_file: .env
@@ -75,6 +86,7 @@ services:
       {
         cockroach: { condition: service_healthy },
         migrate: { condition: service_completed_successfully },
+        resume-sync: { condition: service_completed_successfully },
         redis: { condition: service_healthy },
         minio: { condition: service_healthy },
         semantic: { condition: service_healthy },

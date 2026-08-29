@@ -191,7 +191,11 @@ export function ExperienceTimeline({
 
 export function ContactPanel({ locale }: { locale: Locale }): React.JSX.Element {
   const text = copy[locale];
-  const resumeUrl = `${import.meta.env.BASE_URL}sergey-kutushev-resume.pdf`;
+  const graphqlUrl = import.meta.env.VITE_GRAPHQL_URL || '/graphql';
+  const resumeUrl = new URL(
+    '/assets/resume',
+    new URL(graphqlUrl, window.location.origin).origin,
+  ).toString();
   return (
     <footer id="contact">
       <Reveal className="contact-intro">

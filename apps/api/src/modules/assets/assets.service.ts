@@ -7,6 +7,7 @@ import type { AssetModel, AssetUploadModel, CreateAssetUploadInput } from './ass
 
 @Injectable()
 export class AssetsService {
+  private static readonly resumeKey = 'public/sergey-kutushev-resume.pdf';
   constructor(
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
@@ -64,6 +65,10 @@ export class AssetsService {
       data: { status: 'READY', sizeBytes: object.sizeBytes },
     });
     return { id: ready.id, status: ready.status, contentType: ready.contentType };
+  }
+
+  resumeDownload(): Promise<Uint8Array> {
+    return this.storage.download(AssetsService.resumeKey);
   }
 
   private assertMutationsEnabled(): void {

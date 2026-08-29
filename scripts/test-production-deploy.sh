@@ -46,6 +46,7 @@ test "$(cat "$DEPLOY_STATE_FILE")" = "$IMAGE_SHA"
 test "$(cat "$DEPLOY_PREVIOUS_FILE")" = "abcdef0123456789abcdef0123456789abcdef01"
 grep -F "compose -f docker-compose.production.yml pull" "$log" >/dev/null
 grep -F "compose -f docker-compose.production.yml run --rm --no-deps api pnpm db:migrate" "$log" >/dev/null
+grep -F "compose -f docker-compose.production.yml run --rm --no-deps resume-sync" "$log" >/dev/null
 grep -F "compose -f docker-compose.production.yml up -d --wait semantic" "$log" >/dev/null
 grep -F "compose -f docker-compose.production.yml up -d --wait --no-deps api" "$log" >/dev/null
 grep -F "compose -f docker-compose.production.yml up -d --wait --no-deps web" "$log" >/dev/null

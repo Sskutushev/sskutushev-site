@@ -75,6 +75,7 @@ func main() {
 func (p *probe) run(ctx context.Context) bool {
 	checks := map[string]func(context.Context) error{
 		"public_http": func(ctx context.Context) error { return p.get(ctx, p.siteURL) },
+		"resume":      func(ctx context.Context) error { return p.get(ctx, p.siteURL+"/assets/resume") },
 		"readiness":   func(ctx context.Context) error { return p.get(ctx, p.apiURL+"/health/ready") },
 		"graphql":     p.graphql,
 		"websocket":   p.websocket,

@@ -30,7 +30,7 @@ func TestProbeContracts(t *testing.T) {
 	defer server.Close()
 	p := &probe{client: server.Client(), siteURL: server.URL, apiURL: server.URL, results: make(map[string]result)}
 	p.run(context.Background())
-	if !p.results["public_http"].success || !p.results["readiness"].success || !p.results["graphql"].success {
+	if !p.results["public_http"].success || !p.results["resume"].success || !p.results["readiness"].success || !p.results["graphql"].success {
 		t.Fatalf("expected HTTP contracts to pass: %#v", p.results)
 	}
 }
