@@ -13,6 +13,8 @@ jobs:
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm test:architecture
+      - run: pnpm quality:static
       - run: pnpm test
       - run: pnpm prisma:validate
       - run: pnpm build

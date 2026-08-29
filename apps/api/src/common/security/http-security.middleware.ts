@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { createHash, randomUUID } from 'node:crypto';
-import { CacheService } from '../../cache/cache.service';
+import type { CacheService } from '../../cache/cache.service';
 
 const requestIdPattern = /^[a-zA-Z0-9._-]{1,100}$/;
 

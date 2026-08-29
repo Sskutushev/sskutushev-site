@@ -40,7 +40,8 @@ export class CacheService implements OnModuleDestroy {
   async ping(): Promise<boolean> {
     try {
       if (this.redis.status === 'wait') await this.redis.connect();
-      return (await this.redis.ping()) === 'PONG';
+      await this.redis.ping();
+      return true;
     } catch {
       return false;
     }

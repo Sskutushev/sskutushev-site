@@ -1,6 +1,6 @@
-import { ConfigService } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PrismaService } from '../../database/prisma.service';
+import type { PrismaService } from '../../database/prisma.service';
 import { RealtimeService } from './realtime.service';
 
 const redisInstances = vi.hoisted(() => [] as Array<ReturnType<typeof redisDouble>>);

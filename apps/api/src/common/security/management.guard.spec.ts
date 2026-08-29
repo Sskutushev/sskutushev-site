@@ -1,5 +1,6 @@
-import { ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import type { ExecutionContext } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ManagementGuard } from './management.guard';

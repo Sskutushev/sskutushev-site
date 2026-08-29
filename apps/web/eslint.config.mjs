@@ -9,6 +9,22 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-unnecessary-condition': 'error',
+      complexity: ['error', 30],
+      'max-depth': ['error', 4],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@sskutushev/api', '@sskutushev/api/**', '../../api/**', '../../../api/**'],
+              message: 'The web app must consume API contracts, not API internals.',
+            },
+          ],
+        },
+      ],
     },
   },
 );
