@@ -105,20 +105,20 @@ const cases = [
     tech: ['Python', 'FastAPI', 'Redis', 'Qdrant', 'BigQuery', 'S3 / Wasabi'],
   },
   {
-    slug: 'analytics-migration',
-    titleRu: 'Analytics / Warehouse Migration',
-    titleEn: 'Analytics / Warehouse Migration',
+    slug: 'financial-concurrency',
+    titleRu: 'Financial Concurrency',
+    titleEn: 'Financial Concurrency',
     problemRu:
-      'Looker и прямые warehouse-запросы создавали лишнюю стоимость, latency и расхождение контрактов.',
+      'Расчёты с датой вступления в силу должны сохранять денежные инварианты при конкурентных изменениях.',
     problemEn:
-      'Looker and direct warehouse queries created avoidable cost, latency and contract drift.',
+      'Effective-dated calculations must preserve money invariants under concurrent changes.',
     approachRu:
-      'Typed TS/SQL layer, bounded params, provider abstraction и BigQuery/ClickHouse dialect parity.',
+      'Decimal money, дневной инвариант, optimistic concurrency и транзакционный перерасчёт.',
     approachEn:
-      'A typed TS/SQL layer, bounded parameters, provider abstraction and BigQuery/ClickHouse dialect parity.',
-    resultRu: 'Количество запросов к BigQuery сокращено примерно на 65%.',
-    resultEn: 'BigQuery request volume was reduced by approximately 65%.',
-    tech: ['TypeScript', 'BigQuery', 'ClickHouse', 'GraphQL'],
+      'Decimal money, a daily invariant, optimistic concurrency and transactional recalculation.',
+    resultRu: 'Конфликтующие изменения отклоняются явно, без тихой потери начислений.',
+    resultEn: 'Conflicting changes are rejected explicitly without silently losing accruals.',
+    tech: ['TypeScript', 'CockroachDB', 'Prisma', 'GraphQL'],
   },
   {
     slug: 'production-migration',

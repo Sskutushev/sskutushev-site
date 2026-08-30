@@ -12,12 +12,25 @@ describe('SemanticService', () => {
 
   it('uses the bounded Python ranking order when configured', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify([{ id: '1', score: 0.8 }]), { status: 200 }),
+      new Response(
+        JSON.stringify({ matches: [{ caseStudyId: '1', score: 0.8 }], modelVersion: 'lexical-v1' }),
+        { status: 200 },
+      ),
     );
     const service = new SemanticService({
       get: vi.fn(() => 'http://semantic:8000'),
     } as unknown as ConfigService);
     await expect(service.rank('backend reliability', chunks, 1)).resolves.toEqual([chunks[1]]);
+  });
+
+  it('falls back when Python violates the versioned response contract', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify([{ id: '0', score: 1 }]), { status: 200 }),
+    );
+    const service = new SemanticService({
+      get: vi.fn(() => 'http://semantic:8000'),
+    } as unknown as ConfigService);
+    await expect(service.rank('NestJS cache', chunks, 1)).resolves.toEqual([chunks[1]]);
   });
 
   it('falls back locally when the optional service is unavailable', async () => {

@@ -26,12 +26,16 @@ export function CaseSimulation(): React.JSX.Element {
   const [active, setActive] = useState<Scenario>('NORMAL');
   const result = scenarios[active];
   return (
-    <section className="case-simulation" aria-labelledby="simulation-title">
-      <header>
+    <section className="case-simulation mt-8 p-4 lg:p-7" aria-labelledby="simulation-title">
+      <header className="flex items-end justify-between gap-4">
         <p className="section-no">SIMULATION · NOT LIVE TRAFFIC</p>
         <h3 id="simulation-title">RESILIENCE PATH EXPLORER</h3>
       </header>
-      <div className="simulation-controls" role="group" aria-label="Simulated request condition">
+      <div
+        className="simulation-controls my-5 flex flex-wrap gap-2"
+        role="group"
+        aria-label="Simulated request condition"
+      >
         {(Object.keys(scenarios) as Scenario[]).map((scenario) => (
           <button
             aria-pressed={active === scenario}
