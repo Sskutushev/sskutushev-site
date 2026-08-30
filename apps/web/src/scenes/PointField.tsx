@@ -26,8 +26,8 @@ varying float vHeat;
 void main() {
   vec2 uv = gl_PointCoord - .5;
   float alpha = smoothstep(.5, .08, length(uv));
-  vec3 cold = vec3(.10, .58, .72);
-  vec3 hot = vec3(1., .31, .08);
+  vec3 cold = vec3(.46, .92, .08);
+  vec3 hot = vec3(.91, 1., .68);
   gl_FragColor = vec4(mix(cold, hot, vHeat), alpha * .78);
 }`;
 
