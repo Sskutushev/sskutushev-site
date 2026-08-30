@@ -27,8 +27,8 @@ varying float vSignal;
 void main() {
   float d = length(gl_PointCoord - .5);
   float alpha = smoothstep(.5, .05, d);
-  vec3 cold = vec3(.08, .68, .78);
-  vec3 hot = vec3(1., .25, .05);
+  vec3 cold = vec3(.46, .92, .08);
+  vec3 hot = vec3(.91, 1., .68);
   gl_FragColor = vec4(mix(cold, hot, smoothstep(.35, .85, vSignal)), alpha * .86);
 }`;
 

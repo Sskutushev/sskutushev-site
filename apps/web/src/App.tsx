@@ -138,12 +138,17 @@ export default function App(): React.JSX.Element {
                 : `SPB ${clock('Europe/Moscow')} · UTC ${clock('UTC')}`}
             </span>
           </div>
+          <div className="hero-identity" aria-label="Sergey Kutushev, senior fullstack engineer">
+            <span>SERGEY</span>
+            <span>KUTUSHEV</span>
+            <small>SR+ / PRODUCT ENGINEERING</small>
+          </div>
           <motion.h1
             initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            {text.hero[0]}
+            <span>{text.hero[0]}</span>
             <br />
             <em>{text.hero[1]}</em>
           </motion.h1>
@@ -158,6 +163,7 @@ export default function App(): React.JSX.Element {
             </a>
           </div>
           <div className="ticker">
+            <span className="ticker-index">PORTFOLIO / 26</span>
             <span>TYPE-SAFE CONTRACTS</span>
             <span>DATA HONESTY</span>
             <span>FAIL-CLOSED FLOWS</span>
