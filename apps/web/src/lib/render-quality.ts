@@ -7,6 +7,8 @@ export interface RenderCapabilities {
   hardwareConcurrency?: number;
   devicePixelRatio: number;
   maxTextureSize?: number;
+  /** True when WebGL is being emulated on the CPU rather than a GPU. */
+  softwareRenderer?: boolean;
 }
 
 const order: RenderQuality[] = ['STATIC', 'LOW', 'BALANCED', 'HIGH', 'ULTRA'];
@@ -18,8 +20,12 @@ export function selectRenderQuality({
   hardwareConcurrency,
   devicePixelRatio,
   maxTextureSize,
+  softwareRenderer,
 }: RenderCapabilities): RenderQuality {
-  if (reducedMotion || maxTextureSize === 0) return 'STATIC';
+  // A CPU-emulated renderer runs the scene as a slideshow and holds the main
+  // thread for the whole session. The designed static composition is the better
+  // result on such a device, not a degraded object.
+  if (reducedMotion || maxTextureSize === 0 || softwareRenderer) return 'STATIC';
   if (
     width < 760 ||
     (deviceMemory !== undefined && deviceMemory <= 2) ||

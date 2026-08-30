@@ -20,6 +20,11 @@ describe('render quality', () => {
     expect(selectRenderQuality({ ...capable, maxTextureSize: 0 })).toBe('STATIC');
   });
 
+  it('refuses the scene on a CPU-emulated renderer', () => {
+    expect(selectRenderQuality({ ...capable, softwareRenderer: true })).toBe('STATIC');
+    expect(selectRenderQuality({ ...capable, softwareRenderer: false })).toBe('ULTRA');
+  });
+
   it('degrades one level on slow-frame evidence', () => {
     expect(lowerRenderQuality('ULTRA', 30)).toBe('HIGH');
     expect(lowerRenderQuality('BALANCED', 23)).toBe('LOW');

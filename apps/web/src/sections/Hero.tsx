@@ -4,6 +4,7 @@ import { lazy, Suspense, useRef } from 'react';
 import type { RenderQuality } from '../lib/render-quality';
 import type { Theme } from '../theme/theme';
 import { useCoreDriver } from '../three/use-core-driver';
+import { useDeferredMount } from '../three/use-deferred-mount';
 import { StatusDot } from '../ui/StatusDot';
 import type { SiteCopy } from '../content/site-copy';
 import { asideOpacity, layerOpacity, typeOpacity, typeScale } from './hero-sequence';
@@ -28,6 +29,9 @@ export function Hero({
 }): React.JSX.Element {
   const pinned = useRef<HTMLDivElement>(null);
   const rendersCore = quality !== 'STATIC';
+  // The static composition carries the hero until the object is ready, so the
+  // canvas never competes with the headline for the main thread during load.
+  const coreMounted = useDeferredMount(rendersCore);
   const { driver, setProgress } = useCoreDriver(rendersCore);
 
   const { scrollYProgress } = useScroll({
@@ -49,14 +53,13 @@ export function Hero({
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero__pin" ref={pinned}>
         <div className="hero__frame">
-          {rendersCore && (
-            <div className="hero__stage">
-              <Suspense fallback={<div className="hero__stage-fallback" aria-hidden />}>
-                <CoreStage theme={theme} quality={quality} driver={driver} active={active} />
+          <div aria-hidden className={`hero__stage${coreMounted ? '' : ' hero__stage--static'}`}>
+            {coreMounted && (
+              <Suspense fallback={null}>
+                <CoreStage active={active} driver={driver} quality={quality} theme={theme} />
               </Suspense>
-            </div>
-          )}
-          {!rendersCore && <div className="hero__stage hero__stage--static" aria-hidden />}
+            )}
+          </div>
 
           <motion.p className="hero__eyebrow t-meta" style={{ opacity: supportingOpacity }}>
             {copy.hero.eyebrow}

@@ -35,6 +35,18 @@
 .hero__stage canvas {
   width: 100%;
   height: 100%;
+  animation: stage-in 700ms var(--ease-editorial) both;
+}
+
+/* The object is mounted after load, so it arrives rather than pops. */
+@keyframes stage-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .hero__stage--static {

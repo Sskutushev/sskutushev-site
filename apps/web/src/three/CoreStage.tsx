@@ -23,8 +23,12 @@ function CameraRig({ driver }: { driver: CoreDriver }): null {
   return null;
 }
 
-/** Studio built from lightformers so no HDRI is fetched at runtime. */
-function Stage({ theme }: { theme: Theme }): React.JSX.Element {
+/**
+ * Studio built from lightformers so no HDRI is fetched at runtime. The cubemap
+ * is rendered at start-up, and its resolution is measurable in the Lighthouse
+ * score, so it is sized by profile.
+ */
+function Stage({ theme, quality }: { theme: Theme; quality: RenderQuality }): React.JSX.Element {
   const key = useRef<THREE.Mesh>(null);
   const violet = useRef<THREE.Mesh>(null);
   const cyan = useRef<THREE.Mesh>(null);
@@ -53,7 +57,7 @@ function Stage({ theme }: { theme: Theme }): React.JSX.Element {
   return (
     <>
       <ambientLight intensity={appearance.ambientIntensity} ref={ambient} />
-      <Environment resolution={256}>
+      <Environment resolution={quality === 'ULTRA' ? 128 : 64}>
         <Lightformer
           form="rect"
           intensity={appearance.fillIntensity}
@@ -116,7 +120,7 @@ export default function CoreStage({
       gl={{ antialias: quality === 'ULTRA', powerPreference: 'high-performance', alpha: true }}
     >
       <RuntimeProfiler />
-      <Stage theme={theme} />
+      <Stage quality={quality} theme={theme} />
       <CameraRig driver={driver} />
       <SystemCore
         canTravelThrough={canTravelThrough}

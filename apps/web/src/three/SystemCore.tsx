@@ -26,7 +26,9 @@ function GlassShell({
   appearance: CoreAppearance;
   quality: RenderQuality;
 }): React.JSX.Element {
-  const refractive = quality === 'ULTRA' || quality === 'HIGH';
+  // Real refraction re-renders the scene into a buffer every frame; it earns
+  // its cost only on the top profile.
+  const refractive = quality === 'ULTRA';
   return (
     <RoundedBox
       args={[1.18, 1.18, 1.18]}
@@ -36,8 +38,8 @@ function GlassShell({
     >
       {refractive ? (
         <MeshTransmissionMaterial
-          samples={4}
-          resolution={256}
+          samples={2}
+          resolution={128}
           transmission={appearance.glassTransmission}
           roughness={appearance.glassRoughness}
           thickness={0.6}

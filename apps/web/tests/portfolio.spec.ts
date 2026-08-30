@@ -151,9 +151,20 @@ test.describe('reduced motion', () => {
 });
 
 test.describe('with motion enabled', () => {
-  test('the hero mounts exactly one canvas', async ({ page }) => {
+  test('a CPU-emulated renderer gets the static composition, not a slow object', async ({
+    page,
+  }) => {
     await page.goto('/');
-    await expect(page.locator('canvas')).toHaveCount(1);
+    const renderer = await page.evaluate(() => {
+      const gl = document.createElement('canvas').getContext('webgl2');
+      const info = gl?.getExtension('WEBGL_debug_renderer_info');
+      return info ? String(gl?.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    });
+    // Headless Chromium runs on SwiftShader, which is the case this guards.
+    expect(renderer).toMatch(/swiftshader|llvmpipe|software/i);
+    await expect(page.locator('.hero__stage--static')).toBeAttached();
+    // The budget allows one canvas at most; here it must be none.
+    await expect(page.locator('canvas')).toHaveCount(0);
   });
 
   test('engineering drawer owns its scroll and closes on Escape', async ({ page }) => {
