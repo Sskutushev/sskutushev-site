@@ -1,0 +1,86 @@
+/* Floating translucent navigation. Translucency is permitted here and on the
+   engineering drawer only — see docs/design/DESIGN_SYSTEM.md. */
+.nav {
+  position: fixed;
+  z-index: 50;
+  top: var(--s-5);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-7);
+  width: min(calc(100% - var(--gutter) * 2), var(--content-max));
+  height: var(--nav-height);
+  padding: 0 var(--s-3) 0 var(--s-6);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-full);
+  background: color-mix(in oklab, var(--surface-2) 62%, transparent);
+  backdrop-filter: blur(18px) saturate(130%);
+  box-shadow: var(--shadow-2);
+  transform: translateX(-50%);
+}
+
+.nav__mark {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+.nav__mark span {
+  color: var(--text-tertiary);
+}
+
+.nav nav {
+  display: flex;
+  gap: var(--s-6);
+  font-size: var(--t-small);
+  color: var(--text-secondary);
+}
+
+.nav nav a {
+  position: relative;
+  padding: var(--s-2) 0;
+  transition: color var(--d-micro) var(--ease-micro);
+}
+
+.nav nav a::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--d-micro) var(--ease-micro);
+}
+
+.nav nav a:hover,
+.nav nav a:focus-visible {
+  color: var(--text);
+}
+
+.nav nav a:hover::after,
+.nav nav a:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.nav__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+@media (max-width: 900px) {
+  .nav {
+    top: var(--s-3);
+    gap: var(--s-4);
+    padding-left: var(--s-4);
+  }
+
+  .nav nav {
+    display: none;
+  }
+}

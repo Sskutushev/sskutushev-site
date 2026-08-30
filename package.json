@@ -73,6 +73,10 @@
       "apps/web": {
         "entry": [
           "tests/**/*.ts"
+        ],
+        "ignoreDependencies": [
+          "@fontsource-variable/jetbrains-mono",
+          "@fontsource-variable/onest"
         ]
       }
     }
