@@ -1,15 +1,65 @@
-export type RenderQuality = 'STATIC' | 'LOW' | 'BALANCED' | 'HIGH';
+export type RenderQuality = 'STATIC' | 'LOW' | 'BALANCED' | 'HIGH' | 'ULTRA';
 
-export function selectRenderQuality(width: number, reducedMotion: boolean): RenderQuality {
-  if (reducedMotion) return 'STATIC';
-  if (width < 760) return 'LOW';
-  if (width < 1200) return 'BALANCED';
+export interface RenderCapabilities {
+  width: number;
+  reducedMotion: boolean;
+  deviceMemory?: number;
+  hardwareConcurrency?: number;
+  devicePixelRatio: number;
+  maxTextureSize?: number;
+}
+
+const order: RenderQuality[] = ['STATIC', 'LOW', 'BALANCED', 'HIGH', 'ULTRA'];
+
+export function selectRenderQuality({
+  width,
+  reducedMotion,
+  deviceMemory,
+  hardwareConcurrency,
+  devicePixelRatio,
+  maxTextureSize,
+}: RenderCapabilities): RenderQuality {
+  if (reducedMotion || maxTextureSize === 0) return 'STATIC';
+  if (
+    width < 760 ||
+    (deviceMemory !== undefined && deviceMemory <= 2) ||
+    (hardwareConcurrency !== undefined && hardwareConcurrency <= 2) ||
+    (maxTextureSize !== undefined && maxTextureSize < 4096)
+  )
+    return 'LOW';
+  if (
+    width < 1200 ||
+    (deviceMemory !== undefined && deviceMemory < 8) ||
+    (hardwareConcurrency !== undefined && hardwareConcurrency < 6) ||
+    devicePixelRatio > 2
+  )
+    return 'BALANCED';
+  if (
+    width >= 1600 &&
+    (deviceMemory === undefined || deviceMemory >= 8) &&
+    (hardwareConcurrency === undefined || hardwareConcurrency >= 8) &&
+    devicePixelRatio <= 2 &&
+    (maxTextureSize === undefined || maxTextureSize >= 8192)
+  )
+    return 'ULTRA';
   return 'HIGH';
 }
 
+export function lowerRenderQuality(quality: RenderQuality, frameMs: number): RenderQuality {
+  if (quality === 'STATIC' || frameMs <= 22) return quality;
+  return order[Math.max(0, order.indexOf(quality) - 1)]!;
+}
+
 export function pointBudget(quality: RenderQuality): number {
-  if (quality === 'HIGH') return 230_000;
+  if (quality === 'ULTRA' || quality === 'HIGH') return 230_000;
   if (quality === 'BALANCED') return 90_000;
   if (quality === 'LOW') return 15_000;
   return 0;
+}
+
+export function renderDpr(quality: RenderQuality): [number, number] {
+  if (quality === 'ULTRA') return [1, 2];
+  if (quality === 'HIGH') return [1, 1.5];
+  if (quality === 'BALANCED') return [1, 1.25];
+  return [1, 1];
 }

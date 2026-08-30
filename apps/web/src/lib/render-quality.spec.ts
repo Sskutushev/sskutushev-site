@@ -1,20 +1,36 @@
 import { describe, expect, it } from 'vitest';
-import { pointBudget, selectRenderQuality } from './render-quality';
+import { lowerRenderQuality, pointBudget, selectRenderQuality } from './render-quality';
+
+const capable = {
+  width: 1680,
+  reducedMotion: false,
+  deviceMemory: 16,
+  hardwareConcurrency: 12,
+  devicePixelRatio: 1.5,
+  maxTextureSize: 16_384,
+};
 
 describe('render quality', () => {
-  it('preserves the 230k desktop art contract', () => {
-    expect(pointBudget(selectRenderQuality(1440, false))).toBe(230_000);
+  it('selects all profiles from browser constraints', () => {
+    expect(selectRenderQuality(capable)).toBe('ULTRA');
+    expect(selectRenderQuality({ ...capable, width: 1300 })).toBe('HIGH');
+    expect(selectRenderQuality({ ...capable, deviceMemory: 4 })).toBe('BALANCED');
+    expect(selectRenderQuality({ ...capable, hardwareConcurrency: 2 })).toBe('LOW');
+    expect(selectRenderQuality({ ...capable, reducedMotion: true })).toBe('STATIC');
+    expect(selectRenderQuality({ ...capable, maxTextureSize: 0 })).toBe('STATIC');
   });
 
-  it('prioritizes reduced motion over device capability', () => {
-    expect(selectRenderQuality(1920, true)).toBe('STATIC');
+  it('degrades one level on slow-frame evidence', () => {
+    expect(lowerRenderQuality('ULTRA', 30)).toBe('HIGH');
+    expect(lowerRenderQuality('BALANCED', 23)).toBe('LOW');
+    expect(lowerRenderQuality('LOW', 16)).toBe('LOW');
+    expect(lowerRenderQuality('STATIC', 30)).toBe('STATIC');
   });
 
-  it('reduces geometry on narrow screens', () => {
-    expect(pointBudget(selectRenderQuality(390, false))).toBe(15_000);
-  });
-
-  it('uses a balanced budget for tablets and compact laptops', () => {
-    expect(pointBudget(selectRenderQuality(1024, false))).toBe(90_000);
+  it('keeps declared point budgets', () => {
+    expect(pointBudget('ULTRA')).toBe(230_000);
+    expect(pointBudget('BALANCED')).toBe(90_000);
+    expect(pointBudget('LOW')).toBe(15_000);
+    expect(pointBudget('STATIC')).toBe(0);
   });
 });

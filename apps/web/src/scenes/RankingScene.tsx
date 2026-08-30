@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useSceneVisibility } from './use-scene-visibility';
 import { RuntimeProfiler } from './RuntimeProfiler';
+import { renderDpr, type RenderQuality } from '../lib/render-quality';
 
 const vertex = `
 uniform float uTime;
@@ -96,18 +97,18 @@ function MorphPoints({ mode, count }: { mode: number; count: number }): React.JS
   );
 }
 
-export default function RankingScene(): React.JSX.Element {
+export default function RankingScene({ quality }: { quality: RenderQuality }): React.JSX.Element {
   const [mode, setMode] = useState(0);
   const { container, visible } = useSceneVisibility();
   const labels = ['ABSOLUTE', 'ADJUSTED', 'CATEGORY'];
-  const count = window.innerWidth < 760 ? 8_000 : 28_000;
+  const count = quality === 'LOW' ? 8_000 : 28_000;
 
   return (
     <div className="ranking-visual" ref={container}>
       {visible && (
         <Canvas
           aria-hidden
-          dpr={[1, 1.35]}
+          dpr={renderDpr(quality)}
           camera={{ position: [0, 0, 10], fov: 48 }}
           gl={{ antialias: false, powerPreference: 'high-performance' }}
         >

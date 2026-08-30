@@ -7,7 +7,7 @@ test('portfolio remains navigable without WebGL or a live API', async ({ page })
   await expect(page.locator('main')).toBeVisible();
   await page.getByRole('link', { name: /проектам/i }).focus();
   await expect(page.getByRole('link', { name: /проектам/i })).toBeFocused();
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('link', { name: 'Skip to work' })).toBeVisible();
 });
@@ -24,7 +24,7 @@ test('main document has no serious automated accessibility violations', async ({
 
 test('locale, theme, navigation, cases, and external links work', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
   await page.locator('.site-controls > button').last().click();
@@ -42,7 +42,7 @@ test('locale, theme, navigation, cases, and external links work', async ({ page 
 test('API failure keeps fallback content and resume delivery available', async ({ page }) => {
   await page.route('**/graphql', (route) => route.abort('connectionfailed'));
   await page.goto('/');
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
 
   await expect(page.getByText(/static content active/i)).toBeVisible();
   await expect(page.locator('.case')).toHaveCount(6);
@@ -72,7 +72,7 @@ test('mobile and reduced-motion presentation remains usable', async ({ page }) =
   await page.goto('/');
   await expect(page.locator('h1')).toBeVisible();
   await expect(page.locator('.scene')).toHaveCount(0);
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.goto('/#contact');
   await expect(page.locator('#contact')).toBeVisible();
 });
@@ -80,7 +80,7 @@ test('mobile and reduced-motion presentation remains usable', async ({ page }) =
 for (const theme of ['thermal', 'blueprint'] as const) {
   test(`visual regression: desktop ${theme}`, async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: 'EN' }).click();
+    await page.getByRole('button', { name: 'EN', exact: true }).click();
     if (theme === 'blueprint') await page.locator('.site-controls > button').last().click();
     await expect(page).toHaveScreenshot(`portfolio-desktop-${theme}.png`, {
       animations: 'disabled',
@@ -93,7 +93,7 @@ for (const theme of ['thermal', 'blueprint'] as const) {
 test('visual regression: mobile reduced motion', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   await expect(page).toHaveScreenshot('portfolio-mobile-reduced.png', {
     animations: 'disabled',
     mask: [page.locator('.eyebrow span')],
@@ -103,7 +103,7 @@ test('visual regression: mobile reduced motion', async ({ page }) => {
 
 test('visual regression: case-study view', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   const work = page.locator('#work');
   await work.scrollIntoViewIfNeeded();
   await expect(work).toHaveScreenshot('portfolio-cases.png', {
