@@ -1,0 +1,201 @@
+type AmbientWeather {
+  city: String!
+  condition: String!
+  observedAt: DateTime!
+  stale: Boolean!
+  temperatureC: Float!
+}
+
+type AssetModel {
+  contentType: String!
+  id: String!
+  status: String!
+}
+
+type AssetUploadModel {
+  assetId: String!
+  expiresAt: DateTime!
+  uploadUrl: String!
+}
+
+type AssistantAnswerModel {
+  answer: String!
+  generated: Boolean!
+  sources: [AssistantSourceModel!]!
+}
+
+type AssistantSourceModel {
+  excerpt: String!
+  label: String!
+}
+
+type CaseStudyModel {
+  approach: String!
+  problem: String!
+  result: String!
+  slug: String!
+  technologies: [String!]!
+  title: String!
+}
+
+input CreateAssetUploadInput {
+  checksumSha256: String!
+  contentType: String!
+  fileName: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ExperienceModel {
+  company: String!
+  highlights: [String!]!
+  period: String!
+  role: String!
+  summary: String!
+}
+
+type GithubActivityModel {
+  capturedAt: DateTime!
+  owner: String!
+  repositories: [GithubRepositoryModel!]!
+  stale: Boolean!
+}
+
+type GithubRepositoryModel {
+  forks: Int!
+  name: String!
+  openIssues: Int!
+  pushedAt: DateTime
+  stars: Int!
+  url: String!
+}
+
+input ImportQualityRunInput {
+  branch: String!
+  bundleKb: Int!
+  contractTests: Int!
+  coverageBranches: Float!
+  coverageLines: Float!
+  criticalVulnerabilities: Int!
+  e2eTests: Int!
+  environment: String!
+  highVulnerabilities: Int!
+  integrationTests: Int!
+  lighthouseAccessibility: Int!
+  lighthousePerformance: Int!
+  securityTests: Int!
+  sha: String!
+  unitTests: Int!
+}
+
+enum Locale {
+  EN
+  RU
+}
+
+type ManagedProfileModel {
+  availability: String!
+  fullName: String!
+  headline: String!
+  location: String!
+  socialLinks: [SocialLinkModel!]!
+  summary: String!
+  updatedAt: DateTime!
+  version: Int!
+  yearsExperience: Int!
+}
+
+type Mutation {
+  confirmAssetUpload(assetId: String!): AssetModel!
+  createAssetUpload(input: CreateAssetUploadInput!): AssetUploadModel!
+  importQualityRun(input: ImportQualityRunInput!): QualityRunModel!
+  updateProfile(input: UpdateProfileInput!): ManagedProfileModel!
+}
+
+type PortfolioModel {
+  caseStudies: [CaseStudyModel!]!
+  experience: [ExperienceModel!]!
+  profile: ProfileModel!
+  skills: [SkillModel!]!
+  socialLinks: [SocialLinkModel!]!
+  stale: Boolean!
+}
+
+type ProfileModel {
+  availability: String!
+  fullName: String!
+  headline: String!
+  location: String!
+  summary: String!
+  version: Int!
+  yearsExperience: Int!
+}
+
+type QualityRunModel {
+  branch: String!
+  bundleKb: Int!
+  contractTests: Int!
+  coverageBranches: Float!
+  coverageLines: Float!
+  createdAt: DateTime!
+  criticalVulnerabilities: Int!
+  e2eTests: Int!
+  environment: String!
+  highVulnerabilities: Int!
+  integrationTests: Int!
+  lighthouseAccessibility: Int!
+  lighthousePerformance: Int!
+  securityTests: Int!
+  sha: String!
+  unitTests: Int!
+}
+
+type Query {
+  ambientWeather: AmbientWeather
+  askProfile(locale: Locale!, question: String!): AssistantAnswerModel!
+  githubActivity: GithubActivityModel!
+  latestQualityRun: QualityRunModel
+  portfolioData(locale: Locale!): PortfolioModel!
+  systemEvents(limit: Int! = 20): [SystemEventModel!]!
+}
+
+type SkillModel {
+  category: String!
+  name: String!
+}
+
+input SocialLinkInput {
+  type: String!
+  url: String!
+}
+
+type SocialLinkModel {
+  type: String!
+  url: String!
+}
+
+type Subscription {
+  systemEvent: SystemEventModel!
+}
+
+type SystemEventModel {
+  createdAt: DateTime!
+  id: String!
+  publicPayload: String!
+  severity: String!
+  type: String!
+}
+
+input UpdateProfileInput {
+  availability: String
+  expectedVersion: Int!
+  fullName: String
+  headline: String
+  location: String
+  socialLinks: [SocialLinkInput!]
+  summary: String
+  yearsExperience: Int
+}

@@ -60,3 +60,6 @@ The fallback is an explicit checked-in portfolio snapshot for static GitHub Page
 - [Performance contract](docs/quality/performance.md) — WebGL and web budgets
 - [Security model](docs/operations/security.md) — trust boundaries and hardening status
 - [AI usage](docs/operations/ai-usage.md) — transparent scope and rejected suggestions
+
+The committed GraphQL schema and generated web operation types are checked for drift by
+`pnpm graphql:check`; API resolver changes cannot silently leave the frontend contract stale.
