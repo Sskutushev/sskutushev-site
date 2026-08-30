@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from .ranking import Document, rank
+from .contract import RankResponse, build_rank_response
+from .ranking import Document
 
 app = FastAPI(title="Portfolio similarity service", version="1.0.0")
 
@@ -17,20 +18,12 @@ class RankRequest(BaseModel):
     limit: int = Field(default=5, ge=1, le=20)
 
 
-class RankedDocument(BaseModel):
-    id: str
-    score: float
-
-
 @app.get("/health/live")
 def live() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.post("/v1/rank", response_model=list[RankedDocument])
-def rank_documents(request: RankRequest) -> list[RankedDocument]:
+@app.post("/v1/rank", response_model=RankResponse)
+def rank_documents(request: RankRequest) -> RankResponse:
     documents = [Document(id=item.id, text=item.text) for item in request.documents]
-    return [
-        RankedDocument(id=document.id, score=round(score, 6))
-        for document, score in rank(request.query, documents, request.limit)
-    ]
+    return build_rank_response(request.query, documents, request.limit)

@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { retrieve, type KnowledgeChunk } from './retrieval';
 
-type RankedDocument = { id: string; score: number };
+type RankResponse = {
+  matches: { caseStudyId: string; score: number }[];
+  modelVersion: string;
+};
 
 @Injectable()
 export class SemanticService {
@@ -26,12 +29,14 @@ export class SemanticService {
           })),
           limit,
         }),
-        signal: AbortSignal.timeout(2_000),
+        signal: AbortSignal.timeout(800),
       });
       if (!response.ok) throw new Error(`Similarity service returned ${response.status}`);
-      const ranked = (await response.json()) as RankedDocument[];
-      const selected = ranked
-        .map(({ id }) => chunks[Number(id)])
+      const ranked = (await response.json()) as RankResponse;
+      if (!ranked.modelVersion || !Array.isArray(ranked.matches))
+        throw new Error('Invalid rank contract');
+      const selected = ranked.matches
+        .map(({ caseStudyId }) => chunks[Number(caseStudyId)])
         .filter((chunk): chunk is KnowledgeChunk => chunk !== undefined);
       return selected.length ? selected : retrieve(question, chunks, limit);
     } catch {
