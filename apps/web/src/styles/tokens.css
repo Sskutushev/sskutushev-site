@@ -1,0 +1,108 @@
+/*
+ * Titanium / Prism tokens — see docs/design/COLOR_SYSTEM.md.
+ *
+ * Both themes are declared once through light-dark(). The toggle changes only
+ * `color-scheme`, so a theme switch cannot drift between two duplicated blocks,
+ * and an unset preference resolves from the operating system without a script.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Primitive — prism ramp. Light values are darkened, not reused, so 1px
+     strokes and small text hold contrast on warm paper. */
+  --prism-violet: light-dark(#6258ff, #7868ff);
+  --prism-blue: light-dark(#0b62c4, #38bdf8);
+  --prism-cyan: light-dark(#0e8a99, #5ee7f7);
+  --prism-critical: light-dark(#c42d55, #ff557e);
+  --prism-warning: light-dark(#8a5606, #f0a93b);
+
+  /* Semantic — neutral ground and surfaces. Elevation always moves toward the
+     light source, in both themes. Every text token clears 4.5:1 against every
+     surface it is used on; the values are asserted in tokens.spec.ts. */
+  --bg: light-dark(#f2f0ea, #06070a);
+  --surface-1: light-dark(#f8f7f3, #0d0f14);
+  --surface-2: light-dark(#ffffff, #12151c);
+  --surface-3: light-dark(#ffffff, #191d26);
+
+  --text: light-dark(#08090c, #f4f3ef);
+  --text-secondary: light-dark(#5c5f69, #a6a8b1);
+  --text-tertiary: light-dark(#6a6d74, #868a95);
+
+  --hairline: light-dark(rgb(8 9 12 / 10%), rgb(255 255 255 / 10%));
+  --hairline-strong: light-dark(rgb(8 9 12 / 20%), rgb(255 255 255 / 18%));
+
+  /* Semantic — action and state */
+  --accent: var(--prism-violet);
+  --accent-fg: light-dark(#ffffff, #0a0a12);
+  --accent-quiet: var(--prism-blue);
+  --state-ok: var(--prism-cyan);
+  --state-degraded: var(--prism-warning);
+  --state-failed: var(--prism-critical);
+
+  /* Shadows carry elevation in light only; on near-black they are invisible
+     and cost paint time. */
+  --shadow-2:
+    0 1px 2px light-dark(rgb(8 9 12 / 4%), transparent),
+    0 8px 24px light-dark(rgb(8 9 12 / 6%), transparent);
+  --shadow-3:
+    0 2px 4px light-dark(rgb(8 9 12 / 6%), transparent),
+    0 20px 48px light-dark(rgb(8 9 12 / 10%), transparent);
+
+  /* Type */
+  --font-sans: 'Onest Variable', 'Onest', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+  --t-display: clamp(2.75rem, 6.1vw, 7.5rem);
+  --t-h1: clamp(2.25rem, 4.4vw, 5.25rem);
+  --t-h2: clamp(2rem, 3.6vw, 4.25rem);
+  --t-h3: clamp(1.75rem, 2.4vw, 2.5rem);
+  --t-lead: clamp(1.125rem, 1.5vw, 1.6rem);
+  --t-body-lg: 1.3125rem;
+  --t-body: 1.0625rem;
+  --t-small: 0.9375rem;
+  --t-meta: 0.75rem;
+  --t-meta-sm: 0.6875rem;
+
+  /* Space — 4px base */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4.5rem;
+  --s-9: 7rem;
+  --s-10: clamp(7rem, 12vw, 13.5rem);
+
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --content-max: 97.5rem;
+  --measure-lead: 22em;
+  --measure-body: 34em;
+
+  /* Shape */
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --r-full: 999px;
+
+  /* Motion — four registers, see docs/design/MOTION.md */
+  --ease-micro: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-interface: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --d-micro: 180ms;
+  --d-interface: 320ms;
+  --d-editorial: 700ms;
+
+  --nav-height: 4.25rem;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}

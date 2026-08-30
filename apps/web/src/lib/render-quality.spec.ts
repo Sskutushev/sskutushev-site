@@ -27,6 +27,12 @@ describe('render quality', () => {
     expect(lowerRenderQuality('STATIC', 30)).toBe('STATIC');
   });
 
+  it('never degrades to STATIC on slow frames', () => {
+    let quality = lowerRenderQuality('ULTRA', 40);
+    for (let step = 0; step < 6; step += 1) quality = lowerRenderQuality(quality, 40);
+    expect(quality).toBe('LOW');
+  });
+
   it('keeps declared point budgets', () => {
     expect(pointBudget('ULTRA')).toBe(230_000);
     expect(pointBudget('BALANCED')).toBe(90_000);

@@ -45,9 +45,15 @@ export function selectRenderQuality({
   return 'HIGH';
 }
 
+/**
+ * Runtime degradation floors at LOW. STATIC means "this device cannot or must
+ * not render the scene" — reduced motion, or no WebGL — and is decided by
+ * capability detection. Dropping to it because a few frames ran long removes
+ * the object entirely, which is a design failure rather than a saving.
+ */
 export function lowerRenderQuality(quality: RenderQuality, frameMs: number): RenderQuality {
-  if (quality === 'STATIC' || frameMs <= 22) return quality;
-  return order[Math.max(0, order.indexOf(quality) - 1)]!;
+  if (quality === 'STATIC' || quality === 'LOW' || frameMs <= 22) return quality;
+  return order[Math.max(order.indexOf('LOW'), order.indexOf(quality) - 1)]!;
 }
 
 export function pointBudget(quality: RenderQuality): number {
