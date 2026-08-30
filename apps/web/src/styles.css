@@ -412,6 +412,68 @@ h2 span {
     transform 0.3s,
     color 0.3s;
 }
+
+.case-simulation {
+  margin-top: 2rem;
+  border: 1px solid var(--line);
+  padding: clamp(1rem, 2vw, 1.75rem);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+}
+
+.case-simulation header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.case-simulation h3 {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+}
+
+.simulation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.25rem 0;
+}
+
+.simulation-controls button {
+  border: 1px solid var(--line);
+  padding: 0.55rem 0.75rem;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.simulation-controls button.active {
+  border-color: var(--hot);
+  color: var(--text);
+  background: color-mix(in srgb, var(--hot) 12%, transparent);
+}
+
+.simulation-result {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.5fr) 1fr;
+  gap: 1rem;
+  border-left: 3px solid var(--hot);
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--hot) 8%, transparent);
+}
+
+.simulation-result.warn {
+  border-left-color: #e5a93f;
+}
+
+.simulation-result.error {
+  border-left-color: #e24b3b;
+}
+
+.simulation-result span {
+  color: var(--muted);
+}
 .case:hover > b {
   color: var(--hot);
   transform: translate(5px, -5px);

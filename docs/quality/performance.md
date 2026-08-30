@@ -3,8 +3,11 @@
 - Essential text and navigation render without WebGL.
 - The Three.js chunk is lazy-loaded.
 - Desktop uses one `THREE.Points` draw call for 230,000 procedural points.
-- Narrow screens use 15,000 points and DPR is capped at 1.5.
+- Narrow or constrained devices use 15,000 points; DPR is capped per render profile.
 - Reduced-motion users receive the complete DOM experience with no animated canvas.
+- The initial profile uses `deviceMemory`, hardware concurrency, DPR and WebGL limits. Four
+  consecutive frame samples above 22 ms lower particle count and DPR by one profile.
+- A missing WebGL context selects the static DOM experience.
 - The production build fails when the initial application chunk exceeds 250 KB gzip or any lazy
   chunk exceeds 300 KB gzip.
 

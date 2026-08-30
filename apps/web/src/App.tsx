@@ -7,9 +7,11 @@ import { AssistantChat } from './components/AssistantChat';
 import { GithubActivity } from './components/GithubActivity';
 import { SiteControls } from './components/SiteControls';
 import { QualityDashboard } from './components/QualityDashboard';
+import { CaseSimulation } from './components/CaseSimulation';
 import { fallbackPortfolio } from './lib/fallback-portfolio';
 import { fetchPortfolio, type Locale } from './lib/portfolio';
-import { pointBudget, selectRenderQuality } from './lib/render-quality';
+import { pointBudget } from './lib/render-quality';
+import { useRenderQuality } from './lib/use-render-quality';
 import { usePointerGlow } from './lib/use-pointer-glow';
 import { useEngineeringMetrics } from './lib/use-engineering-metrics';
 import { sparklinePoints } from './lib/graphql-websocket-metrics';
@@ -59,7 +61,7 @@ export default function App(): React.JSX.Element {
   const [visualsReady, setVisualsReady] = useState(false);
   const [now, setNow] = useState(() => new Date());
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const quality = selectRenderQuality(window.innerWidth, reduced);
+  const quality = useRenderQuality(reduced);
   const runtime = useEngineeringMetrics(engineering);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
@@ -121,10 +123,10 @@ export default function App(): React.JSX.Element {
       </header>
       <main id="top">
         <section className="hero">
-          {visualsReady && (
+          {visualsReady && quality !== 'STATIC' && (
             <div className="scene">
               <Suspense fallback={null}>
-                <PointField />
+                <PointField quality={quality} />
               </Suspense>
             </div>
           )}
@@ -225,9 +227,10 @@ export default function App(): React.JSX.Element {
               </article>
             ))}
           </div>
+          <CaseSimulation />
         </section>
 
-        {visualsReady && (
+        {visualsReady && quality !== 'STATIC' && (
           <section className="ranking-section" aria-label="Interactive ranking projection">
             <div className="section-head">
               <p className="section-no">03 / DATA HONESTY</p>
@@ -238,7 +241,7 @@ export default function App(): React.JSX.Element {
               </p>
             </div>
             <Suspense fallback={<div className="visual-fallback" />}>
-              <RankingScene />
+              <RankingScene quality={quality} />
             </Suspense>
           </section>
         )}
@@ -253,9 +256,9 @@ export default function App(): React.JSX.Element {
             <br />
             <span>{text.architectureAccent}</span>
           </h2>
-          {visualsReady && (
+          {visualsReady && quality !== 'STATIC' && (
             <Suspense fallback={<div className="visual-fallback" />}>
-              <PipelineScene />
+              <PipelineScene quality={quality} />
             </Suspense>
           )}
           <div className="pipeline-console">
@@ -316,6 +319,10 @@ export default function App(): React.JSX.Element {
                   ? `${Math.round(1000 / runtime.frameMs)} / ${runtime.frameMs.toFixed(1)}MS`
                   : '—'}
               </dd>
+            </div>
+            <div>
+              <dt>RENDER PROFILE</dt>
+              <dd>{quality}</dd>
             </div>
             <div>
               <dt>POINTS</dt>

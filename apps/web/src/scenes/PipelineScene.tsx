@@ -3,6 +3,7 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useSceneVisibility } from './use-scene-visibility';
 import { RuntimeProfiler } from './RuntimeProfiler';
+import { renderDpr, type RenderQuality } from '../lib/render-quality';
 
 const vertex = `
 uniform float uTime;
@@ -67,19 +68,19 @@ function DataFlow({ count }: { count: number }): React.JSX.Element {
   );
 }
 
-export default function PipelineScene(): React.JSX.Element {
+export default function PipelineScene({ quality }: { quality: RenderQuality }): React.JSX.Element {
   const { container, visible } = useSceneVisibility();
   return (
     <div className="pipeline-visual" ref={container}>
       {visible && (
         <Canvas
           aria-hidden
-          dpr={[1, 1.25]}
+          dpr={renderDpr(quality)}
           camera={{ position: [0, 0, 10], fov: 48 }}
           gl={{ antialias: false, powerPreference: 'high-performance' }}
         >
           <RuntimeProfiler />
-          <DataFlow count={window.innerWidth < 760 ? 4_000 : 14_000} />
+          <DataFlow count={quality === 'LOW' ? 4_000 : 14_000} />
         </Canvas>
       )}
       <span className="scene-label">REQUEST → CONTRACT → DOMAIN → DATA → RESPONSE</span>

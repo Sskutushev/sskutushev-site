@@ -1,7 +1,7 @@
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { pointBudget, selectRenderQuality } from '../lib/render-quality';
+import { pointBudget, renderDpr, type RenderQuality } from '../lib/render-quality';
 import { useSceneVisibility } from './use-scene-visibility';
 import { RuntimeProfiler } from './RuntimeProfiler';
 
@@ -76,15 +76,15 @@ function Particles({ count }: { count: number }): React.JSX.Element {
   );
 }
 
-export default function PointField(): React.JSX.Element {
-  const count = pointBudget(selectRenderQuality(window.innerWidth, false));
+export default function PointField({ quality }: { quality: RenderQuality }): React.JSX.Element {
+  const count = pointBudget(quality);
   const { container, visible } = useSceneVisibility();
   return (
     <div className="scene-canvas" ref={container}>
       {visible && (
         <Canvas
           aria-hidden
-          dpr={[1, 1.5]}
+          dpr={renderDpr(quality)}
           camera={{ position: [0, 4.2, 17], fov: 52 }}
           gl={{ antialias: false, powerPreference: 'high-performance' }}
         >
