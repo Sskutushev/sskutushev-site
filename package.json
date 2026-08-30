@@ -59,6 +59,7 @@
       "apps/api": {
         "entry": [
           "src/main.ts",
+          "src/generate-schema.ts",
           "src/**/*.spec.ts"
         ],
         "ignoreDependencies": [
