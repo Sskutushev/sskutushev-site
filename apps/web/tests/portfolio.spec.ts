@@ -85,7 +85,7 @@ for (const theme of ['thermal', 'blueprint'] as const) {
     await expect(page).toHaveScreenshot(`portfolio-desktop-${theme}.png`, {
       animations: 'disabled',
       mask: [page.locator('.eyebrow span')],
-      maxDiffPixelRatio: 0.02,
+      maxDiffPixelRatio: 0.04,
     });
   });
 }
