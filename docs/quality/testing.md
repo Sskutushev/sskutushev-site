@@ -1,5 +1,13 @@
 # Testing strategy
 
+## GraphQL contract drift
+
+`pnpm graphql:check` builds the NestJS resolver metadata into the committed `schema.graphql`,
+regenerates typed web operations, and fails when either output differs from Git. The generator uses
+Nest's schema factory without booting the API or connecting to infrastructure, so the contract gate
+is deterministic in the fast CI stage. Frontend request and response types come from these generated
+operations rather than manually duplicated DTOs.
+
 Verification is organized around risk rather than mirroring source files:
 
 - domain invariants and state transitions;

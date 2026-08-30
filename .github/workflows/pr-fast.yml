@@ -10,6 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+      - run: pnpm graphql:check
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck

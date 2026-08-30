@@ -1,45 +1,21 @@
-import { GraphQLClient, gql } from 'graphql-request';
+import { GraphQLClient } from 'graphql-request';
+import { graphql } from '../graphql';
+import type {
+  AskProfileQuery,
+  GithubActivityQuery,
+  LatestQualityRunQuery,
+  PortfolioQuery,
+  PortfolioQueryVariables,
+} from '../graphql/graphql';
 
 const endpoint = import.meta.env.VITE_GRAPHQL_URL || '/graphql';
 
-export type Locale = 'RU' | 'EN';
-export interface Portfolio {
-  profile: {
-    fullName: string;
-    headline: string;
-    summary: string;
-    location: string;
-    availability: string;
-    yearsExperience: number;
-  };
-  skills: { name: string; category: string }[];
-  experience: {
-    company: string;
-    role: string;
-    period: string;
-    summary: string;
-    highlights: string[];
-  }[];
-  caseStudies: {
-    slug: string;
-    title: string;
-    problem: string;
-    approach: string;
-    result: string;
-    technologies: string[];
-  }[];
-  socialLinks: { type: string; url: string }[];
-  stale: boolean;
-  weather: {
-    city: string;
-    temperatureC: number;
-    condition: string;
-    observedAt: string;
-    stale: boolean;
-  } | null;
-}
+export type Locale = PortfolioQueryVariables['locale'];
+export type Portfolio = PortfolioQuery['portfolioData'] & {
+  weather: PortfolioQuery['ambientWeather'];
+};
 
-const query = gql`
+const portfolioQuery = graphql(`
   query Portfolio($locale: Locale!) {
     portfolioData(locale: $locale) {
       profile {
@@ -83,116 +59,88 @@ const query = gql`
       stale
     }
   }
-`;
+`);
 
 export async function fetchPortfolio(locale: Locale): Promise<Portfolio> {
   const client = new GraphQLClient(endpoint);
-  const response = await client.request<{
-    portfolioData: Portfolio;
-    ambientWeather: Portfolio['weather'];
-  }>(query, { locale });
+  const response = await client.request(portfolioQuery, { locale });
   return { ...response.portfolioData, weather: response.ambientWeather };
 }
 
-export type AssistantAnswer = {
-  answer: string;
-  generated: boolean;
-  sources: Array<{ label: string; excerpt: string }>;
-};
+export type AssistantAnswer = AskProfileQuery['askProfile'];
+
+const askProfileQuery = graphql(`
+  query AskProfile($question: String!, $locale: Locale!) {
+    askProfile(question: $question, locale: $locale) {
+      answer
+      generated
+      sources {
+        label
+        excerpt
+      }
+    }
+  }
+`);
 
 export async function askProfile(question: string, locale: Locale): Promise<AssistantAnswer> {
   const client = new GraphQLClient(endpoint);
-  const data = await client.request<{ askProfile: AssistantAnswer }>(
-    `query AskProfile($question: String!, $locale: Locale!) {
-      askProfile(question: $question, locale: $locale) {
-        answer
-        generated
-        sources { label excerpt }
-      }
-    }`,
-    { question, locale },
-  );
+  const data = await client.request(askProfileQuery, { question, locale });
   return data.askProfile;
 }
 
-export type GithubActivity = {
-  owner: string;
-  capturedAt: string;
-  stale: boolean;
-  repositories: Array<{
-    name: string;
-    url: string;
-    stars: number;
-    forks: number;
-    openIssues: number;
-    pushedAt: string | null;
-  }>;
-};
+export type GithubActivity = GithubActivityQuery['githubActivity'];
+
+const githubActivityQuery = graphql(`
+  query GithubActivity {
+    githubActivity {
+      owner
+      capturedAt
+      stale
+      repositories {
+        name
+        url
+        stars
+        forks
+        openIssues
+        pushedAt
+      }
+    }
+  }
+`);
 
 export async function fetchGithubActivity(): Promise<GithubActivity> {
   const client = new GraphQLClient(endpoint);
-  const data = await client.request<{ githubActivity: GithubActivity }>(gql`
-    query GithubActivity {
-      githubActivity {
-        owner
-        capturedAt
-        stale
-        repositories {
-          name
-          url
-          stars
-          forks
-          openIssues
-          pushedAt
-        }
-      }
-    }
-  `);
+  const data = await client.request(githubActivityQuery);
   return data.githubActivity;
 }
 
-export type QualityRun = {
-  sha: string;
-  branch: string;
-  environment: string;
-  unitTests: number;
-  integrationTests: number;
-  contractTests: number;
-  e2eTests: number;
-  securityTests: number;
-  coverageLines: number;
-  coverageBranches: number;
-  lighthousePerformance: number;
-  lighthouseAccessibility: number;
-  bundleKb: number;
-  criticalVulnerabilities: number;
-  highVulnerabilities: number;
-  createdAt: string;
-};
+export type QualityRun = NonNullable<LatestQualityRunQuery['latestQualityRun']>;
+
+const latestQualityRunQuery = graphql(`
+  query LatestQualityRun {
+    latestQualityRun {
+      sha
+      branch
+      environment
+      unitTests
+      integrationTests
+      contractTests
+      e2eTests
+      securityTests
+      coverageLines
+      coverageBranches
+      lighthousePerformance
+      lighthouseAccessibility
+      bundleKb
+      criticalVulnerabilities
+      highVulnerabilities
+      createdAt
+    }
+  }
+`);
 
 export async function fetchLatestQualityRun(): Promise<QualityRun | null> {
   const client = new GraphQLClient(endpoint);
-  const data = await client.request<{ latestQualityRun: QualityRun | null }>(gql`
-    query LatestQualityRun {
-      latestQualityRun {
-        sha
-        branch
-        environment
-        unitTests
-        integrationTests
-        contractTests
-        e2eTests
-        securityTests
-        coverageLines
-        coverageBranches
-        lighthousePerformance
-        lighthouseAccessibility
-        bundleKb
-        criticalVulnerabilities
-        highVulnerabilities
-        createdAt
-      }
-    }
-  `);
+  const data = await client.request(latestQualityRunQuery);
   return data.latestQualityRun;
 }

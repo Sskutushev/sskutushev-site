@@ -10,6 +10,11 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "test:unit": "pnpm -r test",
+    "test:contract": "pnpm --filter @sskutushev/api exec vitest run src/modules/github/github.adapter.spec.ts src/modules/assistant/semantic.service.spec.ts src/modules/weather/weather.service.spec.ts src/storage/storage.service.spec.ts",
+    "test:integration": "pnpm db:migrate && pnpm db:seed && pnpm --filter @sskutushev/api test",
+    "test:security": "pnpm --filter @sskutushev/api exec vitest run src/common/graphql/operation-limits.rule.spec.ts src/common/security/http-security.middleware.spec.ts src/common/security/management.guard.spec.ts",
+    "test:web": "pnpm --filter @sskutushev/web test",
     "test:coverage": "pnpm --filter @sskutushev/api test:report && pnpm --filter @sskutushev/web test:report",
     "test:e2e": "pnpm --filter @sskutushev/web test:e2e",
     "test:architecture": "node scripts/check-architecture.mjs",
@@ -21,14 +26,20 @@
     "check:repo": "node scripts/check-repository-hygiene.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "schema:generate": "pnpm --filter @sskutushev/api build && node apps/api/dist/generate-schema.js",
+    "graphql:generate": "graphql-codegen --config codegen.ts && prettier --write apps/web/src/graphql",
+    "graphql:check": "pnpm schema:generate && pnpm graphql:generate && git diff --exit-code -- schema.graphql apps/web/src/graphql",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
+    "migrations:check": "pnpm prisma:validate && pnpm db:migrate && pnpm db:seed",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "verify": "pnpm check:repo && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:architecture && pnpm quality:static && pnpm test && pnpm build",
+    "verify": "pnpm check:repo && pnpm graphql:check && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:architecture && pnpm quality:static && pnpm test && pnpm build",
     "verify:full": "pnpm verify && pnpm prisma:validate && pnpm test:coverage && pnpm test:e2e"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^7.3.1",
+    "@graphql-codegen/client-preset": "^6.1.3",
     "@types/node": "^22.15.0",
     "jscpd": "^5.0.16",
     "knip": "^6.33.0",
@@ -48,6 +59,7 @@
       "apps/api": {
         "entry": [
           "src/main.ts",
+          "src/generate-schema.ts",
           "src/**/*.spec.ts"
         ],
         "ignoreDependencies": [

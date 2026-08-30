@@ -44,6 +44,9 @@ semantic ranker, frontend, and synthetic probe. Seed a fresh database with
 
 ```bash
 pnpm verify
+pnpm verify:full
+pnpm graphql:check
+pnpm migrations:check
 pnpm prisma:validate
 docker compose up --build
 ```
@@ -55,8 +58,12 @@ The fallback is an explicit checked-in portfolio snapshot for static GitHub Page
 ## Documentation
 
 - [Architecture](docs/architecture/overview.md) — runtime boundaries and data flow
-- [Architecture decisions](docs/adr/) — concise records of non-trivial choices
+- [Architecture decisions](docs/adr/) — explicit records for data, cache, storage, contracts,
+  bounded services, telemetry, and frontend rendering
 - [Testing strategy](docs/quality/testing.md) — risk-based verification layers
 - [Performance contract](docs/quality/performance.md) — WebGL and web budgets
 - [Security model](docs/operations/security.md) — trust boundaries and hardening status
 - [AI usage](docs/operations/ai-usage.md) — transparent scope and rejected suggestions
+
+The committed GraphQL schema and generated web operation types are checked for drift by
+`pnpm graphql:check`; API resolver changes cannot silently leave the frontend contract stale.

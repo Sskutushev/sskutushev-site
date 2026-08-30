@@ -7,7 +7,8 @@ const tracked = execFileSync('git', ['ls-files', '-z'], { encoding: 'utf8' })
 // This is a code-complexity guard. Stylesheets are governed by CSS tooling and
 // can legitimately be long without increasing executable control-flow risk.
 const sourcePattern = /\.(?:[cm]?[jt]sx?|py|go)$/;
-const generatedPattern = /(?:^|\/)(?:dist|coverage|generated|node_modules)(?:\/|$)/;
+const generatedPattern =
+  /(?:^|\/)(?:dist|coverage|generated|node_modules)(?:\/|$)|^apps\/web\/src\/graphql\//;
 const warnings = [];
 const failures = [];
 
