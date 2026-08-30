@@ -60,6 +60,8 @@ The fallback is an explicit checked-in portfolio snapshot for static GitHub Page
 - [Architecture](docs/architecture/overview.md) — runtime boundaries and data flow
 - [Architecture decisions](docs/adr/) — explicit records for data, cache, storage, contracts,
   bounded services, telemetry, and frontend rendering
+- [Design system](docs/design/) — art direction, colour, typography, motion, and the 3D concept,
+  versioned alongside the code they govern
 - [Testing strategy](docs/quality/testing.md) — risk-based verification layers
 - [Performance contract](docs/quality/performance.md) — WebGL and web budgets
 - [Security model](docs/operations/security.md) — trust boundaries and hardening status
