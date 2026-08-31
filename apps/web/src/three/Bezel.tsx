@@ -3,8 +3,11 @@ import { useLayoutEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { dampFactor, type CoreAppearance } from './core-theme';
 
-const FIN_COUNT = 16;
+const FIN_COUNT = 24;
 const RING_RADIUS = 1.34;
+/** Second ring in the same plane. Two concentric rings read as a machined
+    assembly; two crossed rings read as a gyroscope toy. */
+const INNER_RING_RADIUS = 0.98;
 
 /**
  * INFRASTRUCTURE — a machined bezel in the horizontal plane: a titanium ring
@@ -17,6 +20,8 @@ const RING_RADIUS = 1.34;
 export function Bezel({ appearance }: { appearance: CoreAppearance }): React.JSX.Element {
   const material = useRef<THREE.MeshStandardMaterial>(null);
   const fins = useRef<THREE.InstancedMesh>(null);
+  /** A wider ring, barely off the bezel plane, turning slowly against it. A
+      steeply crossed ring read as a bent hoop draped over the object. */
   const tilted = useRef<THREE.Mesh>(null);
 
   useLayoutEffect(() => {
@@ -28,7 +33,14 @@ export function Bezel({ appearance }: { appearance: CoreAppearance }): React.JSX
     const scale = new THREE.Vector3(1, 1, 1);
     for (let index = 0; index < FIN_COUNT; index += 1) {
       const angle = (index / FIN_COUNT) * Math.PI * 2;
-      position.set(Math.cos(angle) * RING_RADIUS, 0, Math.sin(angle) * RING_RADIUS);
+      // Seated on the ring rather than beside it: fins placed on the exact
+      // ring radius read as loose tabs orbiting the torus instead of as part
+      // of the same machined part.
+      position.set(
+        Math.cos(angle) * (RING_RADIUS - 0.045),
+        0,
+        Math.sin(angle) * (RING_RADIUS - 0.045),
+      );
       quaternion.setFromEuler(new THREE.Euler(0, -angle, 0));
       matrix.compose(position, quaternion, scale);
       mesh.setMatrixAt(index, matrix);
@@ -49,7 +61,7 @@ export function Bezel({ appearance }: { appearance: CoreAppearance }): React.JSX
   return (
     <group>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[RING_RADIUS, 0.05, 10, 128]} />
+        <torusGeometry args={[RING_RADIUS, 0.075, 12, 128]} />
         <meshStandardMaterial
           ref={material}
           color={appearance.cageColor}
@@ -58,15 +70,15 @@ export function Bezel({ appearance }: { appearance: CoreAppearance }): React.JSX
         />
       </mesh>
       <instancedMesh args={[undefined, undefined, FIN_COUNT]} ref={fins}>
-        <boxGeometry args={[0.16, 0.13, 0.09]} />
+        <boxGeometry args={[0.2, 0.05, 0.14]} />
         <meshStandardMaterial
           color={appearance.cageColor}
           metalness={1}
           roughness={appearance.cageRoughness + 0.1}
         />
       </instancedMesh>
-      <mesh ref={tilted} rotation={[0.22, 0, Math.PI / 2.3]}>
-        <torusGeometry args={[1.2, 0.022, 8, 96]} />
+      <mesh ref={tilted} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[INNER_RING_RADIUS, 0.03, 10, 128]} />
         <meshStandardMaterial
           color={appearance.cageColor}
           metalness={1}

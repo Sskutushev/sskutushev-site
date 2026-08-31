@@ -14,7 +14,9 @@ export interface CoreAppearance {
   /** DATA glass shell */
   glassColor: string;
   glassRoughness: number;
-  glassTransmission: number;
+  /** Shell opacity. Light needs more of it: a shell tuned for near-black
+      paper disappears entirely against warm paper. */
+  glassOpacity: number;
   /** Spectral separation at the bevels */
   dispersion: number;
   /** API core */
@@ -31,37 +33,37 @@ export interface CoreAppearance {
 }
 
 const DARK: CoreAppearance = {
-  cageColor: '#767c8c',
-  cageRoughness: 0.34,
-  glassColor: '#9fb2d4',
-  glassRoughness: 0.06,
-  glassTransmission: 0.88,
-  dispersion: 0.2,
+  cageColor: '#c2c7d2',
+  cageRoughness: 0.17,
+  glassColor: '#ccd3dd',
+  glassRoughness: 0.05,
+  glassOpacity: 0.17,
+  dispersion: 0.16,
   emissiveColor: '#7868ff',
-  emissiveIntensity: 2.6,
-  haloOpacity: 0.32,
-  keyIntensity: 0.5,
-  violetIntensity: 2.4,
-  cyanIntensity: 1.8,
-  fillIntensity: 0.16,
-  ambientIntensity: 0.35,
+  emissiveIntensity: 0.7,
+  haloOpacity: 0.2,
+  keyIntensity: 2.6,
+  violetIntensity: 0.5,
+  cyanIntensity: 0.4,
+  fillIntensity: 0.55,
+  ambientIntensity: 0.12,
 };
 
 const LIGHT: CoreAppearance = {
-  cageColor: '#a9adb8',
-  cageRoughness: 0.28,
-  glassColor: '#c4d2e8',
-  glassRoughness: 0.03,
-  glassTransmission: 0.93,
-  dispersion: 0.4,
+  cageColor: '#b0b5c1',
+  cageRoughness: 0.18,
+  glassColor: '#eef1f6',
+  glassRoughness: 0.02,
+  glassOpacity: 0.38,
+  dispersion: 0.3,
   emissiveColor: '#6258ff',
-  emissiveIntensity: 1.1,
+  emissiveIntensity: 0.4,
   haloOpacity: 0.12,
-  keyIntensity: 3.2,
-  violetIntensity: 0.9,
-  cyanIntensity: 0.7,
-  fillIntensity: 1.5,
-  ambientIntensity: 1.1,
+  keyIntensity: 3.4,
+  violetIntensity: 0.22,
+  cyanIntensity: 0.18,
+  fillIntensity: 1.7,
+  ambientIntensity: 0.9,
 };
 
 export function coreAppearance(theme: Theme): CoreAppearance {

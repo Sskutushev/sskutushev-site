@@ -2,6 +2,7 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { lazy, Suspense, useCallback, useRef } from 'react';
 import type { RenderQuality } from '../lib/render-quality';
 import type { Theme } from '../theme/theme';
+import { CoreStill } from '../three/CoreStill';
 import { useCoreDriver } from '../three/use-core-driver';
 import { useDeferredMount } from '../three/use-deferred-mount';
 import { StatusDot } from '../ui/StatusDot';
@@ -63,11 +64,13 @@ export function Hero({
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero__pin" ref={pinned}>
         <div className="hero__frame">
-          <div aria-hidden className={`hero__stage${coreMounted ? '' : ' hero__stage--static'}`}>
-            {coreMounted && (
+          <div aria-hidden className="hero__stage">
+            {coreMounted ? (
               <Suspense fallback={null}>
                 <CoreStage active={active} driver={driver} quality={quality} theme={theme} />
               </Suspense>
+            ) : (
+              <CoreStill />
             )}
           </div>
 

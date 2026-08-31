@@ -1,7 +1,14 @@
+/* Section rhythm is a single band between two sections, not two bands stacked.
+   With the full step on both edges, adjacent sections opened a gap of nearly
+   400px at desktop width that read as a missing block rather than as air. */
 .section {
   position: relative;
   z-index: 2;
-  padding: var(--s-10) var(--gutter);
+  padding: var(--s-9) var(--gutter);
+}
+
+.section:first-of-type {
+  padding-top: var(--s-10);
 }
 
 .section--raised {

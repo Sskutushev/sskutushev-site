@@ -32,7 +32,10 @@ test.describe('reduced motion', () => {
     await reduceMotion(page);
     await page.goto('/');
     await expect(page.locator('canvas')).toHaveCount(0);
-    await expect(page.locator('.hero__stage--static')).toBeAttached();
+    // The fallback is a drawing of the same object, not an empty stage: the
+    // bezel fins are the part that is missing when it degrades to a wash.
+    await expect(page.locator('.core-still')).toBeVisible();
+    await expect(page.locator('.core-still__fins line')).toHaveCount(24);
     // Everything the sequence would have revealed stays reachable without it.
     await expect(page.locator('.hero__layers li')).toHaveCount(3);
     await expect(page.locator('.hero__layers')).toContainText('INFRASTRUCTURE');
@@ -90,6 +93,21 @@ test.describe('reduced motion', () => {
       'href',
       'https://github.com/Sskutushev',
     );
+  });
+
+  test('sections stay reachable from the navigation on a phone', async ({ page }) => {
+    // The inline links do not fit beside the controls below 900px. They were
+    // simply hidden there, which left every section reachable only by scroll.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await reduceMotion(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'EN', exact: true }).click();
+    await expect(page.getByRole('link', { name: 'Work', exact: true })).toBeHidden();
+
+    await page.getByRole('button', { name: 'Sections' }).click();
+    await page.getByRole('link', { name: 'Contact', exact: true }).click();
+    await expect(page).toHaveURL(/#contact$/);
+    await expect(page.getByRole('link', { name: 'Contact', exact: true })).toBeHidden();
   });
 
   test('API failure keeps fallback content and resume delivery available', async ({ page }) => {
@@ -162,7 +180,7 @@ test.describe('with motion enabled', () => {
     });
     // Headless Chromium runs on SwiftShader, which is the case this guards.
     expect(renderer).toMatch(/swiftshader|llvmpipe|software/i);
-    await expect(page.locator('.hero__stage--static')).toBeAttached();
+    await expect(page.locator('.core-still')).toBeVisible();
     // The budget allows one canvas at most; here it must be none.
     await expect(page.locator('canvas')).toHaveCount(0);
   });

@@ -30,20 +30,20 @@
   color: var(--text-tertiary);
 }
 
-.nav nav {
+.nav__links {
   display: flex;
   gap: var(--s-6);
   font-size: var(--t-small);
   color: var(--text-secondary);
 }
 
-.nav nav a {
+.nav__links a {
   position: relative;
   padding: var(--s-2) 0;
   transition: color var(--d-micro) var(--ease-micro);
 }
 
-.nav nav a::after {
+.nav__links a::after {
   content: '';
   position: absolute;
   right: 0;
@@ -56,13 +56,13 @@
   transition: transform var(--d-micro) var(--ease-micro);
 }
 
-.nav nav a:hover,
-.nav nav a:focus-visible {
+.nav__links a:hover,
+.nav__links a:focus-visible {
   color: var(--text);
 }
 
-.nav nav a:hover::after,
-.nav nav a:focus-visible::after {
+.nav__links a:hover::after,
+.nav__links a:focus-visible::after {
   transform: scaleX(1);
   transform-origin: left;
 }
@@ -73,6 +73,39 @@
   gap: var(--s-2);
 }
 
+/* The sheet is the small-viewport replacement for the inline links, so it is
+   the one that is hidden while they fit. */
+.nav__menu,
+.nav__sheet {
+  display: none;
+}
+
+.nav__sheet {
+  position: absolute;
+  top: calc(100% + var(--s-2));
+  right: 0;
+  left: 0;
+  flex-direction: column;
+  padding: var(--s-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  /* Opaque. A menu is a surface to read, not one to see through: at 92% the
+     display type behind it stayed legible through the labels. */
+  background: var(--surface-2);
+  box-shadow: var(--shadow-3);
+}
+
+.nav__sheet a {
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-sm);
+  font-size: var(--t-body);
+}
+
+.nav__sheet a:hover,
+.nav__sheet a:focus-visible {
+  background: var(--surface-3);
+}
+
 @media (max-width: 900px) {
   .nav {
     top: var(--s-3);
@@ -80,7 +113,15 @@
     padding-left: var(--s-4);
   }
 
-  .nav nav {
+  .nav__links {
     display: none;
+  }
+
+  .nav__menu {
+    display: grid;
+  }
+
+  .nav__sheet:not([hidden]) {
+    display: flex;
   }
 }
