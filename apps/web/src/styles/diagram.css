@@ -1,0 +1,283 @@
+/* Runtime console --------------------------------------------------------- */
+
+.pipeline__console {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--s-4);
+  margin-top: var(--s-6);
+}
+
+.pipeline__console article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-5);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+}
+
+.pipeline__state {
+  display: flex;
+  align-items: center;
+  margin-top: var(--s-5);
+  color: var(--text-secondary);
+}
+
+.flow__label {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--s-4);
+}
+
+/* Shared scenario controls ------------------------------------------------ */
+
+.flow__controls,
+.projection__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-bottom: var(--s-5);
+}
+
+.flow__controls button,
+.projection__controls button {
+  padding: var(--s-2) var(--s-4);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    border-color var(--d-micro) var(--ease-micro),
+    background var(--d-micro) var(--ease-micro),
+    color var(--d-micro) var(--ease-micro);
+}
+
+.flow__controls button:hover,
+.projection__controls button:hover {
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.flow__controls button[aria-pressed='true'],
+.projection__controls button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+/* Flow topology ----------------------------------------------------------- */
+
+.flow,
+.projection {
+  padding: var(--s-6);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.flow__canvas,
+.projection__canvas {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.flow__edge {
+  fill: none;
+  stroke: var(--hairline-strong);
+  stroke-width: 0.4;
+  transition:
+    stroke var(--d-interface) var(--ease-interface),
+    stroke-width var(--d-interface) var(--ease-interface);
+}
+
+.flow__edge.is-active {
+  stroke: var(--accent);
+  stroke-width: 0.7;
+}
+
+.flow__edge.is-degraded {
+  stroke: var(--state-degraded);
+  stroke-width: 0.7;
+}
+
+.flow__edge.is-failed {
+  stroke: var(--state-failed);
+  stroke-dasharray: 1.6 1.6;
+}
+
+.flow__edge.is-skipped {
+  stroke-dasharray: 0.8 1.6;
+  opacity: 0.5;
+}
+
+.flow__node rect {
+  fill: var(--surface-2);
+  stroke: var(--hairline-strong);
+  stroke-width: 0.35;
+  transition:
+    fill var(--d-interface) var(--ease-interface),
+    stroke var(--d-interface) var(--ease-interface);
+}
+
+.flow__node text {
+  fill: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 2.4px;
+  letter-spacing: 0.1px;
+  transition: fill var(--d-interface) var(--ease-interface);
+}
+
+/* The route is drawn on the edges. Giving every node on it an accent border
+   as well put the prism ramp on most of the diagram. */
+.flow__node.is-active rect {
+  stroke: var(--text);
+}
+
+.flow__node.is-active text {
+  fill: var(--text);
+}
+
+.flow__node.is-degraded rect {
+  stroke: var(--state-degraded);
+}
+
+.flow__node.is-failed rect {
+  stroke: var(--state-failed);
+  stroke-dasharray: 1.6 1.2;
+}
+
+.flow__node.is-failed text {
+  fill: var(--state-failed);
+}
+
+.flow__node.is-skipped rect,
+.flow__node.is-skipped text {
+  opacity: 0.42;
+}
+
+.flow__outcome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-top: var(--s-5);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hairline);
+}
+
+.flow__status {
+  display: flex;
+  align-items: center;
+}
+
+.flow__status.is-failed {
+  color: var(--state-failed);
+}
+
+.flow__status.is-degraded {
+  color: var(--state-degraded);
+}
+
+.flow__packet {
+  fill: var(--accent);
+  offset-distance: 0%;
+  offset-rotate: 0deg;
+  animation: flow-packet 2.6s var(--ease-interface) infinite;
+}
+
+.flow__packet.is-degraded {
+  fill: var(--state-degraded);
+}
+
+@keyframes flow-packet {
+  from {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  82% {
+    opacity: 1;
+  }
+
+  to {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+/* Point projection -------------------------------------------------------- */
+
+.projection__point {
+  fill: var(--text-secondary);
+  transition: translate var(--d-editorial) var(--ease-editorial);
+}
+
+/* Hollow, on their own band, in every projection. A row with no basis is not
+   a row with a value of zero, and this is the one place that difference is
+   usually lost. */
+.projection__point.is-unknown {
+  fill: none;
+  stroke: var(--text-tertiary);
+  stroke-width: 0.35;
+  stroke-dasharray: 0.7 0.7;
+}
+
+.projection__point.is-selected {
+  fill: var(--accent);
+}
+
+.projection__band {
+  stroke: var(--hairline);
+  stroke-width: 0.3;
+  stroke-dasharray: 1 1.4;
+}
+
+.projection__band-label {
+  fill: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 2.2px;
+  letter-spacing: 0.12px;
+}
+
+.projection__note {
+  display: block;
+  max-width: var(--measure-body);
+  margin-top: var(--s-5);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hairline);
+}
+
+@media (max-width: 767px) {
+  .flow,
+  .projection {
+    padding: var(--s-5) var(--s-4);
+  }
+
+  .flow__node text {
+    font-size: 2.8px;
+  }
+}
+
+/* Motion carries no information here: every scenario states its route and its
+   outcome in words, and the position of each point is set by the projection
+   rather than by the transition into it. */
+@media (prefers-reduced-motion: reduce) {
+  .flow__edge,
+  .flow__node rect,
+  .flow__node text,
+  .projection__point {
+    transition: none;
+  }
+
+  .flow__packet {
+    display: none;
+  }
+}

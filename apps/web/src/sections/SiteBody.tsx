@@ -1,4 +1,3 @@
-import { CaseSimulation } from '../components/CaseSimulation';
 import type { SiteCopy } from '../content/site-copy';
 import type { Locale, Portfolio } from '../lib/portfolio';
 import type { DataState } from '../ui/StatusDot';
@@ -33,10 +32,8 @@ export function SiteBody({
   return (
     <>
       <Manifesto copy={copy} />
-      <Work cases={data.caseStudies} copy={copy} />
-      <Architecture copy={copy} detail={dataDetail} state={dataState}>
-        <CaseSimulation locale={locale} />
-      </Architecture>
+      <Work cases={data.caseStudies} copy={copy} locale={locale} />
+      <Architecture copy={copy} detail={dataDetail} locale={locale} state={dataState} />
       <Capabilities copy={copy} locale={locale} skills={data.skills} />
       <Experience copy={copy} items={data.experience} />
       <Contact copy={copy} locale={locale} />

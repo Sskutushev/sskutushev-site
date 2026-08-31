@@ -123,19 +123,58 @@ test.describe('reduced motion', () => {
     );
   });
 
-  test('the resilience simulation is labelled as a simulation and switches paths', async ({
+  test('the read path is labelled as a simulation and reroutes on a dependency failure', async ({
     page,
   }) => {
     await reduceMotion(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'EN', exact: true }).click();
-    const simulation = page.locator('.simulation');
-    await simulation.scrollIntoViewIfNeeded();
-    await expect(simulation.getByText(/not live traffic/i)).toBeVisible();
+    const flow = page.locator('#architecture .flow');
+    await flow.scrollIntoViewIfNeeded();
+    await expect(flow.getByText(/not live traffic/i)).toBeVisible();
 
-    await simulation.getByRole('button', { name: 'Incident' }).click();
-    await expect(simulation.locator('output')).toContainText('503 · FAIL CLOSED');
-    await expect(simulation.locator('output')).toContainText(/refusal instead of false success/i);
+    await flow.getByRole('button', { name: 'Database unreachable' }).click();
+    await expect(flow.locator('figcaption')).toContainText('200 · STALE');
+    // Stale is served, and it says it is stale rather than presenting itself
+    // as fresh — the distinction the whole section is about.
+    await expect(flow.locator('figcaption')).toContainText(/Stale and invented are not the same/i);
+    await expect(flow.locator('.flow__node.is-failed')).toHaveCount(1);
+  });
+
+  test('a replayed request visibly does not reach the ledger a second time', async ({ page }) => {
+    await reduceMotion(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'EN', exact: true }).click();
+    const money = page.locator('#case-money .flow');
+    await money.scrollIntoViewIfNeeded();
+
+    await money.getByRole('button', { name: 'Same key replayed' }).click();
+    await expect(money.locator('figcaption')).toContainText('200 · IDEMPOTENT');
+    // Skipped, not merely inactive: the request reaches the key and stops.
+    await expect(money.locator('.flow__node.is-skipped')).toHaveCount(2);
+  });
+
+  test('rows with no comparable basis stay on their own band in every projection', async ({
+    page,
+  }) => {
+    await reduceMotion(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'EN', exact: true }).click();
+    const ranking = page.locator('#case-ranking .projection');
+    await ranking.scrollIntoViewIfNeeded();
+    const unknown = ranking.locator('.projection__point.is-unknown');
+    await expect(unknown).toHaveCount(8);
+
+    for (const basis of ['Cohort-adjusted', 'Category']) {
+      await ranking.getByRole('button', { name: basis }).click();
+      await expect(unknown).toHaveCount(8);
+      // Never plotted: an unknown value and a value of zero are different facts,
+      // so these keep the band's own y in every basis.
+      for (const point of await unknown.all()) {
+        expect(await point.getAttribute('cy')).toBe('54');
+        expect(await point.getAttribute('style')).toBe('translate: 0px;');
+      }
+    }
   });
 
   for (const theme of ['dark', 'light'] as const) {
