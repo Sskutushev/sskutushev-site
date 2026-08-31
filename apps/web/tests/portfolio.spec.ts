@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { gotoOffline } from './offline';
 
 /**
  * Reduced motion is emulated per page rather than declared as a fixture option.
@@ -13,22 +14,6 @@ async function reduceMotion(page: Page): Promise<void> {
 
 const RU_HEADLINE = /Проектирую системы/;
 const EN_HEADLINE = /I build systems/;
-
-/**
- * Visual baselines are captured offline, which is what GitHub Pages serves. The
- * API is refused explicitly rather than left to time out, so the data-state line
- * cannot race the capture.
- */
-async function gotoOffline(page: Page, colorScheme?: 'dark' | 'light'): Promise<void> {
-  await page.emulateMedia({ reducedMotion: 'reduce', ...(colorScheme ? { colorScheme } : {}) });
-  await page.route('**/graphql', (route) => route.abort('connectionfailed'));
-  await page.goto('/');
-  // Everything below the hero is a lazy chunk mounted after first paint. Wait
-  // for it before touching anything inside it.
-  await expect(page.locator('#work')).toBeAttached();
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
-  await expect(page.getByText(/API unavailable/i)).toBeVisible();
-}
 
 test.describe('reduced motion', () => {
   test('renders the designed static composition instead of the canvas', async ({ page }) => {
@@ -249,46 +234,6 @@ test.describe('reduced motion', () => {
       '—',
     );
   });
-
-  /**
-   * Widths where this layout actually changes shape, not a round-number list:
-   * the phone, the wide phone, the tablet, the point where the case chapters
-   * stop stacking, and the desktop range up to a 1920 display.
-   */
-  for (const width of [375, 580, 768, 1000, 1280, 1440, 1680, 1920]) {
-    test(`nothing overflows the page at ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
-      await gotoOffline(page);
-      // Walk the page so every lazily-revealed section has laid out.
-      await page.evaluate(async () => {
-        for (let y = 0; y < document.body.scrollHeight; y += 700) {
-          window.scrollTo(0, y);
-          await new Promise((resolve) => setTimeout(resolve, 40));
-        }
-        window.scrollTo(0, 0);
-      });
-
-      // A page wider than its viewport is a horizontal scrollbar, which is the
-      // one responsive failure a visitor cannot work around.
-      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
-        width,
-      );
-
-      // Text clipped by its own box, which a screenshot at one width hides.
-      const clipped = await page.evaluate(() =>
-        [...document.querySelectorAll('body *')]
-          .filter((element) => {
-            if (element.ownerSVGElement || element.tagName === 'svg') return false;
-            const style = getComputedStyle(element);
-            if (style.overflowX === 'auto' || style.overflowX === 'scroll') return false;
-            return element.scrollWidth > element.clientWidth + 2;
-          })
-          .map((element) => `${element.tagName.toLowerCase()}.${String(element.className).trim()}`),
-      );
-      // The hero stage bleeds past the frame on purpose and the frame clips it.
-      expect(clipped.filter((name) => !name.startsWith('div.hero__frame'))).toEqual([]);
-    });
-  }
 
   for (const theme of ['dark', 'light'] as const) {
     test(`visual regression: desktop ${theme}`, async ({ page }) => {
