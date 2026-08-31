@@ -90,6 +90,6 @@ from CockroachDB.
 
 ## A note on the blueprint
 
-`type: keyvalue` is Render's current name for what it used to call `redis`. If
-the blueprint is rejected on that field, the older name is the fix — the rest of
-the file is unaffected.
+`type: keyvalue` is the current value in Render's blueprint specification;
+`redis` is a deprecated alias for it. Both are accepted, so the file works
+either way, but new blueprints should use `keyvalue`.
