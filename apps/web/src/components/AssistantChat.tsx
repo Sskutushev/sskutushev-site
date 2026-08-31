@@ -1,21 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { askProfile, type AssistantAnswer, type Locale } from '../lib/portfolio';
-
-const suggestions = {
-  RU: [
-    'В чём сильные стороны Сергея?',
-    'Какой у него backend-стек?',
-    'Что он делал в Refty?',
-    'Какой уровень английского?',
-  ],
-  EN: [
-    "What are Sergey's strengths?",
-    'What is his backend stack?',
-    'What did he build at Refty?',
-    'What is his English level?',
-  ],
-};
+import { ASSISTANT_QUESTIONS } from './assistant-questions';
 
 export function AssistantChat({ locale }: { locale: Locale }): React.JSX.Element {
   const [question, setQuestion] = useState('');
@@ -43,7 +29,7 @@ export function AssistantChat({ locale }: { locale: Locale }): React.JSX.Element
           : 'Ask about verified experience, stack and engineering approach.'}
       </p>
       <div className="assistant__suggestions">
-        {suggestions[locale].map((suggestion) => (
+        {ASSISTANT_QUESTIONS[locale].map((suggestion) => (
           <button key={suggestion} onClick={() => submit(suggestion)}>
             {suggestion}
           </button>

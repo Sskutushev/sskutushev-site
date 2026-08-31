@@ -101,9 +101,12 @@ test.describe('reduced motion', () => {
   test('API failure keeps fallback content and resume delivery available', async ({ page }) => {
     await gotoOffline(page);
     await expect(page.locator('.case')).toHaveCount(6);
+    // Served from the build rather than from the API: the published site has no
+    // API behind it, and both buttons used to point at an origin that does not
+    // answer there.
     await expect(page.getByRole('link', { name: /open resume/i })).toHaveAttribute(
       'href',
-      /\/assets\/resume$/,
+      /sergey-kutushev-resume\.pdf$/,
     );
     await expect(page.getByRole('link', { name: /download pdf/i })).toHaveAttribute(
       'download',

@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "tsc -b && vite build && node scripts/check-bundle.mjs && node scripts/build-evidence.mjs",
+    "build": "tsc -b && vite build && node scripts/check-bundle.mjs && node scripts/build-evidence.mjs && node scripts/copy-resume.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --max-warnings=0",
     "test": "vitest run src",

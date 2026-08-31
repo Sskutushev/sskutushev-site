@@ -74,18 +74,74 @@
   bottom: var(--s-8);
   left: calc(var(--gutter) + 6%);
   width: min(26rem, 30vw);
-  opacity: 0.42;
+  opacity: 0.24;
   pointer-events: none;
 }
 
+/* Alive, and quiet enough to read the sentence in front of it. The hero draws
+   this object at full strength; here it is a memory of it, so the motion is a
+   slow drift rather than the entrance animation. */
 .contact__core .core-still {
   animation: none;
+}
+
+.contact__core .core-still__fins {
+  transform-box: view-box;
+  transform-origin: 240px 240px;
+  animation: closing-turn 48s linear infinite;
+}
+
+.contact__core .core-still__ring {
+  transform-box: view-box;
+  transform-origin: 240px 240px;
+  animation: closing-breathe 14s ease-in-out infinite;
+}
+
+.contact__core .core-still__core {
+  animation: closing-pulse 9s ease-in-out infinite;
+}
+
+@keyframes closing-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes closing-breathe {
+  0%,
+  100% {
+    scale: 1;
+  }
+
+  50% {
+    scale: 1.035;
+  }
+}
+
+@keyframes closing-pulse {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Motion here carries nothing; the composition is complete without it. */
+@media (prefers-reduced-motion: reduce) {
+  .contact__core .core-still__fins,
+  .contact__core .core-still__ring,
+  .contact__core .core-still__core {
+    animation: none;
+  }
 }
 
 @media (max-width: 1023px) {
   .contact__core {
     width: min(22rem, 46vw);
-    opacity: 0.32;
+    opacity: 0.2;
   }
 }
 
@@ -96,7 +152,7 @@
     position: static;
     width: 14rem;
     margin: var(--s-6) 0 0;
-    opacity: 0.4;
+    opacity: 0.28;
     transform: none;
   }
 
