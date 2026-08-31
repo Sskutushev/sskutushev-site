@@ -32,16 +32,22 @@ export const copyRu: SiteCopy = {
       id: 'infra',
       label: 'INFRASTRUCTURE',
       description: 'Наблюдаемый rollout с readiness, флагами и откатом.',
+      stack: 'Docker · GitHub Actions · OpenTelemetry',
+      gain: 'Зелёная сборка — не вывод о готовности. Трафик переключается после проверки readiness, а путь назад собран заранее.',
     },
     {
       id: 'data',
       label: 'DATA',
       description: 'Транзакционные инварианты. Unknown остаётся unknown.',
+      stack: 'CockroachDB · Prisma · Redis · BigQuery',
+      gain: 'Повтор операции возвращает тот же результат или именованный конфликт — никогда второе списание.',
     },
     {
       id: 'api',
       label: 'API',
       description: 'Типизированные контракты и границы, за которые не протекает домен.',
+      stack: 'NestJS · GraphQL · WebSocket',
+      gain: 'Один типизированный запрос с локалью, лимиты глубины и сложности, ошибки без внутренних деталей наружу.',
     },
   ],
   sections: {

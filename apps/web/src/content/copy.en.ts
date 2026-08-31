@@ -26,16 +26,22 @@ export const copyEn: SiteCopy = {
       id: 'infra',
       label: 'INFRASTRUCTURE',
       description: 'Observable rollout with readiness, flags and rollback.',
+      stack: 'Docker · GitHub Actions · OpenTelemetry',
+      gain: 'A green build is not a conclusion about readiness. Traffic switches after the readiness check, and the way back is built first.',
     },
     {
       id: 'data',
       label: 'DATA',
       description: 'Transactional invariants. Unknown stays unknown.',
+      stack: 'CockroachDB · Prisma · Redis · BigQuery',
+      gain: 'A repeated operation returns the same result or a named conflict — never a second charge.',
     },
     {
       id: 'api',
       label: 'API',
       description: 'Typed contracts and boundaries the domain does not leak through.',
+      stack: 'NestJS · GraphQL · WebSocket',
+      gain: 'One typed, localised query, depth and complexity limits, and errors that carry no internal detail outward.',
     },
   ],
   sections: {

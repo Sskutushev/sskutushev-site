@@ -32,10 +32,13 @@
 
 /* The canvas sits between two type layers. `.hero__title` deliberately creates
    no stacking context, so its lines compete with the stage on z-index. */
+/* Clear of the lead and the actions, and far enough right that the headline
+   is grazed rather than covered. At the previous size the object sat over the
+   last word of the second line and took it off the page. */
 .hero__stage {
   position: absolute;
   z-index: 2;
-  inset: 0 2% 2% 42%;
+  inset: 4% 3% 26% 60%;
   pointer-events: none;
 }
 
@@ -107,10 +110,15 @@
   align-items: flex-start;
 }
 
+/* The mask that hides the entrance also cropped every descender: at a display
+   line-height under 1 the tail of a "у" or a "р" falls outside the line box.
+   The box is grown downward and the growth taken back out of the layout. */
 .hero__line {
   position: relative;
   z-index: 3;
   display: block;
+  padding-bottom: 0.24em;
+  margin-bottom: -0.24em;
   overflow: hidden;
   transform-origin: 0 50%;
   opacity: var(--hero-type-opacity);
@@ -180,18 +188,67 @@
   left: var(--gutter);
   display: flex;
   flex-direction: column;
-  gap: var(--s-5);
-  width: min(22rem, 34vw);
+  gap: var(--s-6);
+  width: min(46rem, 50vw);
   pointer-events: none;
   transform: translateY(-50%);
 }
 
-.hero__layers li {
+/* Two columns. The name holds the left edge beside the accent rule; the claim,
+   the parts and the behaviour run beside it. A blanket `li > *` rule used to
+   push the name into the right column too, which left the left column empty
+   and opened a gap between the rule and the text. */
+.hero__layers > li {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr);
+  gap: var(--s-3) var(--s-5);
+  padding-left: var(--s-5);
+  border-left: 2px solid var(--accent);
+}
+
+.hero__layer-head {
   display: flex;
   flex-direction: column;
   gap: var(--s-1);
-  padding-left: var(--s-4);
-  border-left: 1px solid var(--hairline-strong);
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  color: var(--text);
+}
+
+.hero__layer-index {
+  color: var(--text-tertiary);
+}
+
+.hero__layer-body {
+  grid-column: 2;
+  grid-row: 1;
+  max-width: var(--measure-body);
+  color: var(--text);
+}
+
+.hero__layer-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.hero__layer-stack li {
+  padding: 2px var(--s-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-full);
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta-sm);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.hero__layer-gain {
+  grid-column: 2;
+  grid-row: 3;
+  max-width: var(--measure-body);
 }
 
 @media (max-width: 1023px) {
@@ -200,7 +257,41 @@
   }
 
   .hero__stage {
-    inset: 4% -6% 6% 36%;
+    inset: 4% -4% 20% 62%;
+  }
+
+  /* One column below 1024: the name column plus a measure of body text needs
+     more width than the object leaves, and the grid was clipping its own
+     content rather than wrapping it. */
+  .hero__layers {
+    width: min(30rem, 52vw);
+  }
+
+  .hero__layers > li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-2);
+  }
+
+  /* The label and the chips both hold their words on one line, so at this
+     width they were overflowing the column rather than wrapping inside it. */
+  .hero__layer-head {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-3);
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .hero__layer-stack li {
+    white-space: normal;
+  }
+
+  .hero__layer-body,
+  .hero__layer-stack,
+  .hero__layer-gain {
+    grid-column: 1;
+    grid-row: auto;
   }
 
   .hero__aside {
@@ -323,6 +414,25 @@
 
   .hero__actions {
     grid-column: 9 / -1;
+  }
+}
+
+/* The reduced-motion layout above is written for the twelve-column frame. On
+   the eight-column one a `9 / -1` placement falls outside the explicit grid,
+   which creates implicit columns and squeezes the explicit ones — the layer
+   list was rendering 111px wide and clipping every line inside it. */
+@media (prefers-reduced-motion: reduce) and (max-width: 1023px) {
+  .hero__layers {
+    grid-column: 1 / -1;
+    width: auto;
+  }
+
+  .hero__aside {
+    grid-column: 1 / 5;
+  }
+
+  .hero__actions {
+    grid-column: 5 / -1;
   }
 }
 

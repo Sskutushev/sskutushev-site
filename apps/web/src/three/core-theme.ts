@@ -23,6 +23,9 @@ export interface CoreAppearance {
   emissiveColor: string;
   emissiveIntensity: number;
   haloOpacity: number;
+  /** The stack marks leaving the core */
+  mark: { disc: string; ink: string; edge: string };
+  markOpacity: number;
   /** Environment */
   keyIntensity: number;
   violetIntensity: number;
@@ -42,6 +45,8 @@ const DARK: CoreAppearance = {
   emissiveColor: '#7868ff',
   emissiveIntensity: 0.7,
   haloOpacity: 0.2,
+  mark: { disc: '#14171f', ink: '#c9cdd8', edge: 'rgba(255,255,255,0.16)' },
+  markOpacity: 0.92,
   keyIntensity: 2.6,
   violetIntensity: 0.5,
   cyanIntensity: 0.4,
@@ -59,6 +64,8 @@ const LIGHT: CoreAppearance = {
   emissiveColor: '#6258ff',
   emissiveIntensity: 0.4,
   haloOpacity: 0.12,
+  mark: { disc: '#ffffff', ink: '#3d414b', edge: 'rgba(8,9,12,0.14)' },
+  markOpacity: 0.95,
   keyIntensity: 3.4,
   violetIntensity: 0.22,
   cyanIntensity: 0.18,

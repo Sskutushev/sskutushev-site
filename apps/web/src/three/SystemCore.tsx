@@ -1,15 +1,17 @@
 import { RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import * as THREE from 'three';
 import type { RenderQuality } from '../lib/render-quality';
 import type { Theme } from '../theme/theme';
 import { Bezel } from './Bezel';
 import { Halo } from './Halo';
+import { Signals } from './Signals';
+import { signalCount } from './signal-marks';
 
 /** Keeps the bezel reading as an ellipse rather than a bar across the type. */
 const BASE_TILT_X = -0.32;
-import { pulseCount, type CoreDriver } from './core-driver';
+import type { CoreDriver } from './core-driver';
 import {
   coreAppearance,
   dampFactor,
@@ -103,7 +105,6 @@ function ApiCore({
       material.current.emissiveIntensity +=
         (target - material.current.emissiveIntensity) * dampFactor(8, delta);
     }
-    if (ring.current) ring.current.rotation.z -= delta * 0.9;
   });
 
   return (
@@ -119,65 +120,13 @@ function ApiCore({
           emissiveIntensity={appearance.emissiveIntensity}
         />
       </mesh>
-      <mesh ref={ring} rotation={[Math.PI / 2.4, 0, 0]}>
+      {/* Near the bezel plane: standing almost upright it read as a wire
+          hoop across the object rather than as part of the core. */}
+      <mesh ref={ring} rotation={[Math.PI / 2 - 0.12, 0, 0]}>
         <torusGeometry args={[0.66, 0.012, 6, 72]} />
         <meshStandardMaterial color={appearance.emissiveColor} metalness={0.9} roughness={0.2} />
       </mesh>
     </group>
-  );
-}
-
-/** Data pulses travelling from the core outward through the cage. */
-function Pulses({
-  appearance,
-  count,
-  driver,
-}: {
-  appearance: CoreAppearance;
-  count: number;
-  driver: CoreDriver;
-}): React.JSX.Element {
-  const mesh = useRef<THREE.InstancedMesh>(null);
-  const paths = useMemo(
-    () =>
-      Array.from({ length: count }, (_, index) => ({
-        angle: (index / count) * Math.PI * 2,
-        tilt: ((index % 5) - 2) * 0.28,
-        offset: index / count,
-      })),
-    [count],
-  );
-
-  useFrame(({ clock }) => {
-    const target = mesh.current;
-    if (!target) return;
-    // Pulses accelerate as the hero camera approaches the object.
-    const speed = 1 + driver.progress.current * 1.6;
-    const matrix = new THREE.Matrix4();
-    for (const [index, path] of paths.entries()) {
-      const t = ((clock.elapsedTime * speed) / 2.4 + path.offset) % 1;
-      const radius = 0.45 + t * 0.72;
-      matrix.makeTranslation(
-        Math.cos(path.angle) * radius,
-        Math.sin(path.tilt) * radius,
-        Math.sin(path.angle) * radius,
-      );
-      matrix.scale(new THREE.Vector3(1, 1, 1).multiplyScalar(1 - Math.abs(t - 0.5) * 0.8));
-      target.setMatrixAt(index, matrix);
-    }
-    target.instanceMatrix.needsUpdate = true;
-  });
-
-  return (
-    <instancedMesh args={[undefined, undefined, count]} ref={mesh}>
-      <sphereGeometry args={[0.03, 8, 8]} />
-      <meshStandardMaterial
-        color={appearance.emissiveColor}
-        emissive={appearance.emissiveColor}
-        emissiveIntensity={appearance.emissiveIntensity * 0.7}
-        toneMapped={false}
-      />
-    </instancedMesh>
   );
 }
 
@@ -207,9 +156,10 @@ export function SystemCore({
     const progress = driver.progress.current;
     const pointer = driver.pointer.current;
 
-    // Idle rotation of 0.6°/s, plus a deliberately small pointer response.
-    // A larger one reads as a toy rather than as an object with weight.
-    group.rotation.y += delta * 0.0105;
+    // The object does not spin. One moving part among still ones reads as a
+    // mechanism; everything turning at once reads as a screensaver, which is
+    // what it was doing — root, bezel, core and inner ring all at different
+    // rates. The middle ring is the only thing that turns now.
     const factor = dampFactor(3, delta);
     const approachTilt = Math.min(Math.max((progress - 0.25) / 0.3, 0), 1) * 0.314;
     group.rotation.x +=
@@ -218,9 +168,10 @@ export function SystemCore({
       (Math.sin((clock.elapsedTime * Math.PI * 2) / 7) * 0.06 - group.position.y) * factor;
     group.position.x += (pointer.x * 0.07 - group.position.x) * factor;
 
-    // Counter-rotation gives the layers visible parallax against each other.
-    if (cage.current) cage.current.rotation.y -= delta * 0.0037;
-    if (core.current) core.current.rotation.y += delta * 0.012;
+    // The core's own ring keeps a slow tilt of its own, on a third period, so
+    // the assembly reads as several things moving independently rather than as
+    // one rigid body.
+    if (core.current) core.current.rotation.z = Math.sin(clock.elapsedTime * 0.09) * 0.2;
 
     const separation = layerSeparation(progress);
     const travel = heroTravel(progress, canTravelThrough);
@@ -228,11 +179,11 @@ export function SystemCore({
     if (cage.current) cage.current.position.y = spread;
     if (glass.current) glass.current.scale.setScalar(1 - separation * 0.1);
     if (core.current) core.current.position.y = -spread;
-    group.scale.setScalar(0.92 * (1 + travel * 2.4));
+    group.scale.setScalar(0.84 * (1 + travel * 2.4));
   });
 
   return (
-    <group ref={root} rotation={[BASE_TILT_X, 0, 0.16]} scale={0.92}>
+    <group ref={root} rotation={[BASE_TILT_X, 0, 0.16]} scale={0.84}>
       {/* Two rim lights, deliberately weak. The prism ramp is allowed to touch
           the edges of the metal and nothing else: the object has to read as
           titanium under coloured light, not as a coloured object. Earlier
@@ -265,7 +216,7 @@ export function SystemCore({
       <group ref={core}>
         <ApiCore appearance={appearance} breathe={breathe} />
       </group>
-      <Pulses appearance={appearance} count={pulseCount(quality)} driver={driver} />
+      <Signals appearance={appearance} count={signalCount(quality)} driver={driver} />
     </group>
   );
 }

@@ -25,7 +25,7 @@ test.describe('reduced motion', () => {
     await expect(page.locator('.hero__stage .core-still')).toBeVisible();
     await expect(page.locator('.hero__stage .core-still__fins line')).toHaveCount(24);
     // Everything the sequence would have revealed stays reachable without it.
-    await expect(page.locator('.hero__layers li')).toHaveCount(3);
+    await expect(page.locator('.hero__layers > li')).toHaveCount(3);
     await expect(page.locator('.hero__layers')).toContainText('INFRASTRUCTURE');
   });
 

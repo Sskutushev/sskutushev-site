@@ -9,10 +9,3 @@ export interface CoreDriver {
   /** Pointer offset in normalised device coordinates, damped in the loop. */
   pointer: React.RefObject<{ x: number; y: number }>;
 }
-
-/** Point budget for the travelling data pulses at each render profile. */
-export function pulseCount(quality: 'STATIC' | 'LOW' | 'BALANCED' | 'HIGH' | 'ULTRA'): number {
-  if (quality === 'ULTRA' || quality === 'HIGH') return 24;
-  if (quality === 'BALANCED') return 12;
-  return 6;
-}

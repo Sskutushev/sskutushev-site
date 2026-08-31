@@ -24,7 +24,7 @@ export interface SiteCopy {
     explore: string;
     source: string;
   };
-  layers: { id: string; label: string; description: string }[];
+  layers: { id: string; label: string; description: string; stack: string; gain: string }[];
   sections: {
     manifesto: string;
     work: string;

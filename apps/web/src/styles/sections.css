@@ -15,7 +15,9 @@
   aspect-ratio: 4 / 5;
   border-radius: var(--r-md);
   object-fit: cover;
-  filter: grayscale(1) contrast(1.06);
+  /* In colour. The lamp and the screen behind the subject are the only warm
+     light on the page and they belong to the portrait. */
+  filter: contrast(1.03) saturate(0.96);
 }
 
 .manifesto__portrait figcaption {

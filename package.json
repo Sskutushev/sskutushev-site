@@ -72,11 +72,13 @@
       },
       "apps/web": {
         "entry": [
-          "tests/**/*.ts"
+          "tests/**/*.ts",
+          "scripts/*.mjs"
         ],
         "ignoreDependencies": [
           "@fontsource-variable/jetbrains-mono",
-          "@fontsource-variable/onest"
+          "@fontsource-variable/onest",
+          "simple-icons"
         ]
       }
     }

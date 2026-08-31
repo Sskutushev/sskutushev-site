@@ -99,6 +99,15 @@
   --nav-height: 4.25rem;
 }
 
+/* Russian sets 20-25% longer than English at the same size, and the hero's line
+   breaks are authored per locale, so the type cannot rewrap to fit. Measured at
+   1600: the longest Russian line ended 188px inside the object while the
+   longest English one cleared it by 155px. The display register is sized per
+   language instead of pretending the two are the same width. */
+:root:lang(ru) {
+  --t-display: clamp(2.5rem, 5vw, 6.25rem);
+}
+
 :root[data-theme='light'] {
   color-scheme: light;
 }
