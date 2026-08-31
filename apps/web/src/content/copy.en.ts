@@ -5,9 +5,11 @@ import type { SiteCopy } from './site-copy';
  *
  * Split out of `site-copy.ts` so the shape and the words change for different
  * reasons: the interface is edited when a surface gains a field, and these are
- * edited when a sentence is wrong. Both locales stay adjacent through the
- * `SiteCopy` type, which is what stops a Russian heading appearing over an
- * English paragraph.
+ * edited when a sentence is wrong.
+ *
+ * The register is deliberate. An engineer with something to prove writes in
+ * aphorisms; these say what happened and what it cost, in the words anyone
+ * would use out loud.
  */
 export const copyEn: SiteCopy = {
   skip: 'Skip to content',
@@ -16,7 +18,7 @@ export const copyEn: SiteCopy = {
     eyebrow: 'Fullstack / Product Engineer',
     lines: ['I build systems', 'that hold under', 'production load.'],
     behind: 1,
-    lead: 'Backend-oriented fullstack engineer. I own the vertical end to end: domain invariants, money and access, cache, integrations and the production rollout.',
+    lead: 'I take a problem end to end, from the data model to the rollout. Usually money, access and search — the places where a mistake does not show up today, it shows up next week in a report.',
     availability: 'Open to senior+ fullstack work, backend-leaning',
     explore: 'Explore the system',
     source: 'View source',
@@ -25,23 +27,23 @@ export const copyEn: SiteCopy = {
     {
       id: 'infra',
       label: 'INFRASTRUCTURE',
-      description: 'Observable rollout with readiness, flags and rollback.',
+      description: 'A rollout you can watch: readiness, flags, rollback.',
       stack: 'Docker · GitHub Actions · OpenTelemetry',
-      gain: 'A green build is not a conclusion about readiness. Traffic switches after the readiness check, and the way back is built first.',
+      gain: 'A build passing is not the same as it being safe to ship. Traffic switches after the readiness check, and the way back exists before the rollout does.',
     },
     {
       id: 'data',
       label: 'DATA',
-      description: 'Transactional invariants. Unknown stays unknown.',
+      description: 'Invariants inside the transaction. Unknown stays unknown.',
       stack: 'CockroachDB · Prisma · Redis · BigQuery',
-      gain: 'A repeated operation returns the same result or a named conflict — never a second charge.',
+      gain: 'If a request arrives twice, the money moves once. The second time returns the same answer, or a clear error.',
     },
     {
       id: 'api',
       label: 'API',
-      description: 'Typed contracts and boundaries the domain does not leak through.',
+      description: 'Typed contracts, and a boundary the domain does not leak through.',
       stack: 'NestJS · GraphQL · WebSocket',
-      gain: 'One typed, localised query, depth and complexity limits, and errors that carry no internal detail outward.',
+      gain: 'One page, one query. Depth and complexity are capped, and error text carries nothing the client has no business seeing.',
     },
   ],
   sections: {
@@ -55,7 +57,7 @@ export const copyEn: SiteCopy = {
   },
   manifesto: {
     lines: ['I do not collect', 'technologies.'],
-    body: 'Eleven years of work, five of them in commercial development; before that I managed sales at Coca-Cola HBC, which is still why I discuss a system in terms of consequences rather than technology. I design boundaries where every dependency solves a concrete operational problem. A system has to stay honest under load: money is not lost, access is not granted by mistake, and a missing value does not quietly become a convenient zero.',
+    body: 'Eleven years of work, five of them writing code. Before that, sales at Coca-Cola HBC — which is why I still explain a system through its consequences rather than its stack. Every dependency here is present because it solves a specific problem, not because it reads well in a list. Under load only one thing matters: money is not lost, access is not granted by accident, and a missing value does not quietly become a convenient zero.',
     stack: [
       { label: 'Primary', value: 'TypeScript / NestJS' },
       { label: 'Data', value: 'CockroachDB / Prisma' },
@@ -64,7 +66,7 @@ export const copyEn: SiteCopy = {
     ],
   },
   work: {
-    note: 'Each case is behaviour under load, not a list of technologies.',
+    note: 'These are about how a system behaves when something goes wrong.',
     open: 'How it is solved',
   },
   reviewer: {
@@ -74,7 +76,7 @@ export const copyEn: SiteCopy = {
     steps: [
       {
         title: 'Engineering mode',
-        body: 'Frame time, draw calls, DPR and web vitals, measured in your own tab right now rather than screenshotted.',
+        body: 'Frame time, draw calls, DPR and web vitals. Measured in your own tab right now, not attached as a screenshot.',
       },
       {
         title: 'The verifiable section',
@@ -82,15 +84,15 @@ export const copyEn: SiteCopy = {
       },
       {
         title: 'Any case, then "How it is solved"',
-        body: 'An excerpt from this repository with a link to the file. A test fails when the excerpt stops being verbatim.',
+        body: 'A piece of code from this repository, with a link to the file. If it drifts from the original by one character, a test fails.',
       },
       {
         title: 'Clone it and run it',
-        body: 'CockroachDB, Redis, MinIO and the API come up with one command; migrations and the seed apply to a clean database.',
+        body: 'CockroachDB, Redis, MinIO and the API come up with one command. Migrations and data land on a clean database.',
       },
       {
         title: 'Read the CI',
-        body: 'Seventeen checks before publish: migrations on an empty database, budgets, axe, snapshots, Semgrep, images.',
+        body: 'Seventeen checks before publish: migrations on an empty database, budgets, accessibility, snapshots, Semgrep, images.',
       },
     ],
   },
@@ -102,12 +104,12 @@ export const copyEn: SiteCopy = {
     close: 'Close',
   },
   engineeringSection: {
-    note: 'Everything here can be checked rather than taken on trust.',
+    note: 'All of this can be checked rather than taken on my word.',
     build: 'This build',
     atBuild: 'measured at build time',
     liveSurface: 'Live surface',
     liveNote:
-      'The published GitHub Pages build calls an API on its own origin. There is none there — and that state is named rather than hidden.',
+      'The published build calls an API on its own domain. On GitHub Pages there is none — and the site says so plainly, rather than pretending the data is live.',
     commit: 'Commit',
     built: 'Built',
     gates: 'Gates before publish',
@@ -121,23 +123,23 @@ export const copyEn: SiteCopy = {
     buildMissing: 'Build evidence is unavailable — this page was not produced by our pipeline.',
   },
   architecture: {
-    note: 'The topology of this site, and what it does when a dependency disappears.',
+    note: 'How this site is put together, and what it does when one of the parts drops out.',
     title: 'Read path',
     cards: [
       {
         label: 'Read',
         heading: 'One GraphQL aggregate',
-        body: 'One typed, localised query. The frontend has no second source of data.',
+        body: 'One page, one query. The frontend has no second source of data.',
       },
       {
         label: 'Resilience',
         heading: 'Redis SWR',
-        body: 'Fresh, then stale, then an honest refusal. There is no silent zero.',
+        body: 'Fresh first, then stale, then an honest "could not". Nothing is quietly replaced by a zero.',
       },
       {
         label: 'Data and files',
         heading: 'CockroachDB + S3',
-        body: 'Source of truth in the database; binaries go straight to storage, never through the API.',
+        body: 'The truth lives in the database. Files go straight to storage, past the API.',
       },
     ],
   },
@@ -152,6 +154,6 @@ export const copyEn: SiteCopy = {
     open: 'Open engineering mode',
     close: 'Close',
     title: 'Engineering mode',
-    note: 'Values are measured in this browser session. Nothing here is a CI number presented as runtime state.',
+    note: 'Everything is measured in this tab. No number here arrived from CI dressed as runtime.',
   },
 };
