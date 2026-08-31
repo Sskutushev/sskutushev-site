@@ -1,4 +1,6 @@
 import { ArrowUpRight, Download } from 'lucide-react';
+import { CoreStill } from '../three/CoreStill';
+import { ReviewerPath } from './ReviewerPath';
 import type { SiteCopy } from '../content/site-copy';
 import type { Locale } from '../lib/portfolio';
 import { StatusDot } from '../ui/StatusDot';
@@ -35,10 +37,26 @@ function resumeUrl(): string {
   return new URL('/assets/resume', new URL(graphql, window.location.origin).origin).toString();
 }
 
-export function Contact({ copy, locale }: { copy: SiteCopy; locale: Locale }): React.JSX.Element {
+export function Contact({
+  copy,
+  locale,
+  onEngineering,
+}: {
+  copy: SiteCopy;
+  locale: Locale;
+  onEngineering: () => void;
+}): React.JSX.Element {
   const resume = resumeUrl();
   return (
     <footer className="contact" id="contact">
+      <ReviewerPath copy={copy} onEngineering={onEngineering} />
+      {/* The object the first screen opened with, drawn once more and at rest.
+          It is the line-work rather than the canvas: one persistent canvas is
+          the performance contract, and this is the form every visitor on a
+          software renderer saw at the top of the page anyway. */}
+      <div aria-hidden className="contact__core">
+        <CoreStill />
+      </div>
       <div className="grid">
         <div className="contact__title">
           <p className="contact__availability t-meta">

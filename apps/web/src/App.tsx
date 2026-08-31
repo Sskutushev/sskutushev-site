@@ -105,6 +105,7 @@ export default function App(): React.JSX.Element {
               dataDetail={dataDetail}
               dataState={dataState}
               locale={locale}
+              onEngineering={() => setEngineering(true)}
               onEvidenceVisible={setEvidenceVisible}
               runtime={runtime}
             />

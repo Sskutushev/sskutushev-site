@@ -236,6 +236,13 @@
   background: var(--surface-1);
 }
 
+/* Above the closing composition, which is absolutely positioned behind them. */
+.contact .grid,
+.contact__foot {
+  position: relative;
+  z-index: 1;
+}
+
 .contact__title {
   grid-column: 1 / 8;
 }
