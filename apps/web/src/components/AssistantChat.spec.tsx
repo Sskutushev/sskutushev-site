@@ -46,8 +46,15 @@ describe('AssistantChat', () => {
     fireEvent.submit(screen.getByRole('textbox', { name: 'Question' }).closest('form')!);
     expect(askProfile).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: "What are Sergey's strengths?" }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Which technical decision turned out to be wrong, and how did that surface?',
+      }),
+    );
     await waitFor(() => expect(askProfile).toHaveBeenCalledOnce());
-    expect(askProfile).toHaveBeenCalledWith("What are Sergey's strengths?", 'EN');
+    expect(askProfile).toHaveBeenCalledWith(
+      'Which technical decision turned out to be wrong, and how did that surface?',
+      'EN',
+    );
   });
 });

@@ -32,10 +32,15 @@ const RESUME: Record<Locale, { open: string; download: string }> = {
   EN: { open: 'Open resume', download: 'Download PDF' },
 };
 
-function resumeUrl(): string {
-  const graphql = import.meta.env.VITE_GRAPHQL_URL || '/graphql';
-  return new URL('/assets/resume', new URL(graphql, window.location.origin).origin).toString();
-}
+/**
+ * The copy that ships with the build.
+ *
+ * The API serves the same file from object storage, which is the path the
+ * architecture section describes — and not a path the published site has, since
+ * GitHub Pages has no API behind it. Both buttons pointed at an origin that
+ * does not answer there and did nothing at all.
+ */
+const RESUME_FILE = `${import.meta.env.BASE_URL}sergey-kutushev-resume.pdf`;
 
 export function Contact({
   copy,
@@ -46,7 +51,6 @@ export function Contact({
   locale: Locale;
   onEngineering: () => void;
 }): React.JSX.Element {
-  const resume = resumeUrl();
   return (
     <footer className="contact" id="contact">
       <ReviewerPath copy={copy} onEngineering={onEngineering} />
@@ -86,11 +90,20 @@ export function Contact({
             </a>
           ))}
           <div className="contact__resume">
-            <a className="button button--primary" href={resume} rel="noreferrer" target="_blank">
+            <a
+              className="button button--primary"
+              href={RESUME_FILE}
+              rel="noreferrer"
+              target="_blank"
+            >
               {RESUME[locale].open}
               <ArrowUpRight aria-hidden size={18} strokeWidth={1.5} />
             </a>
-            <a className="button button--quiet" download="sergey-kutushev-resume.pdf" href={resume}>
+            <a
+              className="button button--quiet"
+              download="sergey-kutushev-resume.pdf"
+              href={RESUME_FILE}
+            >
               {RESUME[locale].download}
               <Download aria-hidden size={18} strokeWidth={1.5} />
             </a>

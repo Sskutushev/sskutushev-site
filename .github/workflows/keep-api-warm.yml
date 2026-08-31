@@ -1,0 +1,48 @@
+name: Keep API warm
+
+# A free container host stops the instance after a quiet period, and the next
+# visitor waits up to a minute for it to start. On a page whose whole argument
+# is that a system stays honest under load, a reviewer reading that as a broken
+# site is the worst possible first impression.
+#
+# This is a workaround, not architecture, and it is written down as one: the
+# real fix is an instance that does not sleep. It costs nothing and it is
+# harmless — one HEAD request to a liveness endpoint that touches no dependency.
+#
+# It does nothing until the repository variable `PUBLIC_GRAPHQL_URL` is set, and
+# GitHub disables scheduled workflows after 60 days without repository activity.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions: { contents: read }
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the liveness endpoint
+        env:
+          GRAPHQL_URL: ${{ vars.PUBLIC_GRAPHQL_URL }}
+        shell: bash
+        run: |
+          if [ -z "$GRAPHQL_URL" ]; then
+            echo 'PUBLIC_GRAPHQL_URL is not set; nothing to keep warm.'
+            exit 0
+          fi
+          origin="${GRAPHQL_URL%/graphql}"
+          echo "Waking ${origin}"
+          # A cold instance can take most of a minute to answer, and one missed
+          # ping is not a failure worth a red run: the next one is ten minutes
+          # away and the site degrades honestly in between.
+          for attempt in 1 2 3; do
+            if curl --fail --silent --show-error --max-time 60 "${origin}/health/live"; then
+              echo
+              echo "Awake after attempt ${attempt}."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "No answer from ${origin}/health/live after three attempts."

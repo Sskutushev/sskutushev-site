@@ -3,6 +3,7 @@ import { Locale } from '../portfolio/portfolio.models';
 import { PortfolioService } from '../portfolio/portfolio.service';
 import type { AssistantAnswerModel } from './assistant.models';
 import { GeminiService } from './gemini.service';
+import { judgementChunks } from './judgement';
 import { isProfileRelated, type KnowledgeChunk } from './retrieval';
 import { SemanticService } from './semantic.service';
 
@@ -23,9 +24,15 @@ export class AssistantService {
     }
     this.consumeQuota();
     const portfolio = await this.portfolio.getPortfolio(locale);
-    const evidence = await this.semantic.rank(normalized, this.toChunks(portfolio), 4);
+    const evidence = await this.semantic.rank(normalized, this.toChunks(portfolio, locale), 4);
     const profileRelated = isProfileRelated(normalized);
-    const generated = await this.gemini.answer(normalized, evidence, locale, profileRelated);
+    // A question about the profile with nothing retrieved has no grounding, so
+    // the model is not asked: it would answer from its own priors, and the
+    // answer would be about a person it has never read anything about.
+    const grounded = !profileRelated || evidence.length > 0;
+    const generated = grounded
+      ? await this.gemini.answer(normalized, evidence, locale, profileRelated)
+      : null;
     return {
       answer: generated ?? this.extractiveAnswer(evidence, locale),
       sources: profileRelated
@@ -46,6 +53,7 @@ export class AssistantService {
 
   private toChunks(
     portfolio: Awaited<ReturnType<PortfolioService['getPortfolio']>>,
+    locale: Locale,
   ): KnowledgeChunk[] {
     const chunks: KnowledgeChunk[] = [
       {
@@ -71,6 +79,9 @@ export class AssistantService {
         text: `${item.problem} ${item.approach} ${item.result}. ${item.technologies.join(', ')}`,
       });
     }
+    // What was decided, refused and got wrong. Without these the questions the
+    // interface actually offers have nothing to retrieve against.
+    chunks.push(...judgementChunks(locale));
     return chunks;
   }
 

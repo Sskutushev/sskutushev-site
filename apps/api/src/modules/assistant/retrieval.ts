@@ -20,8 +20,20 @@ export function retrieve(question: string, chunks: KnowledgeChunk[], limit = 4):
     .map(({ chunk }) => chunk);
 }
 
+/**
+ * Whether a question is about this profile at all.
+ *
+ * The second alternation is the vocabulary of judgement — decisions, refusals,
+ * mistakes, proof. Those questions are the ones the interface now offers, and
+ * without them here the assistant treated its own suggestions as off-topic.
+ */
 export function isProfileRelated(question: string): boolean {
-  return /(серг|serg|кутуш|kutush|стек|stack|опыт|experience|уме|skill|навык|работ|work|англий|english|backend|frontend|fullstack|devops|security|безопас|данн|data|проект|project|refty|уров|level|резюме|resume)/iu.test(
-    question,
+  return (
+    /(серг|serg|кутуш|kutush|стек|stack|опыт|experience|уме|skill|навык|работ|work|англий|english|backend|frontend|fullstack|devops|security|безопас|данн|data|проект|project|refty|уров|level|резюме|resume)/iu.test(
+      question,
+    ) ||
+    /(решени|выбра|ошиб|отказ|доказ|скучн|инцидент|слаб|риск|decision|choose|chose|wrong|mistake|refus|prove|boring|incident|weak|risk|trade)/iu.test(
+      question,
+    )
   );
 }
