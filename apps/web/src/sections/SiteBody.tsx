@@ -26,6 +26,7 @@ export function SiteBody({
   locale,
   runtime,
   onEvidenceVisible,
+  onEngineering,
 }: {
   copy: SiteCopy;
   data: Portfolio;
@@ -34,6 +35,7 @@ export function SiteBody({
   locale: Locale;
   runtime: EngineeringMetrics;
   onEvidenceVisible: (visible: boolean) => void;
+  onEngineering: () => void;
 }): React.JSX.Element {
   return (
     <>
@@ -50,7 +52,7 @@ export function SiteBody({
       />
       <Capabilities copy={copy} locale={locale} skills={data.skills} />
       <Experience copy={copy} items={data.experience} />
-      <Contact copy={copy} locale={locale} />
+      <Contact copy={copy} locale={locale} onEngineering={onEngineering} />
     </>
   );
 }

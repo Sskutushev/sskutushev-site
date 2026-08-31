@@ -37,8 +37,8 @@ test.describe('reduced motion', () => {
     await expect(page.locator('canvas')).toHaveCount(0);
     // The fallback is a drawing of the same object, not an empty stage: the
     // bezel fins are the part that is missing when it degrades to a wash.
-    await expect(page.locator('.core-still')).toBeVisible();
-    await expect(page.locator('.core-still__fins line')).toHaveCount(24);
+    await expect(page.locator('.hero__stage .core-still')).toBeVisible();
+    await expect(page.locator('.hero__stage .core-still__fins line')).toHaveCount(24);
     // Everything the sequence would have revealed stays reachable without it.
     await expect(page.locator('.hero__layers li')).toHaveCount(3);
     await expect(page.locator('.hero__layers')).toContainText('INFRASTRUCTURE');
@@ -205,6 +205,22 @@ test.describe('reduced motion', () => {
     }
   });
 
+  test('the reviewer path names five checkable steps and opens engineering mode', async ({
+    page,
+  }) => {
+    await gotoOffline(page);
+    const reviewer = page.locator('.reviewer');
+    await reviewer.scrollIntoViewIfNeeded();
+    await expect(reviewer.locator('li')).toHaveCount(5);
+    // A command is case-sensitive; the meta register uppercases by default.
+    await expect(reviewer.locator('.reviewer__command')).toHaveText(
+      'git clone … && docker compose up',
+    );
+
+    await reviewer.getByRole('button', { name: /engineering mode/i }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+  });
+
   test('the engineering section carries build evidence when the API is gone', async ({ page }) => {
     // The published build has no API behind it, so every live panel on it is
     // offline. Without something measured at build time the whole section would
@@ -316,7 +332,7 @@ test.describe('with motion enabled', () => {
     });
     // Headless Chromium runs on SwiftShader, which is the case this guards.
     expect(renderer).toMatch(/swiftshader|llvmpipe|software/i);
-    await expect(page.locator('.core-still')).toBeVisible();
+    await expect(page.locator('.hero__stage .core-still')).toBeVisible();
     // The budget allows one canvas at most; here it must be none.
     await expect(page.locator('canvas')).toHaveCount(0);
   });

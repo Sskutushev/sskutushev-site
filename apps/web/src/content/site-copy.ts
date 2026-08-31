@@ -52,6 +52,12 @@ export interface SiteCopy {
   };
   manifesto: { lines: string[]; body: string; stack: { label: string; value: string }[] };
   work: { note: string; open: string };
+  reviewer: {
+    label: string;
+    title: string;
+    command: string;
+    steps: { title: string; body: string }[];
+  };
   caseNote: {
     context: string;
     decision: string;
@@ -127,6 +133,33 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     work: {
       note: 'Каждый кейс — поведение под нагрузкой, а не список технологий.',
       open: 'Как это решено',
+    },
+    reviewer: {
+      label: 'Ревьюеру',
+      title: 'Что проверить за десять минут',
+      command: 'git clone … && docker compose up',
+      steps: [
+        {
+          title: 'Инженерный режим',
+          body: 'Кадр, draw calls, DPR и web vitals — измеренные в вашей вкладке прямо сейчас, а не скриншот.',
+        },
+        {
+          title: 'Секция «Проверяемое»',
+          body: 'Коммит, из которого собрана эта страница, семнадцать гейтов по именам и размеры бандла, взвешенные самой сборкой.',
+        },
+        {
+          title: 'Любой кейс → «Как это решено»',
+          body: 'Фрагмент из этого репозитория со ссылкой на файл. Тест падает, если фрагмент перестал быть дословным.',
+        },
+        {
+          title: 'Клонировать и поднять',
+          body: 'CockroachDB, Redis, MinIO и API поднимаются одной командой; миграции и сид применяются к чистой базе.',
+        },
+        {
+          title: 'Посмотреть CI',
+          body: 'Семнадцать проверок до публикации: миграции на пустой базе, бюджеты, axe, снимки, Semgrep, образы.',
+        },
+      ],
     },
     caseNote: {
       context: 'Откуда задача',
@@ -241,6 +274,33 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     work: {
       note: 'Each case is behaviour under load, not a list of technologies.',
       open: 'How it is solved',
+    },
+    reviewer: {
+      label: 'For a reviewer',
+      title: 'What to check in ten minutes',
+      command: 'git clone … && docker compose up',
+      steps: [
+        {
+          title: 'Engineering mode',
+          body: 'Frame time, draw calls, DPR and web vitals, measured in your own tab right now rather than screenshotted.',
+        },
+        {
+          title: 'The verifiable section',
+          body: 'The commit this page was built from, seventeen gates by name, and bundle sizes the build weighed itself.',
+        },
+        {
+          title: 'Any case, then "How it is solved"',
+          body: 'An excerpt from this repository with a link to the file. A test fails when the excerpt stops being verbatim.',
+        },
+        {
+          title: 'Clone it and run it',
+          body: 'CockroachDB, Redis, MinIO and the API come up with one command; migrations and the seed apply to a clean database.',
+        },
+        {
+          title: 'Read the CI',
+          body: 'Seventeen checks before publish: migrations on an empty database, budgets, axe, snapshots, Semgrep, images.',
+        },
+      ],
     },
     caseNote: {
       context: 'Where it comes from',

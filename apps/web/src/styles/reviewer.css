@@ -1,0 +1,106 @@
+/* Reviewer path ------------------------------------------------------------
+   The last thing before the contact details, because it is the thing a person
+   evaluating a candidate actually wants: five places on this page that can be
+   checked rather than read. */
+
+.reviewer {
+  max-width: var(--content-max);
+  margin-bottom: var(--s-10);
+  padding: var(--s-7) 0 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.reviewer__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-bottom: var(--s-6);
+}
+
+.reviewer__steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--s-5) var(--s-6);
+}
+
+.reviewer__steps li {
+  display: flex;
+  gap: var(--s-4);
+  align-items: baseline;
+}
+
+.reviewer__index {
+  flex: none;
+  color: var(--text-tertiary);
+}
+
+.reviewer__steps strong {
+  display: block;
+  margin-bottom: var(--s-2);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.reviewer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4);
+  margin-top: var(--s-6);
+}
+
+/* A command is case-sensitive; the meta register uppercases, which would make
+   this one wrong to copy. */
+.reviewer__command {
+  padding: var(--s-2) var(--s-4);
+  text-transform: none;
+  letter-spacing: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* Closing composition ------------------------------------------------------
+   The object the first screen opened with, at rest behind the last sentence. */
+
+/* Bottom left, under the closing sentence: the first screen puts the object on
+   the right, so the last one mirrors it, and it fills the only dead area of
+   the footer instead of sitting behind the contact links. */
+.contact__core {
+  position: absolute;
+  z-index: 0;
+  bottom: var(--s-8);
+  left: calc(var(--gutter) + 6%);
+  width: min(26rem, 30vw);
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.contact__core .core-still {
+  animation: none;
+}
+
+@media (max-width: 1023px) {
+  .contact__core {
+    width: min(22rem, 46vw);
+    opacity: 0.32;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Below the copy rather than behind it: at this width it would sit under the
+     closing sentence and take the contrast out of it. */
+  .contact__core {
+    position: static;
+    width: 14rem;
+    margin: var(--s-6) 0 0;
+    opacity: 0.4;
+    transform: none;
+  }
+
+  .reviewer__steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
