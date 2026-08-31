@@ -150,6 +150,10 @@
   gap: var(--s-4);
 }
 
+.hero__lead {
+  max-width: var(--measure-lead);
+}
+
 .hero__availability {
   display: flex;
   align-items: center;

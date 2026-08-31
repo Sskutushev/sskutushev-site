@@ -182,7 +182,7 @@ jobs:
       - name: Lint production shell contracts
         run: shellcheck scripts/deploy-production.sh scripts/rollback-production.sh scripts/smoke-production.sh scripts/test-production-deploy.sh
   quality-report:
-    name: 15 · Quality evidence
+    name: 16 · Quality evidence
     needs:
       [
         backend-integration,
@@ -196,14 +196,14 @@ jobs:
     uses: ./.github/workflows/quality-report.yml
     secrets: inherit
   docker-quality:
-    name: 16 · Docker images
+    name: 17 · Docker images
     needs: quality-report
     permissions: { contents: read, packages: write }
     uses: ./.github/workflows/docker.yml
     with:
       push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
   publish-pages:
-    name: 17 · Publish Pages
+    name: 18 · Publish Pages
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: docker-quality
     runs-on: ubuntu-latest
@@ -216,7 +216,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
   deploy-production:
-    name: 18 · Deploy production
+    name: 19 · Deploy production
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
