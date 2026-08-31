@@ -155,9 +155,10 @@ test.describe('reduced motion', () => {
   });
 
   test('a case opens the code that decides it, and closes on Escape', async ({ page }) => {
-    await reduceMotion(page);
-    await page.goto('/');
-    await page.getByRole('button', { name: 'EN', exact: true }).click();
+    // Settled first: every other test here waits for a resolved data state, and
+    // clicking with the portfolio query still in flight is what made this one
+    // fail only on a slower machine.
+    await gotoOffline(page);
     const chapter = page.locator('#case-search-cache-reliability');
     await chapter.scrollIntoViewIfNeeded();
     await chapter.getByRole('button', { name: 'How it is solved' }).click();

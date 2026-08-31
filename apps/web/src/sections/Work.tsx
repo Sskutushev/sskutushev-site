@@ -25,8 +25,11 @@ export function Work({
 }): React.JSX.Element {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const closeNote = useCallback(() => setOpenSlug(null), []);
-  const open = openSlug ? cases.find((item) => item.slug === openSlug) : undefined;
-  const openNote = open ? caseNotes[open.slug] : undefined;
+  // Resolved from the notes rather than from `cases`: the portfolio query can
+  // resolve, fail or switch locale while the dialog is open, and a lookup into
+  // the data would make it vanish mid-read on whichever of those happens first.
+  const openNote = openSlug ? caseNotes[openSlug] : undefined;
+  const openTitle = cases.find((item) => item.slug === openSlug)?.title ?? openSlug;
 
   return (
     <section className="section section--work" id="work">
@@ -66,13 +69,13 @@ export function Work({
         );
       })}
 
-      {open && openNote && (
+      {openNote && openTitle && (
         <CaseDialog
           copy={copy}
           locale={locale}
           note={openNote}
           onClose={closeNote}
-          title={open.title}
+          title={openTitle}
         />
       )}
     </section>
