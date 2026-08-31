@@ -45,90 +45,101 @@ export const cases = [
     slug: 'money-entitlement',
     titleRu: 'Money & Entitlement',
     titleEn: 'Money & Entitlement',
-    problemRu: 'Оплаченный, но не выданный доступ — не состояние системы.',
-    problemEn: 'Paid for but not granted is not a state a system may have.',
+    problemRu: 'Человек заплатил, а доступ не открылся. Такого состояния у системы быть не должно.',
+    problemEn:
+      'Someone paid and the access never opened. A system should not be able to be in that state.',
     approachRu:
-      'Backend-owned pricing, ledger, idempotency identity, fail-closed grant, refund и reconciliation.',
+      'Цену считает бэкенд. Ключ повтора — сама операция, а не дата с суммой. Хранилище недоступно — доступ не выдаётся.',
     approachEn:
-      'Backend-owned pricing, ledgers, idempotency identity, fail-closed grants, refunds and reconciliation.',
-    resultRu:
-      'Повтор операции возвращает тот же результат или именованный конфликт — никогда второе списание.',
+      'The backend owns the price. The repeat key is the operation itself, not a date and an amount. If storage is down, access is not granted.',
+    resultRu: 'Повтор возвращает тот же ответ или понятный конфликт. Второго списания не бывает.',
     resultEn:
-      'A repeated operation returns the same result or a named conflict — never a second charge.',
+      'A repeat returns the same answer, or a conflict with a name on it. There is never a second charge.',
     tech: ['TypeScript', 'Node.js', 'CockroachDB', 'Redis'],
   },
   {
     slug: 'ranking-data-honesty',
     titleRu: 'Ranking V3 / Data Honesty',
     titleEn: 'Ranking V3 / Data Honesty',
-    problemRu: 'Математически точная, но продуктово ложная цифра убедительнее пустого поля.',
+    problemRu:
+      'Цифра, посчитанная верно, но означающая не то, что думает читатель, опаснее пустого поля.',
     problemEn:
-      'A mathematically precise but product-invalid number is more convincing than an empty field.',
+      'A number that is arithmetically right but does not mean what the reader thinks it means is worse than an empty field.',
     approachRu:
-      'Absolute / adjusted / category modes, cohort basis, confidence, reason taxonomy и unknown ≠ zero.',
+      'Три режима — absolute, adjusted, category. У каждого числа видно выборку и уверенность. Данных нет — так и написано.',
     approachEn:
-      'Absolute, adjusted and category modes with cohort basis, confidence, reason taxonomy and unknown ≠ zero.',
-    resultRu: 'Три явных режима на каталоге из 230k+ объявлений; unknown остаётся unknown.',
-    resultEn: 'Three explicit modes over a 230k+ catalogue; unknown stays unknown.',
+      'Three modes — absolute, adjusted, category. Every number shows its cohort and its confidence. No data says no data.',
+    resultRu:
+      'Три явных режима на каталоге из 230 тысяч объявлений. Неизвестное остаётся неизвестным.',
+    resultEn:
+      'Three explicit modes over a catalogue of 230 thousand listings. Unknown stays unknown.',
     tech: ['TypeScript', 'BigQuery', 'Redis', 'React'],
   },
   {
     slug: 'search-cache-reliability',
     titleRu: 'Search / Cache Reliability',
     titleEn: 'Search / Cache Reliability',
-    problemRu: 'Устаревшие данные и ложный fallback — разные состояния.',
-    problemEn: 'Stale data and a false fallback are different states.',
+    problemRu:
+      'Показать старые данные и показать выдуманные — это разные вещи, и путать их нельзя.',
+    problemEn:
+      'Showing old data and showing invented data are different things, and they must not be confused.',
     approachRu:
-      'Versioned SWR envelopes, deterministic keys, in-flight dedupe и честный stale fallback.',
+      'Версионированный кэш, предсказуемые ключи, параллельные запросы схлопываются в один. Устарело — так и помечено.',
     approachEn:
-      'Versioned SWR envelopes, deterministic keys, in-flight dedupe and an explicit stale fallback.',
-    resultRu: 'Search V2 и виртуализация снизили нагрузку на браузер примерно на 75%.',
-    resultEn: 'Search V2 and virtualisation cut browser load by roughly 75%.',
+      'A versioned cache, predictable keys, concurrent requests collapsed into one. Stale is labelled stale.',
+    resultRu: 'Search V2 и виртуализация выдачи сняли с браузера примерно 75% работы.',
+    resultEn:
+      'Search V2 and a virtualised result list took roughly 75% of the work off the browser.',
     tech: ['Redis', 'React', 'TanStack Query', 'TypeScript'],
   },
   {
     slug: 'image-similarity',
     titleRu: 'Image Similarity Pipeline',
     titleEn: 'Image Similarity Pipeline',
-    problemRu: 'Поиск по фотографии среди 230k+ объявлений, который однажды вернул ноль.',
-    problemEn: 'Photo search across 230k+ listings — which once returned nothing at all.',
+    problemRu:
+      'Поиск по фотографии среди 230 тысяч объявлений. Однажды он перестал находить вообще что-либо.',
+    problemEn:
+      'Photo search across 230 thousand listings. One day it stopped finding anything at all.',
     approachRu:
-      'Quality gate, Redis → Wasabi → CLIP embeddings → Qdrant → BigQuery и fallback на original asset.',
+      'Проверка качества снимка, дальше Redis → Wasabi → CLIP → Qdrant → BigQuery, с откатом на исходный файл.',
     approachEn:
-      'Quality gate, Redis → Wasabi → CLIP embeddings → Qdrant → BigQuery and original-asset fallback.',
+      'A quality check on the photo, then Redis → Wasabi → CLIP → Qdrant → BigQuery, with a fallback to the original file.',
     resultRu:
-      'Причина устранена сквозь storage, embedding, vector retrieval и warehouse projection.',
+      'Причина нашлась не в одном месте, а в четырёх сразу: хранилище, эмбеддинги, векторный поиск, витрина. Убрал во всех.',
     resultEn:
-      'The cause was removed across storage, embedding, vector retrieval and warehouse projection.',
+      'The cause was not in one place but in four at once: storage, embeddings, vector retrieval, the warehouse projection. All four were fixed.',
     tech: ['Python', 'FastAPI', 'Redis', 'Qdrant', 'BigQuery', 'S3 / Wasabi'],
   },
   {
     slug: 'financial-concurrency',
     titleRu: 'Financial Concurrency',
     titleEn: 'Financial Concurrency',
-    problemRu: 'Округление ниже одного филса — потерянные деньги, а не погрешность.',
-    problemEn: 'Rounding below one fils is lost money, not a rounding error.',
+    problemRu:
+      'Округление ниже одного филса — это не погрешность. Это потерянные деньги, просто их не видно сразу.',
+    problemEn:
+      'Rounding below one fils is not a rounding error. It is lost money — it just does not look like it at first.',
     approachRu:
-      'Decimal money, дневной инвариант, optimistic concurrency и транзакционный перерасчёт.',
+      'Деньги в decimal, дневной инвариант, оптимистичные блокировки и пересчёт внутри одной транзакции.',
     approachEn:
-      'Decimal money, a daily invariant, optimistic concurrency and transactional recalculation.',
-    resultRu: 'Конфликтующие изменения отклоняются явно, без тихой потери начислений.',
-    resultEn: 'Conflicting changes are rejected explicitly, without silently losing accruals.',
+      'Money in decimal, a daily invariant, optimistic locking, and the recalculation inside a single transaction.',
+    resultRu: 'Конкурирующие правки отклоняются явно. Начисления не пропадают молча.',
+    resultEn: 'Competing edits are rejected out loud. Accruals do not disappear quietly.',
     tech: ['TypeScript', 'CockroachDB', 'Prisma', 'C#'],
   },
   {
     slug: 'production-migration',
     titleRu: 'Production Migration',
     titleEn: 'Production Migration',
-    problemRu: 'Зелёная сборка — не вывод о готовности к продакшену.',
-    problemEn: 'A green build is not a conclusion about production readiness.',
+    problemRu: 'Сборка зелёная — это ещё не значит, что миграцию можно катить на прод.',
+    problemEn: 'A green build does not mean the migration is safe to run in production.',
     approachRu:
-      'Additive schema, compatibility layer, feature flag, readiness, traffic switch, smoke и rollback.',
+      'Схема только расширяется, старый код живёт через слой совместимости. Флаг, готовность, переключение трафика, smoke, откат.',
     approachEn:
-      'Additive schema, compatibility layer, feature flags, readiness, traffic switch, smoke and rollback.',
-    resultRu: 'Rollout — часть реализации: parity с legacy, production sweep и путь назад заранее.',
+      'The schema only grows; the old code lives through a compatibility layer. A flag, readiness, the traffic switch, smoke, rollback.',
+    resultRu:
+      'Выкат — часть работы, а не то, что делают после неё: сверка со старой системой, прогон на проде и заранее готовый путь назад.',
     resultEn:
-      'Rollout is part of implementation: parity with legacy, a production sweep, the way back first.',
+      'The rollout is part of the work, not something that happens after it: parity with the old system, a production sweep, and the way back ready in advance.',
     tech: ['Docker', 'Kubernetes', 'GitHub Actions', 'Playwright'],
   },
 ] as const;
@@ -146,8 +157,8 @@ export const experiences = [
     startDate: new Date('2026-01-01'),
     endDate: null,
     summary: {
-      ru: 'Международная proptech-платформа рынка недвижимости ОАЭ. Ownership backend, data и production-валидации; фронтенд — там, где он упирается в данные.',
-      en: 'An international proptech platform for the UAE property market. Ownership of the backend, the data and production validation; the frontend where it meets the data.',
+      ru: 'Proptech-платформа для рынка недвижимости ОАЭ. На мне бэкенд, данные и проверка того, что уехало в прод. Фронтенд — там, где он упирается в данные.',
+      en: 'A proptech platform for the UAE property market. The backend, the data and checking what actually shipped are mine. The frontend where it runs into the data.',
     },
     highlights: [
       {
@@ -213,8 +224,8 @@ export const experiences = [
     startDate: new Date('2021-03-01'),
     endDate: new Date('2025-12-01'),
     summary: {
-      ru: 'Внутренние торговые и аналитические системы: realtime- и исторические данные, crypto и copy trading. Алгоритмические компоненты на MQL, Python, Go и Rust — стек подбирался под требования к скорости исполнения.',
-      en: 'Internal trading and analytics systems: realtime and historical data, crypto and copy trading. Algorithmic components in MQL, Python, Go and Rust, with the language chosen for the execution-speed requirement.',
+      ru: 'Внутренние торговые и аналитические системы: данные в реальном времени и исторические, crypto и copy trading. Алгоритмические части на MQL, Python, Go и Rust — язык выбирался под то, насколько быстро должна отработать конкретная операция.',
+      en: 'Internal trading and analytics systems: realtime and historical data, crypto and copy trading. The algorithmic parts in MQL, Python, Go and Rust, with the language picked for how fast that particular operation had to run.',
     },
     highlights: [],
   },
@@ -224,8 +235,8 @@ export const experiences = [
     startDate: new Date('2024-12-01'),
     endDate: new Date('2025-06-01'),
     summary: {
-      ru: 'Единственный фронтенд-разработчик мультипродуктовой платформы: ролевой интерфейс для семи типов пользователей и компонентная система на сотни экранных состояний.',
-      en: 'The only frontend engineer on a multi-product platform: a role-based interface for seven user types and a component system covering hundreds of screen states.',
+      ru: 'Единственный фронтенд-разработчик мультипродуктовой платформы: семь типов пользователей, у каждого свой интерфейс, и компонентная система на сотни экранных состояний.',
+      en: 'The only frontend engineer on a multi-product platform: seven user types, each with its own interface, and a component system covering hundreds of screen states.',
     },
     highlights: [],
   },
@@ -235,8 +246,8 @@ export const experiences = [
     startDate: new Date('2015-02-01'),
     endDate: new Date('2020-12-01'),
     summary: {
-      ru: 'Управление командой, KPI и переговоры. Отсюда привычка обсуждать систему в терминах последствий для бизнеса, а не технологий.',
-      en: 'Team management, KPIs and negotiation. This is where the habit of discussing a system in terms of business consequences rather than technology comes from.',
+      ru: 'Команда, KPI, переговоры. Отсюда привычка говорить о системе через последствия для бизнеса, а не через технологии.',
+      en: 'A team, KPIs, negotiation. This is where the habit of talking about a system through business consequences rather than technology comes from.',
     },
     highlights: [],
   },
@@ -245,15 +256,14 @@ export const experiences = [
 export const profileText = {
   ru: {
     headline: 'Senior+ Fullstack / Product Engineer · Backend 60% / Frontend 40%',
-    summary:
-      'Веду продуктовые вертикали целиком: доменная модель, база, API, интерфейс, интеграции и выкат в production.',
+    summary: 'Беру продуктовую задачу целиком: модель, база, API, интерфейс, интеграции и выкат.',
     location: 'Санкт-Петербург · Remote · UTC+3',
     availability: 'Открыт к senior+ backend-работе',
   },
   en: {
     headline: 'Senior+ Fullstack / Product Engineer · Backend 60% / Frontend 40%',
     summary:
-      'I own product verticals end to end: domain model, database, API, interface, integrations and the production rollout.',
+      'I take a product problem end to end: the model, the database, the API, the interface, the integrations and the rollout.',
     location: 'Saint Petersburg · Remote · UTC+3',
     availability: 'Open to senior+ backend work',
   },

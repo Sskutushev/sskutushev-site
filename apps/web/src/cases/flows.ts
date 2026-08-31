@@ -63,8 +63,8 @@ export const moneyFlow: FlowCase = {
         status: '409 · FAIL CLOSED',
         state: 'failed',
         detail: {
-          RU: 'Проводка откатывается вместе с выдачей. Оплаченный, но не выданный доступ — не состояние.',
-          EN: 'The entry rolls back with the grant. Paid-for but ungranted access is not a state.',
+          RU: 'Проводка откатывается вместе с выдачей: заплатил, но не получил — так быть не должно.',
+          EN: 'The entry rolls back with the grant: paid for but not received is not a state we allow.',
         },
       },
     },

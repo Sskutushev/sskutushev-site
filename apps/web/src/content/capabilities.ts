@@ -19,40 +19,40 @@ export const capabilityMeta: Record<string, CapabilityMeta> = {
     icon: Server,
     weight: '60%',
     description: {
-      RU: 'Доменные инварианты, money- и access-потоки на TypeScript и C#. Идемпотентность — часть доменной корректности, а не деталь HTTP.',
-      EN: 'Domain invariants, money and access flows in TypeScript and C#. Idempotency is part of domain correctness, not an HTTP detail.',
+      RU: 'Деньги и доступы на TypeScript и C#. Что делать с повторным запросом — вопрос предметной области, а не заголовка в HTTP.',
+      EN: 'Money and access flows in TypeScript and C#. What to do with a repeated request is a question about the domain, not about an HTTP header.',
     },
   },
   Data: {
     icon: Database,
     weight: 'Source of truth',
     description: {
-      RU: 'Транзакционные и аналитические контуры. Перенос аналитики с Looker на TypeScript/SQL сократил обращения к BigQuery примерно на 65%.',
-      EN: 'Transactional and analytical paths. Moving analytics off Looker onto TypeScript and SQL cut BigQuery calls by roughly 65%.',
+      RU: 'Транзакционные и аналитические данные. Перенёс аналитику с Looker на TypeScript и SQL — обращений к BigQuery стало примерно на 65% меньше.',
+      EN: 'Transactional and analytical data. Moving analytics off Looker onto TypeScript and SQL left roughly 65% fewer BigQuery calls.',
     },
   },
   Frontend: {
     icon: Layers,
     weight: '30%',
     description: {
-      RU: 'Сложные состояния и data-heavy интерфейсы. Search V2 с виртуализацией снял около 75% нагрузки с браузера.',
-      EN: 'Complex state and data-heavy interfaces. Search V2 with virtualisation took roughly 75% of the load off the browser.',
+      RU: 'Интерфейсы, где много данных и много состояний. Виртуализация выдачи в Search V2 сняла с браузера около 75% работы.',
+      EN: 'Interfaces with a lot of data and a lot of state. A virtualised result list in Search V2 took roughly 75% of the work off the browser.',
     },
   },
   Infrastructure: {
     icon: Boxes,
     weight: 'Ship & operate',
     description: {
-      RU: 'Контейнеры, storage, контролируемый rollout. Зелёная сборка — только одно из входных условий, а не вывод о готовности.',
-      EN: 'Containers, storage, a controlled rollout. A green build is one prerequisite, not a conclusion about readiness.',
+      RU: 'Контейнеры, хранилище, управляемый выкат. Зелёная сборка — условие на входе, а не разрешение катить.',
+      EN: 'Containers, storage, a controlled rollout. A green build is a precondition, not permission to ship.',
     },
   },
   Quality: {
     icon: ShieldCheck,
     weight: 'Guardrails',
     description: {
-      RU: 'Негативные пути и исполняемые проверки вместо обещаний. Внешний аудит команды за лето 2026: доля тестов 41%, лучший показатель в команде.',
-      EN: 'Negative paths and executable checks instead of assurances. A team audit in summer 2026 put the test ratio at 41%, the highest on the team.',
+      RU: 'Тесты на то, что ломается, а не на то, что и так работает. Внешний аудит команды летом 2026: доля тестов 41%, лучший результат в команде.',
+      EN: 'Tests for what breaks rather than for what already works. A team audit in the summer of 2026 put the test ratio at 41%, the highest on the team.',
     },
   },
 };

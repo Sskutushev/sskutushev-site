@@ -407,30 +407,37 @@
     grid-column: 1 / -1;
   }
 
-  .case__title {
+  /* The tag keeps the row it is given above, where it sits beside the index in
+     its own column. Here every child is full width, so it needs a row of its
+     own: without this it stayed on row 1 and printed straight over the number. */
+  .case__tag {
     grid-row: 2;
+  }
+
+  .case__title {
+    grid-row: 3;
     margin-bottom: 0;
     max-width: none;
   }
 
   .case__visual {
-    grid-row: 3;
-  }
-
-  .case__problem {
     grid-row: 4;
   }
 
-  .case__result {
+  .case__problem {
     grid-row: 5;
   }
 
-  .case__stack {
+  .case__result {
     grid-row: 6;
   }
 
-  .case__open {
+  .case__stack {
     grid-row: 7;
+  }
+
+  .case__open {
+    grid-row: 8;
     justify-self: start;
   }
 
