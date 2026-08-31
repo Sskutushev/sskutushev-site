@@ -56,53 +56,70 @@
   text-align: right;
 }
 
-/* Cases ------------------------------------------------------------------- */
+/* Case chapters ----------------------------------------------------------- */
 
-.cases {
+.section--work {
+  padding-bottom: 0;
+}
+
+/* One case per screen. The visual is the dominant subject; the copy is a
+   caption for it, which is the opposite of the row layout this replaced. */
+.case {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s-4) var(--s-6);
+  align-content: center;
+  min-height: 88svh;
+  padding: var(--s-9) 0;
   border-top: 1px solid var(--hairline);
 }
 
-.case {
-  display: grid;
-  grid-template-columns: 3.5rem minmax(0, 5fr) minmax(0, 4fr) 2rem;
-  gap: var(--s-6);
-  align-items: start;
-  padding: var(--s-8) 0;
-  border-bottom: 1px solid var(--hairline);
-  transition: background var(--d-interface) var(--ease-interface);
-}
-
-.case:hover {
-  background: var(--surface-2);
-}
-
 .case__index {
+  grid-column: 1 / 2;
+  grid-row: 1;
   color: var(--text-tertiary);
 }
 
 .case__tag {
-  margin-bottom: var(--s-4);
+  grid-column: 2 / 8;
+  grid-row: 1;
+  align-self: baseline;
   color: var(--text-secondary);
 }
 
-.case__title {
-  max-width: 12ch;
-}
-
-.case__detail {
+.case__copy {
   display: flex;
   flex-direction: column;
   gap: var(--s-4);
-  padding-top: var(--s-2);
+  grid-column: 1 / 5;
+  grid-row: 2;
+  align-self: center;
+  margin-top: var(--s-5);
+}
+
+.case__title {
+  margin-bottom: var(--s-3);
+  max-width: 11ch;
+}
+
+.case__problem {
+  max-width: var(--measure-lead);
+}
+
+.case__visual {
+  grid-column: 6 / -1;
+  grid-row: 2;
+  align-self: center;
 }
 
 .case__stack {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-2);
+  margin-top: var(--s-2);
 }
 
-.case__stack span {
+.case__stack li {
   padding: var(--s-1) var(--s-3);
   border: 1px solid var(--hairline);
   border-radius: var(--r-full);
@@ -110,20 +127,6 @@
   font-family: var(--font-mono);
   font-size: var(--t-meta-sm);
   letter-spacing: 0.06em;
-}
-
-.case__arrow {
-  align-self: center;
-  justify-self: end;
-  color: var(--text-tertiary);
-  transition:
-    transform var(--d-micro) var(--ease-micro),
-    color var(--d-micro) var(--ease-micro);
-}
-
-.case:hover .case__arrow {
-  color: var(--accent);
-  transform: translate(3px, -3px);
 }
 
 /* Capabilities ------------------------------------------------------------ */
@@ -302,12 +305,12 @@
     margin-top: var(--s-7);
   }
 
-  .case {
-    grid-template-columns: 2.5rem minmax(0, 1fr) 2rem;
+  .case__copy {
+    grid-column: 1 / 4;
   }
 
-  .case__detail {
-    grid-column: 2;
+  .case__visual {
+    grid-column: 4 / -1;
   }
 
   .timeline__item {
@@ -325,14 +328,36 @@
     grid-column: 1 / -1;
   }
 
-  .case,
   .timeline__item {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--s-4);
   }
 
-  .case__arrow {
-    display: none;
+  /* Stacked: the visual keeps a reserved band above the copy rather than
+     competing with it for a column that is no longer there. */
+  .case {
+    min-height: 0;
+    gap: var(--s-5);
+  }
+
+  .case__index,
+  .case__tag,
+  .case__copy,
+  .case__visual {
+    grid-column: 1 / -1;
+  }
+
+  .case__title {
+    max-width: none;
+  }
+
+  .case__visual {
+    grid-row: 2;
+  }
+
+  .case__copy {
+    grid-row: 3;
+    margin-top: 0;
   }
 
   .contact__foot {

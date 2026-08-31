@@ -32,6 +32,12 @@ export interface SiteCopy {
     contact: string;
   };
   manifesto: { lines: string[]; body: string };
+  work: { note: string };
+  architecture: {
+    note: string;
+    title: string;
+    cards: { label: string; heading: string; body: string }[];
+  };
   data: { live: string; stale: string; failed: string; simulated: string };
   theme: { toLight: string; toDark: string };
   engineering: { open: string; close: string; title: string };
@@ -84,6 +90,28 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     manifesto: {
       lines: ['Не коллекционирую', 'технологии.'],
       body: 'Проектирую границы, где каждая зависимость решает конкретную эксплуатационную задачу. Система должна оставаться честной, когда начинается реальная нагрузка: деньги не теряются, доступ не выдаётся по ошибке, а недостающие данные не превращаются в удобный ноль.',
+    },
+    work: { note: 'Каждый кейс — поведение под нагрузкой, а не список технологий.' },
+    architecture: {
+      note: 'Топология этого сайта и то, что он делает, когда зависимость исчезает.',
+      title: 'Путь чтения',
+      cards: [
+        {
+          label: 'Чтение',
+          heading: 'Один GraphQL-агрегат',
+          body: 'Один типизированный запрос с локалью. У фронтенда нет второго источника данных.',
+        },
+        {
+          label: 'Отказоустойчивость',
+          heading: 'Redis SWR',
+          body: 'Свежее, затем устаревшее, затем честный отказ. Тихого нуля не бывает.',
+        },
+        {
+          label: 'Данные и файлы',
+          heading: 'CockroachDB + S3',
+          body: 'Источник истины в базе, бинарники грузятся в хранилище напрямую, минуя API.',
+        },
+      ],
     },
     data: {
       live: 'Данные из источника',
@@ -138,6 +166,28 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     manifesto: {
       lines: ['I do not collect', 'technologies.'],
       body: 'I design boundaries where every dependency solves a concrete operational problem. A system has to stay honest once real load arrives: money is not lost, access is not granted by mistake, and missing data does not quietly become a convenient zero.',
+    },
+    work: { note: 'Each case is behaviour under load, not a list of technologies.' },
+    architecture: {
+      note: 'The topology of this site, and what it does when a dependency disappears.',
+      title: 'Read path',
+      cards: [
+        {
+          label: 'Read',
+          heading: 'One GraphQL aggregate',
+          body: 'One typed, localised query. The frontend has no second source of data.',
+        },
+        {
+          label: 'Resilience',
+          heading: 'Redis SWR',
+          body: 'Fresh, then stale, then an honest refusal. There is no silent zero.',
+        },
+        {
+          label: 'Data and files',
+          heading: 'CockroachDB + S3',
+          body: 'Source of truth in the database; binaries go straight to storage, never through the API.',
+        },
+      ],
     },
     data: {
       live: 'Live from source',
