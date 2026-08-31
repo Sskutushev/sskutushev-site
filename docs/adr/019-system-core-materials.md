@@ -24,4 +24,4 @@ environment contains, and on the near-black ground a single overhead source left
 reflect and it read as black rubber. A second broad lightformer from below is what makes it titanium.
 
 Transmission earns its cost again if a case visual needs genuine refraction — an object seen
-*through* the shell, where the distortion is the information. The hero is not that.
+_through_ the shell, where the distortion is the information. The hero is not that.
