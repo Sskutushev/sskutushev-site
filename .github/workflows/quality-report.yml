@@ -70,6 +70,12 @@ jobs:
       - name: Browser measurements
         env: { PLAYWRIGHT_JSON_OUTPUT_FILE: '../../artifacts/e2e-tests.json' }
         run: pnpm --filter @sskutushev/web exec playwright test --reporter=json
+      # This job runs the browser suite alongside the database, cache, storage
+      # and API, so it is the one that surfaces load-sensitive failures. Without
+      # the traces those are diagnosed by guessing.
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: measured-playwright-results, path: apps/web/test-results }
       - name: Runtime integration evidence
         shell: bash
         run: |
