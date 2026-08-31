@@ -33,8 +33,21 @@
 }
 
 .section__note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s-2);
   max-width: 24em;
   text-align: right;
+  color: var(--text-tertiary);
+}
+
+/* Path arrows read as direction, not punctuation: they carry the same weight
+   as the hairlines and never compete with the step names. */
+.section__note svg,
+.simulation__path svg {
+  flex: none;
   color: var(--text-tertiary);
 }
 
@@ -64,6 +77,7 @@
   }
 
   .section__note {
+    justify-content: flex-start;
     text-align: left;
   }
 }

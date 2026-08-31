@@ -1,23 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
-import { CaseSimulation } from './components/CaseSimulation';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { siteCopy } from './content/site-copy';
+import { afterPaint } from './lib/after-paint';
 import { fallbackPortfolio } from './lib/fallback-portfolio';
 import { fetchPortfolio, type Locale } from './lib/portfolio';
 import { useEngineeringMetrics } from './lib/use-engineering-metrics';
 import { useRenderQuality } from './lib/use-render-quality';
 import { useSmoothScroll } from './lib/use-smooth-scroll';
-import { Architecture } from './sections/Architecture';
-import { Capabilities } from './sections/Capabilities';
-import { Contact } from './sections/Contact';
-import { Experience } from './sections/Experience';
 import { Hero } from './sections/Hero';
-import { Manifesto } from './sections/Manifesto';
-import { Work } from './sections/Work';
 import { useTheme } from './theme/use-theme';
-import { EngineeringDrawer } from './ui/EngineeringDrawer';
 import { SiteNav } from './ui/SiteNav';
 import type { DataState } from './ui/StatusDot';
+
+const SiteBody = lazy(() =>
+  import('./sections/SiteBody').then(({ SiteBody: component }) => ({ default: component })),
+);
+const EngineeringDrawer = lazy(() =>
+  import('./ui/EngineeringDrawer').then(({ EngineeringDrawer: component }) => ({
+    default: component,
+  })),
+);
 
 /** Stops the render loop as soon as the hero leaves the viewport. */
 function useHeroVisible(): { ref: React.RefObject<HTMLDivElement | null>; visible: boolean } {
@@ -49,9 +51,16 @@ export default function App(): React.JSX.Element {
   // scroll container receives wheel events. See ADR-017.
   useSmoothScroll(reduced || engineering);
 
+  // Nothing below the hero, and no network call, is owed to the first paint:
+  // the first screen is a 240vh pin and the page renders from the bundled
+  // fallback. Both wait until it is up.
+  const [live, setLive] = useState(false);
+  useEffect(() => afterPaint(() => setLive(true)), []);
+
   const { data = fallbackPortfolio[locale], isError } = useQuery({
     queryKey: ['portfolio', locale],
     queryFn: () => fetchPortfolio(locale),
+    enabled: live,
     retry: 1,
   });
 
@@ -85,24 +94,29 @@ export default function App(): React.JSX.Element {
             theme={theme}
           />
         </div>
-        <Manifesto copy={copy} />
-        <Work cases={data.caseStudies} copy={copy} />
-        <Architecture copy={copy} detail={dataDetail} state={dataState}>
-          <CaseSimulation locale={locale} />
-        </Architecture>
-        <Capabilities copy={copy} locale={locale} skills={data.skills} />
-        <Experience copy={copy} items={data.experience} />
+        {live && (
+          <Suspense fallback={null}>
+            <SiteBody
+              copy={copy}
+              data={data}
+              dataDetail={dataDetail}
+              dataState={dataState}
+              locale={locale}
+            />
+          </Suspense>
+        )}
       </main>
-      <Contact copy={copy} locale={locale} />
       {engineering && (
-        <EngineeringDrawer
-          copy={copy}
-          dataState={dataDetail}
-          locale={locale}
-          onClose={() => setEngineering(false)}
-          quality={quality}
-          runtime={runtime}
-        />
+        <Suspense fallback={null}>
+          <EngineeringDrawer
+            copy={copy}
+            dataState={dataDetail}
+            locale={locale}
+            onClose={() => setEngineering(false)}
+            quality={quality}
+            runtime={runtime}
+          />
+        </Suspense>
       )}
     </>
   );

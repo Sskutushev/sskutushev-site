@@ -108,9 +108,16 @@
   color: var(--accent-fg);
 }
 
+.simulation__path {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+}
+
 .simulation__result {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--s-4);
   padding: var(--s-4) var(--s-5);
   border-left: 2px solid var(--text-tertiary);

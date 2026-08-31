@@ -1,3 +1,5 @@
+import { ArrowRight } from 'lucide-react';
+import { Fragment } from 'react';
 import type { SiteCopy } from '../content/site-copy';
 import { StatusDot } from '../ui/StatusDot';
 import type { DataState } from '../ui/StatusDot';
@@ -11,6 +13,8 @@ const NODES = [
   { id: 'cockroach', label: 'CockroachDB', role: 'Source of truth' },
   { id: 's3', label: 'S3', role: 'Assets' },
 ] as const;
+
+const READ_PATH = ['Request', 'contract', 'domain', 'data', 'response'] as const;
 
 export function Architecture({
   copy,
@@ -27,7 +31,14 @@ export function Architecture({
     <section className="section" id="architecture">
       <div className="section__head">
         <p className="section__index t-meta">03 / {copy.sections.architecture}</p>
-        <p className="section__note t-meta-sm">Request → contract → domain → data → response</p>
+        <p className="section__note t-meta-sm">
+          {READ_PATH.map((step, index) => (
+            <Fragment key={step}>
+              {index > 0 && <ArrowRight aria-hidden size={13} strokeWidth={1.5} />}
+              {step}
+            </Fragment>
+          ))}
+        </p>
       </div>
 
       <ol className="pipeline">

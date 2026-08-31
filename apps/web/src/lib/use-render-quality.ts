@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { afterPaint } from './after-paint';
 import type { RenderMetrics } from '../scenes/RuntimeProfiler';
 import {
   lowerRenderQuality,
@@ -38,18 +39,35 @@ function detectCapabilities(reducedMotion: boolean): RenderCapabilities {
     softwareRenderer: gl ? isSoftwareRenderer(gl) : true,
   };
   if (browser.deviceMemory !== undefined) capabilities.deviceMemory = browser.deviceMemory;
+  // The probe context is never drawn into. Releasing it immediately keeps the
+  // GPU process from holding a second context alongside the scene's own.
+  gl?.getExtension('WEBGL_lose_context')?.loseContext();
   return capabilities;
 }
 
+/**
+ * Reports how much scene a device should be asked to render.
+ *
+ * Detection creates a WebGL context, and creating one is not cheap: on a
+ * software renderer it costs hundreds of milliseconds and it holds the main
+ * thread while it happens. Running it during the first render — which is where
+ * it used to live — pushed the hero's own paint behind it and was what
+ * Lighthouse measured as the largest contentful paint. The answer is therefore
+ * resolved once the page is idle, and the hero shows its designed static
+ * composition until then, which is what it must show on the devices that end
+ * up staying static anyway.
+ */
 export function useRenderQuality(reducedMotion: boolean): RenderQuality {
-  const [quality, setQuality] = useState(() =>
-    selectRenderQuality(detectCapabilities(reducedMotion)),
-  );
+  const [quality, setQuality] = useState<RenderQuality>('STATIC');
 
-  useEffect(
-    () => setQuality(selectRenderQuality(detectCapabilities(reducedMotion))),
-    [reducedMotion],
-  );
+  useEffect(() => {
+    if (reducedMotion) {
+      setQuality('STATIC');
+      return;
+    }
+    return afterPaint(() => setQuality(selectRenderQuality(detectCapabilities(reducedMotion))));
+  }, [reducedMotion]);
+
   useEffect(() => {
     let slowSamples = 0;
     const onMetrics = (event: Event): void => {

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { ArrowUpRight, CircleDot, GitFork, Star } from 'lucide-react';
 import { fetchGithubActivity, type Locale } from '../lib/portfolio';
 
 export function GithubActivity({ locale }: { locale: Locale }): React.JSX.Element {
@@ -26,9 +27,14 @@ export function GithubActivity({ locale }: { locale: Locale }): React.JSX.Elemen
         <a href={repository.url} target="_blank" rel="noreferrer" key={repository.name}>
           <strong>{repository.name}</strong>
           <span>
-            ★ {repository.stars} · ⑂ {repository.forks} · ISSUE {repository.openIssues}
+            <Star aria-hidden size={13} strokeWidth={1.5} />
+            {repository.stars}
+            <GitFork aria-hidden size={13} strokeWidth={1.5} />
+            {repository.forks}
+            <CircleDot aria-hidden size={13} strokeWidth={1.5} />
+            {repository.openIssues}
           </span>
-          <b aria-hidden="true">↗</b>
+          <ArrowUpRight aria-hidden size={16} strokeWidth={1.5} />
         </a>
       ))}
       {isError && (

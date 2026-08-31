@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { Fragment, useState } from 'react';
 import type { Locale } from '../lib/portfolio';
 import { StatusDot } from '../ui/StatusDot';
 import type { DataState } from '../ui/StatusDot';
@@ -7,7 +8,7 @@ interface Scenario {
   id: string;
   label: Record<Locale, string>;
   status: string;
-  path: Record<Locale, string>;
+  path: Record<Locale, string[]>;
   tone: Exclude<DataState, 'simulated'>;
 }
 
@@ -21,14 +22,17 @@ const SCENARIOS: Scenario[] = [
     id: 'normal',
     label: { RU: 'Норма', EN: 'Normal' },
     status: '200 · LIVE',
-    path: { RU: 'попадание в кэш → ответ', EN: 'cache hit → response' },
+    path: { RU: ['попадание в кэш', 'ответ'], EN: ['cache hit', 'response'] },
     tone: 'ok',
   },
   {
     id: 'miss',
     label: { RU: 'Промах кэша', EN: 'Cache miss' },
     status: '200 · REFRESHED',
-    path: { RU: 'база → заполнение кэша → ответ', EN: 'database → cache fill → response' },
+    path: {
+      RU: ['база', 'заполнение кэша', 'ответ'],
+      EN: ['database', 'cache fill', 'response'],
+    },
     tone: 'ok',
   },
   {
@@ -36,8 +40,8 @@ const SCENARIOS: Scenario[] = [
     label: { RU: 'Таймаут провайдера', EN: 'Provider timeout' },
     status: '200 · DEGRADED',
     path: {
-      RU: 'бюджет таймаута → устаревший снимок провайдера',
-      EN: 'timeout budget → stale provider snapshot',
+      RU: ['бюджет таймаута', 'устаревший снимок провайдера'],
+      EN: ['timeout budget', 'stale provider snapshot'],
     },
     tone: 'degraded',
   },
@@ -46,8 +50,8 @@ const SCENARIOS: Scenario[] = [
     label: { RU: 'Отдача из снимка', EN: 'Stale fallback' },
     status: '200 · STALE',
     path: {
-      RU: 'источник недоступен → помеченный снимок',
-      EN: 'source unavailable → labelled snapshot',
+      RU: ['источник недоступен', 'помеченный снимок'],
+      EN: ['source unavailable', 'labelled snapshot'],
     },
     tone: 'degraded',
   },
@@ -56,8 +60,8 @@ const SCENARIOS: Scenario[] = [
     label: { RU: 'Инцидент', EN: 'Incident' },
     status: '503 · FAIL CLOSED',
     path: {
-      RU: 'отказ зависимости → отказ вместо ложного успеха',
-      EN: 'dependency failure → refusal instead of false success',
+      RU: ['отказ зависимости', 'отказ вместо ложного успеха'],
+      EN: ['dependency failure', 'refusal instead of false success'],
     },
     tone: 'failed',
   },
@@ -105,7 +109,14 @@ export function CaseSimulation({ locale }: { locale: Locale }): React.JSX.Elemen
         className={`simulation__result simulation__result--${active.tone}`}
       >
         <strong className="t-meta">{active.status}</strong>
-        <span className="t-small text-secondary">{active.path[locale]}</span>
+        <span className="simulation__path t-small text-secondary">
+          {active.path[locale].map((step, index) => (
+            <Fragment key={step}>
+              {index > 0 && <ArrowRight aria-hidden size={14} strokeWidth={1.5} />}
+              {step}
+            </Fragment>
+          ))}
+        </span>
       </output>
     </section>
   );
