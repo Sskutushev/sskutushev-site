@@ -65,11 +65,23 @@ jobs:
       - run: mkdir -p artifacts/lighthouse
       - run: pnpm --filter @sskutushev/api test:report
       - run: pnpm --filter @sskutushev/web test:report
-      - run: pnpm --filter @sskutushev/web build
+      # The job-level NODE_ENV=test belongs to the API and the unit runs. Leaked
+      # into the web build it produced a development React bundle — 147KB gzip
+      # against 88KB, with effects mounted twice — so this job measured, and
+      # published quality numbers for, an artifact that is never shipped.
+      - name: Build the shipped bundle
+        env: { NODE_ENV: production }
+        run: pnpm --filter @sskutushev/web build
       - run: pnpm --filter @sskutushev/web exec playwright install --with-deps chromium
       - name: Browser measurements
         env: { PLAYWRIGHT_JSON_OUTPUT_FILE: '../../artifacts/e2e-tests.json' }
         run: pnpm --filter @sskutushev/web exec playwright test --reporter=json
+      # This job runs the browser suite alongside the database, cache, storage
+      # and API, so it is the one that surfaces load-sensitive failures. Without
+      # the traces those are diagnosed by guessing.
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: measured-playwright-results, path: apps/web/test-results }
       - name: Runtime integration evidence
         shell: bash
         run: |

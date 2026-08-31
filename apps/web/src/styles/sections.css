@@ -123,6 +123,11 @@
   margin-top: var(--s-2);
 }
 
+.case__open {
+  align-self: flex-start;
+  margin-top: var(--s-3);
+}
+
 .case__stack li {
   padding: var(--s-1) var(--s-3);
   border: 1px solid var(--hairline);
@@ -199,10 +204,12 @@
   color: var(--text-tertiary);
 }
 
+/* Secondary, not accent: in accent blue the role read as an unvisited link on
+   every row of the timeline. */
 .timeline__role {
   display: block;
   margin-top: var(--s-2);
-  color: var(--accent-quiet);
+  color: var(--text-secondary);
 }
 
 .timeline__highlights {
@@ -211,6 +218,7 @@
   gap: var(--s-2);
   margin-top: var(--s-4);
   color: var(--text-secondary);
+  max-width: var(--measure-body);
 }
 
 .timeline__highlights li {
@@ -377,13 +385,16 @@
     display: contents;
   }
 
+  /* Every child of the dissolved copy wrapper needs its own placement: one
+     left off the list lands in a one-column implicit track and clips. */
   .case__index,
   .case__tag,
   .case__title,
   .case__visual,
   .case__problem,
   .case__result,
-  .case__stack {
+  .case__stack,
+  .case__open {
     grid-column: 1 / -1;
   }
 
@@ -407,6 +418,11 @@
 
   .case__stack {
     grid-row: 6;
+  }
+
+  .case__open {
+    grid-row: 7;
+    justify-self: start;
   }
 
   .contact__foot {

@@ -1,3 +1,7 @@
+import { Code2 } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { CaseDialog } from '../cases/CaseDialog';
+import { caseNotes } from '../cases/case-notes';
 import { caseVisual } from '../cases/case-visuals';
 import type { SiteCopy } from '../content/site-copy';
 import type { Locale, Portfolio } from '../lib/portfolio';
@@ -5,10 +9,10 @@ import type { Locale, Portfolio } from '../lib/portfolio';
 /**
  * Selected systems, as chapters rather than as rows.
  *
- * Each case owns a viewport and a visual that explains its specific problem.
- * As a table these read as six lines of similar-sounding claims; the visual is
- * the part that shows the behaviour instead of asserting it, which is the whole
- * argument the page is making.
+ * Each case owns a viewport, a visual that shows its behaviour, and the code
+ * that decides it. As a table these read as six lines of similar-sounding
+ * claims; a reviewer wants to check rather than believe, and the excerpt is the
+ * part that can be checked.
  */
 export function Work({
   copy,
@@ -19,6 +23,14 @@ export function Work({
   locale: Locale;
   cases: Portfolio['caseStudies'];
 }): React.JSX.Element {
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  const closeNote = useCallback(() => setOpenSlug(null), []);
+  // Resolved from the notes rather than from `cases`: the portfolio query can
+  // resolve, fail or switch locale while the dialog is open, and a lookup into
+  // the data would make it vanish mid-read on whichever of those happens first.
+  const openNote = openSlug ? caseNotes[openSlug] : undefined;
+  const openTitle = cases.find((item) => item.slug === openSlug)?.title ?? openSlug;
+
   return (
     <section className="section section--work" id="work">
       <div className="section__head">
@@ -41,11 +53,31 @@ export function Work({
                   <li key={technology}>{technology}</li>
                 ))}
               </ul>
+              {caseNotes[item.slug] && (
+                <button
+                  className="button button--quiet case__open"
+                  onClick={() => setOpenSlug(item.slug)}
+                  type="button"
+                >
+                  {copy.work.open}
+                  <Code2 aria-hidden size={18} strokeWidth={1.5} />
+                </button>
+              )}
             </div>
             {visual && <div className="case__visual">{visual}</div>}
           </article>
         );
       })}
+
+      {openNote && openTitle && (
+        <CaseDialog
+          copy={copy}
+          locale={locale}
+          note={openNote}
+          onClose={closeNote}
+          title={openTitle}
+        />
+      )}
     </section>
   );
 }

@@ -23,6 +23,9 @@ async function gotoOffline(page: Page, colorScheme?: 'dark' | 'light'): Promise<
   await page.emulateMedia({ reducedMotion: 'reduce', ...(colorScheme ? { colorScheme } : {}) });
   await page.route('**/graphql', (route) => route.abort('connectionfailed'));
   await page.goto('/');
+  // Everything below the hero is a lazy chunk mounted after first paint. Wait
+  // for it before touching anything inside it.
+  await expect(page.locator('#work')).toBeAttached();
   await page.getByRole('button', { name: 'EN', exact: true }).click();
   await expect(page.getByText(/API unavailable/i)).toBeVisible();
 }
@@ -145,7 +148,7 @@ test.describe('reduced motion', () => {
     await reduceMotion(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'EN', exact: true }).click();
-    const money = page.locator('#case-money .flow');
+    const money = page.locator('#case-money-entitlement .flow');
     await money.scrollIntoViewIfNeeded();
 
     await money.getByRole('button', { name: 'Same key replayed' }).click();
@@ -154,13 +157,38 @@ test.describe('reduced motion', () => {
     await expect(money.locator('.flow__node.is-skipped')).toHaveCount(2);
   });
 
+  test('a case opens the code that decides it, and closes on Escape', async ({ page }) => {
+    // Settled first: every other test here waits for a resolved data state, and
+    // clicking with the portfolio query still in flight is what made this one
+    // fail only on a slower machine.
+    await gotoOffline(page);
+    const chapter = page.locator('#case-search-cache-reliability');
+    await chapter.scrollIntoViewIfNeeded();
+    await chapter.getByRole('button', { name: 'How it is solved' }).click();
+
+    const note = page.locator('dialog.note');
+    await expect(note).toBeVisible();
+    // The excerpt is the claim: it names its file and shows the branch that
+    // makes a provider outage a degradation rather than an outage.
+    await expect(note).toContainText('apps/api/src/cache/cache.service.ts');
+    await expect(note.locator('pre code')).toContainText(
+      'return { value: cached.value, stale: true }',
+    );
+
+    // `close()` queues its event; a dialog that reopens on the same tick used
+    // to close itself a frame after opening.
+    await expect(note).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(note).toBeHidden();
+  });
+
   test('rows with no comparable basis stay on their own band in every projection', async ({
     page,
   }) => {
     await reduceMotion(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'EN', exact: true }).click();
-    const ranking = page.locator('#case-ranking .projection');
+    const ranking = page.locator('#case-ranking-data-honesty .projection');
     await ranking.scrollIntoViewIfNeeded();
     const unknown = ranking.locator('.projection__point.is-unknown');
     await expect(unknown).toHaveCount(8);
@@ -189,9 +217,10 @@ test.describe('reduced motion', () => {
     // A build with no repository behind it — a source archive, or this suite
     // running from a copied tree — reports the commit as unknown. What it must
     // never do is render an empty row.
-    await expect(section.locator('.evidence__row code').first()).toHaveText(
-      /^([0-9a-f]{7}|unknown)$/,
-    );
+    // Addressed by its label rather than by position: "the first code element
+    // in the section" also matches the GraphQL operation in the panel beside it.
+    const commit = section.locator('.evidence__row').filter({ hasText: 'Commit' });
+    await expect(commit).toHaveText(/^Commit ?([0-9a-f]{7}|unknown)$/);
 
     await section.getByText('Show the checks').click();
     const gates = section.locator('.evidence__gates li');
