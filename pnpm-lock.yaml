@@ -234,6 +234,9 @@ importers:
       postcss:
         specifier: ^8.5.26
         version: 8.5.26
+      simple-icons:
+        specifier: ^16.29.0
+        version: 16.29.0
       typescript-eslint:
         specifier: ^8.31.1
         version: 8.68.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
@@ -5192,6 +5195,10 @@ packages:
   signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
+
+  simple-icons@16.29.0:
+    resolution: {integrity: sha512-4H94f5ZgcCcgJroc902TFlFdgPu2IU2eD7+WebN2Z14xKYrKHeJ4UQcZwzgSuH4Rgzw+jp7sbHl40NefuIEYsg==}
+    engines: {node: '>=0.12.18'}
 
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
@@ -11323,6 +11330,8 @@ snapshots:
   signal-exit@3.0.7: {}
 
   signal-exit@4.1.0: {}
+
+  simple-icons@16.29.0: {}
 
   slash@3.0.0: {}
 

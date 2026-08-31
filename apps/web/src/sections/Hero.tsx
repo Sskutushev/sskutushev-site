@@ -122,10 +122,24 @@ export function Hero({
           {/* Present in the DOM regardless of motion: the layer meaning is
               content, not an animation payload. */}
           <ul className="hero__layers">
-            {copy.layers.map((layer) => (
+            {copy.layers.map((layer, index) => (
               <li key={layer.id}>
-                <b className="t-meta">{layer.label}</b>
-                <span className="t-small text-secondary">{layer.description}</span>
+                <p className="hero__layer-head t-meta">
+                  <span className="hero__layer-index">{String(index + 1).padStart(2, '0')}</span>
+                  {layer.label}
+                </p>
+                <p className="hero__layer-body t-body">{layer.description}</p>
+                {/* What the layer is actually made of. The three sentences alone
+                    are a claim; the parts under each are the half a reviewer can
+                    check against the architecture section. */}
+                <ul className="hero__layer-stack">
+                  {layer.stack.split(' · ').map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                {/* What the layer buys, in the terms a reviewer cares about.
+                    The parts alone are a stack list; this is the behaviour. */}
+                <p className="hero__layer-gain t-small text-secondary">{layer.gain}</p>
               </li>
             ))}
           </ul>
