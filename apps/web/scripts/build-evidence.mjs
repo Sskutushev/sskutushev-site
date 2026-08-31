@@ -34,12 +34,22 @@ function gitSha() {
  * The gates this build had to clear, read from the workflow so the list cannot
  * fall behind it. Publishing and deployment are jobs, not gates: they run after
  * this build exists and counting them would overstate what was checked.
+ *
+ * The workflow is not always there to read. The web container image is built
+ * from a context that carries `apps/web` and nothing else, and `.github` is in
+ * `.dockerignore` besides — a build from that context has no gate list to
+ * report, which is a fact about the build rather than a failure of it.
  */
 function gates() {
-  const workflow = readFileSync(
-    fileURLToPath(new URL('../../../.github/workflows/ci.yml', import.meta.url)),
-    'utf8',
-  );
+  let workflow;
+  try {
+    workflow = readFileSync(
+      fileURLToPath(new URL('../../../.github/workflows/ci.yml', import.meta.url)),
+      'utf8',
+    );
+  } catch {
+    return [];
+  }
   return [...workflow.matchAll(/^ {4}name: (\d+ · .+)$/gm)]
     .map(([, name]) => name)
     .filter((name) => !/Publish Pages|Deploy production/.test(name));
@@ -75,5 +85,7 @@ writeFileSync(
 );
 
 console.log(
-  `Build evidence written: ${evidence.sha?.slice(0, 7) ?? 'unknown commit'}, ${evidence.gates.length} gates, entry ${evidence.bundle.entryGzipBytes} bytes gzip.`,
+  `Build evidence written: ${evidence.sha?.slice(0, 7) ?? 'unknown commit'}, ${
+    evidence.gates.length || 'no'
+  } gates, entry ${evidence.bundle.entryGzipBytes} bytes gzip.`,
 );
