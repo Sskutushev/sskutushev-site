@@ -133,7 +133,11 @@ export function Engineering({
                 })}
               </Row>
               <Row label={copy.engineeringSection.gates}>
-                {evidence.runUrl ? (
+                {/* A build made outside the pipeline has no gate list to report.
+                    Zero would read as "nothing was checked"; it is unknown. */}
+                {evidence.gates.length === 0 ? (
+                  <code>{copy.engineeringSection.unknown}</code>
+                ) : evidence.runUrl ? (
                   <a href={evidence.runUrl} rel="noreferrer" target="_blank">
                     {evidence.gates.length} <ArrowUpRight aria-hidden size={14} strokeWidth={1.5} />
                   </a>
@@ -147,7 +151,7 @@ export function Engineering({
               </Row>
             </dl>
           ) : null}
-          {evidence ? (
+          {evidence && evidence.gates.length > 0 ? (
             /* Named, not counted. "17 gates" is a number; the list is the claim. */
             <details className="evidence__gates">
               <summary className="t-meta-sm">{copy.engineeringSection.gateList}</summary>
