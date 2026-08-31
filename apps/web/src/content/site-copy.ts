@@ -8,12 +8,14 @@ import type { Locale } from '../lib/portfolio';
  */
 export interface SiteCopy {
   skip: string;
-  nav: { work: string; system: string; about: string; contact: string };
+  nav: { work: string; system: string; about: string; contact: string; menu: string };
   hero: {
     eyebrow: string;
     /** One entry per rendered display line. */
     lines: string[];
-    /** Index of the line that renders behind the System Core. */
+    /** Index of the line that renders behind the System Core. Pick the line
+     * that actually crosses the object: a line that clears it entirely makes
+     * the composition flat no matter which side of the canvas it is on. */
     behind: number;
     lead: string;
     availability: string;
@@ -38,11 +40,17 @@ export interface SiteCopy {
 export const siteCopy: Record<Locale, SiteCopy> = {
   RU: {
     skip: 'К содержанию',
-    nav: { work: 'Работы', system: 'Система', about: 'О себе', contact: 'Контакт' },
+    nav: {
+      work: 'Работы',
+      system: 'Система',
+      about: 'О себе',
+      contact: 'Контакт',
+      menu: 'Разделы',
+    },
     hero: {
       eyebrow: 'Fullstack / Product Engineer',
       lines: ['Проектирую системы,', 'которые выдерживают', 'продакшен.'],
-      behind: 0,
+      behind: 1,
       lead: 'Backend-ориентированный инженер. 11 лет в продукте — от денежных инвариантов до наблюдаемого rollout.',
       availability: 'Открыт к senior+ backend-работе',
       explore: 'Исследовать систему',
@@ -92,11 +100,11 @@ export const siteCopy: Record<Locale, SiteCopy> = {
   },
   EN: {
     skip: 'Skip to content',
-    nav: { work: 'Work', system: 'System', about: 'About', contact: 'Contact' },
+    nav: { work: 'Work', system: 'System', about: 'About', contact: 'Contact', menu: 'Sections' },
     hero: {
       eyebrow: 'Fullstack / Product Engineer',
       lines: ['I build systems', 'that hold under', 'production load.'],
-      behind: 0,
+      behind: 1,
       lead: 'Backend-oriented engineer. 11 years in product — from money invariants to observable rollout.',
       availability: 'Open to senior+ backend work',
       explore: 'Explore the system',

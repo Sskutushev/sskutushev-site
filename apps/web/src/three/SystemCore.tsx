@@ -1,4 +1,4 @@
-import { MeshTransmissionMaterial, RoundedBox } from '@react-three/drei';
+import { RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -18,7 +18,16 @@ import {
   type CoreAppearance,
 } from './core-theme';
 
-/** DATA — a bevelled shell of optical glass, rotated off-axis from the cage. */
+/**
+ * DATA — a bevelled shell of polished glass.
+ *
+ * Screen-space transmission was tried first and abandoned. It resolves the
+ * shell from a low-resolution buffer of everything behind it, so the emissive
+ * core smeared across the whole volume and the object read as a solid violet
+ * lump with banding at its edges — the opposite of the neutral, machined
+ * result the direction calls for. A reflective shell with a clearcoat keeps
+ * the interior open, costs no extra render target, and holds its highlights.
+ */
 function GlassShell({
   appearance,
   quality,
@@ -26,9 +35,16 @@ function GlassShell({
   appearance: CoreAppearance;
   quality: RenderQuality;
 }): React.JSX.Element {
-  // Real refraction re-renders the scene into a buffer every frame; it earns
-  // its cost only on the top profile.
-  const refractive = quality === 'ULTRA';
+  const material = useRef<THREE.MeshPhysicalMaterial>(null);
+
+  useFrame((_, delta) => {
+    const target = material.current;
+    if (!target) return;
+    const factor = dampFactor(4, delta);
+    target.color.lerp(new THREE.Color(appearance.glassColor), factor);
+    target.roughness += (appearance.glassRoughness - target.roughness) * factor;
+  });
+
   return (
     <RoundedBox
       args={[1.18, 1.18, 1.18]}
@@ -36,41 +52,44 @@ function GlassShell({
       smoothness={4}
       rotation={[0, Math.PI / 4, 0]}
     >
-      {refractive ? (
-        <MeshTransmissionMaterial
-          samples={2}
-          resolution={128}
-          transmission={appearance.glassTransmission}
-          roughness={appearance.glassRoughness}
-          thickness={0.6}
-          ior={1.46}
-          chromaticAberration={appearance.dispersion}
-          anisotropy={0.25}
-          iridescence={0.7}
-          iridescenceIOR={1.28}
-          color={appearance.glassColor}
-        />
-      ) : (
-        <meshPhysicalMaterial
-          color={appearance.glassColor}
-          metalness={0}
-          roughness={appearance.glassRoughness + 0.08}
-          transparent
-          opacity={0.34}
-          clearcoat={1}
-          clearcoatRoughness={0.08}
-          ior={1.46}
-        />
-      )}
+      <meshPhysicalMaterial
+        ref={material}
+        color={appearance.glassColor}
+        metalness={0}
+        roughness={appearance.glassRoughness}
+        transparent
+        opacity={appearance.glassOpacity}
+        clearcoat={1}
+        clearcoatRoughness={0.04}
+        // Spectral separation lives on the bevels and nowhere else: it is the
+        // only place the prism ramp is allowed onto a neutral surface.
+        iridescence={quality === 'ULTRA' ? appearance.dispersion : 0}
+        iridescenceIOR={1.3}
+        ior={1.46}
+        depthWrite={false}
+      />
     </RoundedBox>
   );
 }
 
-/** API — the emissive centre, its counter-rotating ring and its glow. */
-function ApiCore({ appearance }: { appearance: CoreAppearance }): React.JSX.Element {
+/**
+ * API — the emissive centre and its counter-rotating ring.
+ *
+ * The glow is deliberately not a child of this group. A large additive quad
+ * sitting inside the transmissive shell was refracted by it and read as a
+ * solid block of colour filling the whole cube; the halo now sits behind the
+ * object, where it behaves as light around it.
+ */
+function ApiCore({
+  appearance,
+  breathe,
+}: {
+  appearance: CoreAppearance;
+  /** Shared 5s pulse, so the core and the halo behind it move together. */
+  breathe: React.RefObject<number>;
+}): React.JSX.Element {
   const material = useRef<THREE.MeshStandardMaterial>(null);
   const ring = useRef<THREE.Mesh>(null);
-  const breathe = useRef(1);
 
   useFrame(({ clock }, delta) => {
     // 5s breathing pulse, shared with the halo so both move together.
@@ -89,9 +108,8 @@ function ApiCore({ appearance }: { appearance: CoreAppearance }): React.JSX.Elem
 
   return (
     <group>
-      <Halo breathe={breathe} color={appearance.emissiveColor} opacity={appearance.haloOpacity} />
       <mesh>
-        <icosahedronGeometry args={[0.34, 0]} />
+        <icosahedronGeometry args={[0.3, 0]} />
         <meshStandardMaterial
           ref={material}
           color="#0c0d14"
@@ -180,6 +198,7 @@ export function SystemCore({
   const cage = useRef<THREE.Group>(null);
   const glass = useRef<THREE.Group>(null);
   const core = useRef<THREE.Group>(null);
+  const breathe = useRef(1);
   const appearance = coreAppearance(theme);
 
   useFrame(({ clock }, delta) => {
@@ -214,16 +233,29 @@ export function SystemCore({
 
   return (
     <group ref={root} rotation={[BASE_TILT_X, 0, 0.16]} scale={0.92}>
+      {/* Two rim lights, deliberately weak. The prism ramp is allowed to touch
+          the edges of the metal and nothing else: the object has to read as
+          titanium under coloured light, not as a coloured object. Earlier
+          values were six times higher and turned the whole sculpture violet,
+          which broke the 85-90% neutral rule the direction is built on. */}
       <pointLight
         color={appearance.emissiveColor}
-        intensity={appearance.violetIntensity * 6}
+        distance={7}
+        intensity={appearance.violetIntensity * 3}
         position={[-2.6, 1.4, 1.8]}
       />
       <pointLight
         color="#5ee7f7"
-        intensity={appearance.cyanIntensity * 5}
+        distance={7}
+        intensity={appearance.cyanIntensity * 2.4}
         position={[2.8, -1, 1.4]}
       />
+      {/* Neutral key. Without it the fins have no shading of their own and the
+          bezel reads as flat plastic. */}
+      <directionalLight intensity={appearance.keyIntensity * 0.5} position={[1.6, 3.2, 2.4]} />
+      <group position={[0, 0, -1.6]} scale={0.55}>
+        <Halo breathe={breathe} color={appearance.emissiveColor} opacity={appearance.haloOpacity} />
+      </group>
       <group ref={cage}>
         <Bezel appearance={appearance} />
       </group>
@@ -231,7 +263,7 @@ export function SystemCore({
         <GlassShell appearance={appearance} quality={quality} />
       </group>
       <group ref={core}>
-        <ApiCore appearance={appearance} />
+        <ApiCore appearance={appearance} breathe={breathe} />
       </group>
       <Pulses appearance={appearance} count={pulseCount(quality)} driver={driver} />
     </group>

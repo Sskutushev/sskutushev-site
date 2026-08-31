@@ -28,12 +28,12 @@ each standing for a layer of the systems described in the case studies.
                          ↑ pulses travel outward ↑
 ```
 
-| Layer   | Label          | Geometry                                                 | Material                                                                       |
-| ------- | -------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Outer   | INFRASTRUCTURE | 8 vertical struts on a radius, capped by two torus rings | Brushed titanium: `metalness 1.0`, `roughness 0.34`, anisotropic highlight     |
-| Middle  | DATA           | Rounded box, bevelled, rotated 45° on Y                  | Optical glass: transmission, `ior 1.46`, low `roughness`, chromatic dispersion |
-| Inner   | API            | Icosahedron + a thin counter-rotating ring               | Emissive, prism-tinted, intensity driven by a 5s pulse                         |
-| Between | —              | 24 instanced pulses on radial paths                      | Additive-free emissive; visible in both themes                                 |
+| Layer   | Label          | Geometry                                                 | Material                                                                                     |
+| ------- | -------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Outer   | INFRASTRUCTURE | 8 vertical struts on a radius, capped by two torus rings | Brushed titanium: `metalness 1.0`, `roughness 0.34`, anisotropic highlight                   |
+| Middle  | DATA           | Rounded box, bevelled, rotated 45° on Y                  | Polished glass: near-transparent, `clearcoat 1`, `ior 1.46`, iridescent bevels — see ADR-019 |
+| Inner   | API            | Icosahedron + a thin counter-rotating ring               | Emissive, prism-tinted, intensity driven by a 5s pulse                                       |
+| Between | —              | 24 instanced pulses on radial paths                      | Additive-free emissive; visible in both themes                                               |
 
 Built entirely from Three.js primitives and `drei` helpers. **No GLB.** A downloaded model would add
 1–2MB to a page whose entry budget is 250KB gzip, and would be harder to make theme-reactive.
@@ -43,14 +43,14 @@ Built entirely from Three.js primitives and `drei` helpers. **No GLB.** A downlo
 The theme switch is the most convincing single moment on the site: the same object is re-lit and
 re-surfaced, and it reads as two different manufactured things.
 
-| Property      | Dark                                                          | Light                                              |
-| ------------- | ------------------------------------------------------------- | -------------------------------------------------- |
-| Cage          | Smoked titanium, `#2A2D34`, `roughness 0.34`                  | Brushed aluminium, `#C8CAD0`, `roughness 0.28`     |
-| Glass         | Cold smoked glass, slight `#8FA8C8` tint, `transmission 0.94` | Clear optical glass, neutral, `transmission 0.98`  |
-| Core emissive | `--prism-violet` → `--prism-cyan`                             | `--prism-violet` → `--prism-blue`, lower intensity |
-| Dispersion    | Low — edges only                                              | Higher — visible spectral separation at bevels     |
-| Environment   | Two violet and cyan lightformers, low ambient                 | Broad white studio lightformer, high ambient       |
-| Bloom         | Subtle, threshold 0.85                                        | Off                                                |
+| Property      | Dark                                          | Light                                              |
+| ------------- | --------------------------------------------- | -------------------------------------------------- |
+| Cage          | Smoked titanium, `#2A2D34`, `roughness 0.34`  | Brushed aluminium, `#C8CAD0`, `roughness 0.28`     |
+| Glass         | Cold smoked shell, `#CCD3DD`, opacity 0.17    | Clear shell, `#EEF1F6`, opacity 0.38               |
+| Core emissive | `--prism-violet` → `--prism-cyan`             | `--prism-violet` → `--prism-blue`, lower intensity |
+| Dispersion    | Low — edges only                              | Higher — visible spectral separation at bevels     |
+| Environment   | Two violet and cyan lightformers, low ambient | Broad white studio lightformer, high ambient       |
+| Bloom         | Subtle, threshold 0.85                        | Off                                                |
 
 Transition runs 700ms, easing `cubic-bezier(0.22, 1, 0.36, 1)`, on: environment intensity → material
 color and roughness → emissive intensity. Values are interpolated per frame, not swapped.
@@ -94,12 +94,12 @@ so no WebGL text and no per-glyph masking is required.
 
 ## Degradation
 
-| Profile          | Behaviour                                                                                  |
-| ---------------- | ------------------------------------------------------------------------------------------ |
-| `ULTRA` / `HIGH` | Full object, transmission glass, bloom, 24 pulses                                          |
-| `BALANCED`       | Transmission `samples` reduced, bloom off, 12 pulses                                       |
-| `LOW`            | Glass replaced by `MeshPhysicalMaterial` without transmission, 6 pulses, no dispersion     |
-| `STATIC`         | Canvas never mounts. A designed static composition is rendered instead — not a blank area. |
+| Profile          | Behaviour                                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ULTRA` / `HIGH` | Full object, transmission glass, bloom, 24 pulses                                                                        |
+| `BALANCED`       | Bloom off, 12 pulses                                                                                                     |
+| `LOW`            | 6 pulses, no iridescence on the bevels                                                                                   |
+| `STATIC`         | Canvas never mounts. `CoreStill` draws the same object as line-work — same bezel, same fin count, same shell, same core. |
 
 `prefers-reduced-motion: reduce` forces `STATIC`. The static fallback is a real composition that
 must be reviewed on its own; a missing object is a design failure, not an acceptable fallback.

@@ -73,6 +73,17 @@ function Stage({ theme, quality }: { theme: Theme; quality: RenderQuality }): Re
           scale={[8, 4, 1]}
           ref={key}
         />
+        {/* A second broad source from below. Metal at `metalness: 1` renders
+            whatever the environment contains, and on the near-black ground a
+            single top source left the bezel with nothing to reflect: it read
+            as black rubber rather than as titanium. */}
+        <Lightformer
+          form="rect"
+          intensity={appearance.fillIntensity * 1.6}
+          position={[-3, -3, 3]}
+          rotation={[-Math.PI / 3, 0, 0]}
+          scale={[10, 5, 1]}
+        />
         <Lightformer
           form="circle"
           color="#7868ff"
