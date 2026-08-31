@@ -10,23 +10,28 @@ const BASIS: Record<Locale, string> = { RU: 'Проекции', EN: 'Projections
 /**
  * The visual belonging to each case chapter, keyed by the slug the API returns.
  *
+ * The static slice and the seed had different slugs for the same six cases, so
+ * these matched only while the API was unreachable: against a live API every
+ * chapter would have rendered without its visual. `case-visuals.spec.ts` fails
+ * if either source gains a case this does not cover.
+ *
  * Two engines cover all six. Four cases are a request travelling through a
  * topology; two are one dataset under several explicit projections. Six
  * bespoke widgets would have produced six visual languages on one page.
  */
 export function caseVisual(slug: string, locale: Locale): React.JSX.Element | null {
   switch (slug) {
-    case 'money':
+    case 'money-entitlement':
       return <FlowDiagram flow={moneyFlow} label={SCENARIOS[locale]} locale={locale} />;
-    case 'cache':
+    case 'search-cache-reliability':
       return <FlowDiagram flow={cacheFlow} label={SCENARIOS[locale]} locale={locale} />;
     case 'financial-concurrency':
       return <FlowDiagram flow={concurrencyFlow} label={SCENARIOS[locale]} locale={locale} />;
-    case 'rollout':
+    case 'production-migration':
       return <FlowDiagram flow={rolloutFlow} label={SCENARIOS[locale]} locale={locale} />;
-    case 'ranking':
+    case 'ranking-data-honesty':
       return <PointProjection data={rankingProjection()} label={BASIS[locale]} locale={locale} />;
-    case 'vision':
+    case 'image-similarity':
       return <PointProjection data={embeddingProjection()} label={BASIS[locale]} locale={locale} />;
     default:
       return null;

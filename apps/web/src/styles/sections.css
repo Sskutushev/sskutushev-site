@@ -199,10 +199,12 @@
   color: var(--text-tertiary);
 }
 
+/* Secondary, not accent: in accent blue the role read as an unvisited link on
+   every row of the timeline. */
 .timeline__role {
   display: block;
   margin-top: var(--s-2);
-  color: var(--accent-quiet);
+  color: var(--text-secondary);
 }
 
 .timeline__highlights {
@@ -211,6 +213,7 @@
   gap: var(--s-2);
   margin-top: var(--s-4);
   color: var(--text-secondary);
+  max-width: var(--measure-body);
 }
 
 .timeline__highlights li {

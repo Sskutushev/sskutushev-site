@@ -76,8 +76,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       eyebrow: 'Fullstack / Product Engineer',
       lines: ['Проектирую системы,', 'которые выдерживают', 'продакшен.'],
       behind: 1,
-      lead: 'Backend-ориентированный инженер. 11 лет в продукте — от денежных инвариантов до наблюдаемого rollout.',
-      availability: 'Открыт к senior+ backend-работе',
+      lead: 'Backend-ориентированный fullstack-инженер. Веду вертикаль целиком: доменные инварианты, деньги и доступы, кэш, интеграции и выкат в production.',
+      availability: 'Открыт к senior+ fullstack с уклоном в backend',
       explore: 'Исследовать систему',
       source: 'Исходный код',
     },
@@ -109,7 +109,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     },
     manifesto: {
       lines: ['Не коллекционирую', 'технологии.'],
-      body: 'Проектирую границы, где каждая зависимость решает конкретную эксплуатационную задачу. Система должна оставаться честной, когда начинается реальная нагрузка: деньги не теряются, доступ не выдаётся по ошибке, а недостающие данные не превращаются в удобный ноль.',
+      body: 'Одиннадцать лет работы, пять из них — коммерческая разработка; до этого управлял продажами в Coca-Cola HBC, и это до сих пор помогает обсуждать систему в терминах последствий, а не технологий. Проектирую границы, где каждая зависимость решает конкретную эксплуатационную задачу. Система должна оставаться честной под нагрузкой: деньги не теряются, доступ не выдаётся по ошибке, а недостающее значение не превращается в удобный ноль.',
       stack: [
         { label: 'Основное', value: 'TypeScript / NestJS' },
         { label: 'Данные', value: 'CockroachDB / Prisma' },
@@ -180,8 +180,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       eyebrow: 'Fullstack / Product Engineer',
       lines: ['I build systems', 'that hold under', 'production load.'],
       behind: 1,
-      lead: 'Backend-oriented engineer. 11 years in product — from money invariants to observable rollout.',
-      availability: 'Open to senior+ backend work',
+      lead: 'Backend-oriented fullstack engineer. I own the vertical end to end: domain invariants, money and access, cache, integrations and the production rollout.',
+      availability: 'Open to senior+ fullstack work, backend-leaning',
       explore: 'Explore the system',
       source: 'View source',
     },
@@ -213,7 +213,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     },
     manifesto: {
       lines: ['I do not collect', 'technologies.'],
-      body: 'I design boundaries where every dependency solves a concrete operational problem. A system has to stay honest once real load arrives: money is not lost, access is not granted by mistake, and missing data does not quietly become a convenient zero.',
+      body: 'Eleven years of work, five of them in commercial development; before that I managed sales at Coca-Cola HBC, which is still why I discuss a system in terms of consequences rather than technology. I design boundaries where every dependency solves a concrete operational problem. A system has to stay honest under load: money is not lost, access is not granted by mistake, and a missing value does not quietly become a convenient zero.',
       stack: [
         { label: 'Primary', value: 'TypeScript / NestJS' },
         { label: 'Data', value: 'CockroachDB / Prisma' },

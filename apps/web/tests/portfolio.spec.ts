@@ -145,7 +145,7 @@ test.describe('reduced motion', () => {
     await reduceMotion(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'EN', exact: true }).click();
-    const money = page.locator('#case-money .flow');
+    const money = page.locator('#case-money-entitlement .flow');
     await money.scrollIntoViewIfNeeded();
 
     await money.getByRole('button', { name: 'Same key replayed' }).click();
@@ -160,7 +160,7 @@ test.describe('reduced motion', () => {
     await reduceMotion(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'EN', exact: true }).click();
-    const ranking = page.locator('#case-ranking .projection');
+    const ranking = page.locator('#case-ranking-data-honesty .projection');
     await ranking.scrollIntoViewIfNeeded();
     const unknown = ranking.locator('.projection__point.is-unknown');
     await expect(unknown).toHaveCount(8);
