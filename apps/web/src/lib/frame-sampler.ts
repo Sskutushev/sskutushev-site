@@ -13,10 +13,10 @@
  */
 
 /** No real frame takes this long. Past it, the number is measuring a pause. */
-export const MAX_PLAUSIBLE_FRAME_MS = 250;
+const MAX_PLAUSIBLE_FRAME_MS = 250;
 
 /** How much rendering to average before reporting, in seconds. */
-export const SAMPLE_WINDOW_S = 0.5;
+const SAMPLE_WINDOW_S = 0.5;
 
 export interface FrameSampler {
   /** Records one frame. Returns the mean frame time when a window closes. */
