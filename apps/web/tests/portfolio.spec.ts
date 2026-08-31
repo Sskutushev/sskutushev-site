@@ -217,9 +217,10 @@ test.describe('reduced motion', () => {
     // A build with no repository behind it — a source archive, or this suite
     // running from a copied tree — reports the commit as unknown. What it must
     // never do is render an empty row.
-    await expect(section.locator('.evidence__row code').first()).toHaveText(
-      /^([0-9a-f]{7}|unknown)$/,
-    );
+    // Addressed by its label rather than by position: "the first code element
+    // in the section" also matches the GraphQL operation in the panel beside it.
+    const commit = section.locator('.evidence__row').filter({ hasText: 'Commit' });
+    await expect(commit).toHaveText(/^Commit ?([0-9a-f]{7}|unknown)$/);
 
     await section.getByText('Show the checks').click();
     const gates = section.locator('.evidence__gates li');

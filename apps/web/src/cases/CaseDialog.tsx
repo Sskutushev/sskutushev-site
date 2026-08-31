@@ -35,7 +35,14 @@ export function CaseDialog({
   useEffect(() => {
     const node = dialog.current;
     if (!node) return;
-    const onDialogClose = (): void => close.current();
+    // `close()` queues its event rather than dispatching it, so the one queued
+    // by a cleanup arrives after the next mount has already reopened the
+    // dialog. React's development mode mounts every effect twice on purpose to
+    // surface exactly this, and the dialog was closing itself a tick after it
+    // opened. A close event only means something when the dialog is shut.
+    const onDialogClose = (): void => {
+      if (!node.open) close.current();
+    };
     // `close` covers Escape, the close button and a backdrop click alike, so
     // there is one path back out rather than three.
     node.addEventListener('close', onDialogClose);
