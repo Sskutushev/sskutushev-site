@@ -40,10 +40,13 @@ function useHeroVisible(): { ref: React.RefObject<HTMLDivElement | null>; visibl
 export default function App(): React.JSX.Element {
   const [locale, setLocale] = useState<Locale>('RU');
   const [engineering, setEngineering] = useState(false);
+  // The realtime socket opens only while the evidence section is on screen, or
+  // while the drawer is open. Neither is owed a connection on first paint.
+  const [evidenceVisible, setEvidenceVisible] = useState(false);
   const { theme, toggle } = useTheme();
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const quality = useRenderQuality(reduced);
-  const runtime = useEngineeringMetrics(engineering);
+  const runtime = useEngineeringMetrics(engineering || evidenceVisible);
   const hero = useHeroVisible();
   const copy = siteCopy[locale];
 
@@ -102,6 +105,8 @@ export default function App(): React.JSX.Element {
               dataDetail={dataDetail}
               dataState={dataState}
               locale={locale}
+              onEvidenceVisible={setEvidenceVisible}
+              runtime={runtime}
             />
           </Suspense>
         )}

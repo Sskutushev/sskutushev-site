@@ -33,16 +33,16 @@ export function AssistantChat({ locale }: { locale: Locale }): React.JSX.Element
   };
 
   return (
-    <section className="assistant-chat" aria-label="Profile AI assistant">
-      <div className="assistant-status">
+    <section className="assistant" aria-label="Profile AI assistant">
+      <div className="assistant__status t-meta-sm">
         <i /> GEMINI + GROUNDED PROFILE RAG
       </div>
-      <p>
+      <p className="assistant__lead t-small text-secondary">
         {locale === 'RU'
           ? 'Спросите о подтверждённом опыте, стеке и инженерном подходе.'
           : 'Ask about verified experience, stack and engineering approach.'}
       </p>
-      <div className="assistant-suggestions">
+      <div className="assistant__suggestions">
         {suggestions[locale].map((suggestion) => (
           <button key={suggestion} onClick={() => submit(suggestion)}>
             {suggestion}
@@ -50,6 +50,7 @@ export function AssistantChat({ locale }: { locale: Locale }): React.JSX.Element
         ))}
       </div>
       <form
+        className="assistant__form"
         onSubmit={(event) => {
           event.preventDefault();
           submit(question);
@@ -67,14 +68,14 @@ export function AssistantChat({ locale }: { locale: Locale }): React.JSX.Element
         </button>
       </form>
       {mutation.isError && (
-        <p className="assistant-error">
+        <p className="assistant__error t-small">
           {locale === 'RU'
             ? 'API пока недоступен. Запустите backend или повторите позже.'
             : 'API is unavailable. Start the backend or try again later.'}
         </p>
       )}
       {answer && (
-        <div className="assistant-answer">
+        <div className="assistant__answer t-small">
           <small>
             {answer.generated
               ? locale === 'RU'

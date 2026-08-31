@@ -27,9 +27,28 @@ export interface SiteCopy {
     manifesto: string;
     work: string;
     architecture: string;
+    engineering: string;
     capabilities: string;
     experience: string;
     contact: string;
+  };
+  engineeringSection: {
+    note: string;
+    build: string;
+    atBuild: string;
+    liveSurface: string;
+    liveNote: string;
+    commit: string;
+    built: string;
+    gates: string;
+    gateList: string;
+    bundle: string;
+    chunks: string;
+    roundTrip: string;
+    events: string;
+    unknown: string;
+    loading: string;
+    buildMissing: string;
   };
   manifesto: { lines: string[]; body: string; stack: { label: string; value: string }[] };
   work: { note: string };
@@ -83,6 +102,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       manifesto: 'Позиция',
       work: 'Избранные системы',
       architecture: 'Живая архитектура',
+      engineering: 'Проверяемое',
       capabilities: 'Компетенции',
       experience: 'Опыт',
       contact: 'Контакт',
@@ -98,6 +118,26 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       ],
     },
     work: { note: 'Каждый кейс — поведение под нагрузкой, а не список технологий.' },
+    engineeringSection: {
+      note: 'Всё, что можно проверить, не веря на слово.',
+      build: 'Эта сборка',
+      atBuild: 'измерено при сборке',
+      liveSurface: 'Живой контур',
+      liveNote:
+        'Опубликованная сборка на GitHub Pages ходит в API того же origin. Его там нет — и это состояние названо, а не скрыто.',
+      commit: 'Коммит',
+      built: 'Собрана',
+      gates: 'Гейтов до публикации',
+      gateList: 'Показать проверки',
+      bundle: 'Входной чанк',
+      chunks: 'чанков',
+      roundTrip: 'Круг',
+      events: 'События',
+      unknown: 'неизвестен',
+      loading: 'Читаю данные сборки…',
+      buildMissing:
+        'Файл со сведениями о сборке недоступен — этот экран собран не нашим пайплайном.',
+    },
     architecture: {
       note: 'Топология этого сайта и то, что он делает, когда зависимость исчезает.',
       title: 'Путь чтения',
@@ -166,6 +206,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       manifesto: 'Position',
       work: 'Selected systems',
       architecture: 'Live architecture',
+      engineering: 'Verifiable',
       capabilities: 'Capabilities',
       experience: 'Experience',
       contact: 'Contact',
@@ -181,6 +222,25 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       ],
     },
     work: { note: 'Each case is behaviour under load, not a list of technologies.' },
+    engineeringSection: {
+      note: 'Everything here can be checked rather than taken on trust.',
+      build: 'This build',
+      atBuild: 'measured at build time',
+      liveSurface: 'Live surface',
+      liveNote:
+        'The published GitHub Pages build calls an API on its own origin. There is none there — and that state is named rather than hidden.',
+      commit: 'Commit',
+      built: 'Built',
+      gates: 'Gates before publish',
+      gateList: 'Show the checks',
+      bundle: 'Entry chunk',
+      chunks: 'chunks',
+      roundTrip: 'Round trip',
+      events: 'Events',
+      unknown: 'unknown',
+      loading: 'Reading build evidence…',
+      buildMissing: 'Build evidence is unavailable — this page was not produced by our pipeline.',
+    },
     architecture: {
       note: 'The topology of this site, and what it does when a dependency disappears.',
       title: 'Read path',
