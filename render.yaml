@@ -1,0 +1,66 @@
+# Free-tier deployment of the API behind the published site.
+#
+# The site is on GitHub Pages, which serves files and nothing else, so the
+# GraphQL surface, the realtime feed and the assistant need somewhere to run.
+# This describes that somewhere, so the deployment is a file in the repository
+# rather than a sequence of clicks nobody wrote down.
+#
+# Two things are deliberately not here. The database is a CockroachDB Cloud
+# cluster, because the Prisma schema targets the `cockroachdb` provider and the
+# free tier there does not expire — a hosted Postgres that is deleted after
+# thirty days is a broken link on a CV. And `sync: false` marks every value a
+# person has to paste in: secrets do not belong in a repository, and a blueprint
+# that pretends otherwise is worse than one that asks.
+#
+# Free instances sleep after fifteen minutes of no traffic and take most of a
+# minute to wake. `.github/workflows/keep-api-warm.yml` pings this service every
+# ten minutes to keep that off the first visitor. That is a workaround, and it
+# is written down as one.
+
+services:
+  - type: web
+    name: sskutushev-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./infrastructure/docker/api.Dockerfile
+    dockerContext: .
+    # Liveness, not readiness: readiness touches the database and Redis, and a
+    # dependency blip should degrade the site honestly rather than restart the
+    # container underneath it.
+    healthCheckPath: /health/live
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      # The exact origin the browser sends, with no path. CORS compares this
+      # string; `https://sskutushev.github.io/sskutushev-site` never matches.
+      - key: WEB_ORIGIN
+        value: https://sskutushev.github.io
+      # The published surface is read-only. With mutations off, object storage
+      # is never written, which is why no S3 credentials appear here.
+      - key: ENABLE_MUTATIONS
+        value: false
+      # Background workers need a queue and something to put in it. Neither is
+      # part of what a reviewer sees, and both cost the free instance memory.
+      - key: ENABLE_WORKERS
+        value: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: sskutushev-cache
+          property: connectionString
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_PROJECT_ID
+        sync: false
+
+  - type: keyvalue
+    name: sskutushev-cache
+    plan: free
+    region: frankfurt
+    # Reachable only from the services in this blueprint.
+    ipAllowList: []
