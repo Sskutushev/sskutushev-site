@@ -14,13 +14,16 @@ import { fallbackPortfolio } from '../lib/fallback-portfolio';
  * so this does.
  */
 
-/** Slugs the seed writes, read from the seed itself rather than restated. */
+/** Slugs the seed writes, read from the seed data itself rather than restated. */
 function seedSlugs(): string[] {
   const seed = readFileSync(
-    fileURLToPath(new URL('../../../../prisma/seed.ts', import.meta.url)),
+    fileURLToPath(new URL('../../../../prisma/seed-data.ts', import.meta.url)),
     'utf8',
   );
-  const cases = seed.slice(0, seed.indexOf('async function main'));
+  const cases = seed.slice(
+    seed.indexOf('export const cases'),
+    seed.indexOf('export const experiences'),
+  );
   return [...cases.matchAll(/^ {4}slug: '([^']+)',$/gm)].flatMap(([, slug]) =>
     slug ? [slug] : [],
   );

@@ -8,9 +8,17 @@ import type { Locale, Portfolio } from './portfolio';
  */
 
 const skills = [
-  ...['TypeScript', 'Node.js', 'NestJS', 'GraphQL', 'REST', 'WebSocket', 'Python / FastAPI'].map(
-    (name) => ({ name, category: 'Backend' }),
-  ),
+  ...[
+    'TypeScript',
+    'Node.js',
+    'NestJS',
+    'GraphQL',
+    'REST',
+    'WebSocket',
+    'Python / FastAPI',
+    'C#',
+    '.NET',
+  ].map((name) => ({ name, category: 'Backend' })),
   ...[
     'CockroachDB',
     'PostgreSQL',
@@ -183,7 +191,7 @@ const caseStudies: Record<Locale, readonly CaseRow[]> = {
       'Округление ниже одного филса — потерянные деньги, а не погрешность.',
       'Decimal money, дневной инвариант, optimistic concurrency и транзакционный перерасчёт.',
       'Конфликтующие изменения отклоняются явно, без тихой потери начислений.',
-      ['TypeScript', 'CockroachDB', 'Prisma', 'GraphQL'],
+      ['TypeScript', 'CockroachDB', 'Prisma', 'C#'],
     ],
     [
       'production-migration',
@@ -233,7 +241,7 @@ const caseStudies: Record<Locale, readonly CaseRow[]> = {
       'Rounding below one fils is lost money, not a rounding error.',
       'Decimal money, a daily invariant, optimistic concurrency and transactional recalculation.',
       'Conflicting changes are rejected explicitly, without silently losing accruals.',
-      ['TypeScript', 'CockroachDB', 'Prisma', 'GraphQL'],
+      ['TypeScript', 'CockroachDB', 'Prisma', 'C#'],
     ],
     [
       'production-migration',

@@ -19,8 +19,8 @@ export const capabilityMeta: Record<string, CapabilityMeta> = {
     icon: Server,
     weight: '60%',
     description: {
-      RU: 'Доменные инварианты, money- и access-потоки. Идемпотентность — часть доменной корректности, а не деталь HTTP.',
-      EN: 'Domain invariants, money and access flows. Idempotency is part of domain correctness, not an HTTP detail.',
+      RU: 'Доменные инварианты, money- и access-потоки на TypeScript и C#. Идемпотентность — часть доменной корректности, а не деталь HTTP.',
+      EN: 'Domain invariants, money and access flows in TypeScript and C#. Idempotency is part of domain correctness, not an HTTP detail.',
     },
   },
   Data: {

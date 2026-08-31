@@ -15,6 +15,8 @@ export const skills = [
   ['WebSocket', 'Backend'],
   ['Python', 'Backend'],
   ['FastAPI', 'Backend'],
+  ['C#', 'Backend'],
+  ['.NET', 'Backend'],
   ['CockroachDB', 'Data'],
   ['PostgreSQL', 'Data'],
   ['MongoDB', 'Data'],
@@ -112,7 +114,7 @@ export const cases = [
       'Decimal money, a daily invariant, optimistic concurrency and transactional recalculation.',
     resultRu: 'Конфликтующие изменения отклоняются явно, без тихой потери начислений.',
     resultEn: 'Conflicting changes are rejected explicitly, without silently losing accruals.',
-    tech: ['TypeScript', 'CockroachDB', 'Prisma', 'GraphQL'],
+    tech: ['TypeScript', 'CockroachDB', 'Prisma', 'C#'],
   },
   {
     slug: 'production-migration',
