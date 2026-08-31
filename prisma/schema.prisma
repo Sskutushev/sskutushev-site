@@ -15,22 +15,38 @@ enum AssetStatus {
 }
 
 model Profile {
-  id              String      @id @default(uuid())
-  slug            String      @unique
+  id              String               @id @default(uuid())
+  slug            String               @unique
   fullName        String
   headline        String
   summary         String
   location        String
   availability    String
   yearsExperience Int
-  version         Int         @default(1)
+  version         Int                  @default(1)
+  translations    ProfileTranslation[]
   skills          Skill[]
   experiences     Experience[]
   caseStudies     CaseStudy[]
   socialLinks     SocialLink[]
   assets          Asset[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+}
+
+/// Locale projection of the profile. The base columns stay authoritative and
+/// are used when a locale has no row, so adding a language is additive.
+model ProfileTranslation {
+  id           String  @id @default(uuid())
+  profileId    String
+  locale       String
+  headline     String
+  summary      String
+  location     String
+  availability String
+  profile      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, locale])
 }
 
 model Skill {
@@ -46,7 +62,7 @@ model Skill {
 }
 
 model Experience {
-  id           String                @id @default(uuid())
+  id           String                  @id @default(uuid())
   profileId    String
   companyLabel String
   role         String
@@ -54,33 +70,56 @@ model Experience {
   endDate      DateTime?
   summary      String
   sortOrder    Int
-  profile      Profile               @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile      Profile                 @relation(fields: [profileId], references: [id], onDelete: Cascade)
   highlights   ExperienceHighlight[]
+  translations ExperienceTranslation[]
+}
+
+model ExperienceTranslation {
+  id           String     @id @default(uuid())
+  experienceId String
+  locale       String
+  summary      String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  @@unique([experienceId, locale])
 }
 
 model ExperienceHighlight {
-  id           String     @id @default(uuid())
+  id           String                           @id @default(uuid())
   experienceId String
   title        String
   description  String
   sortOrder    Int
-  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  experience   Experience                       @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  translations ExperienceHighlightTranslation[]
+}
+
+model ExperienceHighlightTranslation {
+  id          String              @id @default(uuid())
+  highlightId String
+  locale      String
+  title       String
+  description String
+  highlight   ExperienceHighlight @relation(fields: [highlightId], references: [id], onDelete: Cascade)
+
+  @@unique([highlightId, locale])
 }
 
 model CaseStudy {
-  id           String                @id @default(uuid())
+  id           String                 @id @default(uuid())
   profileId    String
-  slug         String                @unique
-  featured     Boolean               @default(false)
+  slug         String                 @unique
+  featured     Boolean                @default(false)
   sortOrder    Int
-  version      Int                   @default(1)
-  profile      Profile               @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  version      Int                    @default(1)
+  profile      Profile                @relation(fields: [profileId], references: [id], onDelete: Cascade)
   translations CaseStudyTranslation[]
   metrics      CaseStudyMetric[]
   technologies CaseStudyTechnology[]
   assets       Asset[]
-  createdAt    DateTime              @default(now())
-  updatedAt    DateTime              @updatedAt
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
 }
 
 model CaseStudyTranslation {
@@ -144,14 +183,14 @@ model Asset {
 }
 
 model GithubSnapshot {
-  id          String   @id @default(uuid())
-  owner       String
-  repository  String
-  stars       Int
-  forks       Int
-  openIssues  Int
-  pushedAt    DateTime?
-  capturedAt  DateTime @default(now())
+  id         String    @id @default(uuid())
+  owner      String
+  repository String
+  stars      Int
+  forks      Int
+  openIssues Int
+  pushedAt   DateTime?
+  capturedAt DateTime  @default(now())
 
   @@index([owner, capturedAt])
 }

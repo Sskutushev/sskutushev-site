@@ -30,22 +30,12 @@ export function Manifesto({ copy }: { copy: SiteCopy }): React.JSX.Element {
         </figure>
         <p className="manifesto__body t-body-lg">{copy.manifesto.body}</p>
         <dl className="manifesto__stack">
-          <div>
-            <dt>Primary</dt>
-            <dd>TypeScript / NestJS</dd>
-          </div>
-          <div>
-            <dt>Data</dt>
-            <dd>CockroachDB / Prisma</dd>
-          </div>
-          <div>
-            <dt>Cache</dt>
-            <dd>Redis / BullMQ</dd>
-          </div>
-          <div>
-            <dt>Delivery</dt>
-            <dd>Docker / CI / OTel</dd>
-          </div>
+          {copy.manifesto.stack.map((entry) => (
+            <div key={entry.label}>
+              <dt>{entry.label}</dt>
+              <dd>{entry.value}</dd>
+            </div>
+          ))}
         </dl>
       </div>
     </section>

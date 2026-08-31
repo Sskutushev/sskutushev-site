@@ -139,6 +139,107 @@ const cases = [
   },
 ] as const;
 
+/**
+ * Localised employment history. The base columns on `Experience` keep the
+ * Russian text so an unknown locale still reads as one language; both locales
+ * are then stated explicitly, because a Russian heading over an English summary
+ * is the defect this table exists to remove.
+ */
+const experiences = [
+  {
+    companyLabel: 'Refty.ai',
+    role: 'Senior Fullstack Developer',
+    startDate: new Date('2026-01-01'),
+    endDate: null,
+    summary: {
+      ru: 'Международная proptech-платформа рынка недвижимости ОАЭ. Ownership backend, data и production-валидации; фронтенд — там, где он упирается в данные.',
+      en: 'An international proptech platform for the UAE property market. Ownership of the backend, the data and production validation; the frontend where it meets the data.',
+    },
+    highlights: [
+      {
+        ru: {
+          title: 'Ranking V3',
+          description: 'три явных режима ранжирования и честный контракт доступности',
+        },
+        en: {
+          title: 'Ranking V3',
+          description: 'three explicit ranking modes and an honest availability contract',
+        },
+      },
+      {
+        ru: {
+          title: 'Поиск по изображению',
+          description: 'Wasabi, CLIP, Qdrant и BigQuery — пайплайн в проде',
+        },
+        en: {
+          title: 'Image search',
+          description: 'a Wasabi, CLIP, Qdrant and BigQuery pipeline in production',
+        },
+      },
+      {
+        ru: {
+          title: 'Надёжность',
+          description: 'SWR, схлопывание параллельных запросов, E2E и регрессии на инциденты',
+        },
+        en: {
+          title: 'Reliability',
+          description: 'SWR, in-flight dedupe, E2E and incident regression coverage',
+        },
+      },
+    ],
+  },
+  {
+    companyLabel: 'Investment Fund · NDA',
+    role: 'Trading Strategies / Fullstack Developer',
+    startDate: new Date('2021-03-01'),
+    endDate: new Date('2025-12-01'),
+    summary: {
+      ru: 'Внутренние торговые и аналитические системы: realtime- и исторические данные, крипта, copy trading, алгоритмические компоненты.',
+      en: 'Internal trading and analytics systems: realtime and historical data, crypto, copy trading and algorithmic components.',
+    },
+    highlights: [],
+  },
+  {
+    companyLabel: 'TOT · NDA',
+    role: 'Sole Frontend Developer',
+    startDate: new Date('2024-12-01'),
+    endDate: new Date('2025-06-01'),
+    summary: {
+      ru: 'Фронтенд-архитектура мультипродуктовой платформы: ролевой UI и система компонентов на сотни состояний.',
+      en: 'The frontend architecture of a multi-product platform: role-based UI and a component system covering hundreds of states.',
+    },
+    highlights: [],
+  },
+  {
+    companyLabel: 'Coca-Cola HBC Russia',
+    role: 'Senior Key Account Manager',
+    startDate: new Date('2015-02-01'),
+    endDate: new Date('2020-12-01'),
+    summary: {
+      ru: 'Управление командой, KPI и переговоры. Отсюда привычка обсуждать систему в терминах последствий для бизнеса, а не технологий.',
+      en: 'Team management, KPIs and negotiation. This is where the habit of discussing a system in terms of business consequences rather than technology comes from.',
+    },
+    highlights: [],
+  },
+] as const;
+
+const profileText = {
+  ru: {
+    headline: 'Senior+ Fullstack / Product Engineer · Backend 60% / Frontend 40%',
+    summary:
+      'Веду продуктовые вертикали целиком: доменная модель, база, API, интерфейс, интеграции и выкат в production.',
+    location: 'Санкт-Петербург · Remote · UTC+3',
+    availability: 'Открыт к senior+ backend-работе',
+  },
+  en: {
+    headline: 'Senior+ Fullstack / Product Engineer · Backend 60% / Frontend 40%',
+    summary:
+      'I own product verticals end to end: domain model, database, API, interface, integrations and the production rollout.',
+    location: 'Saint Petersburg · Remote · UTC+3',
+    availability: 'Open to senior+ backend work',
+  },
+} as const;
+
 async function main(): Promise<void> {
   await prisma.profile.deleteMany({
     where: { slug: { in: ['sergey-skutushev', 'sergey-kutushev'] } },
@@ -147,11 +248,10 @@ async function main(): Promise<void> {
     data: {
       slug: 'sergey-kutushev',
       fullName: 'Сергей Кутушев',
-      headline: 'Senior+ Fullstack / Product Engineer · Backend 60% / Frontend 40%',
-      summary:
-        'Веду сложные продуктовые вертикали от доменной модели и базы данных до React-интерфейса, интеграций и production rollout.',
-      location: 'Санкт-Петербург · Remote · UTC+3',
-      availability: 'Открыт к сильным backend и product engineering командам',
+      headline: profileText.ru.headline,
+      summary: profileText.ru.summary,
+      location: profileText.ru.location,
+      availability: profileText.ru.availability,
       yearsExperience: 11,
       skills: {
         create: skills.map(([name, category], priority) => ({ name, category, priority })),
@@ -164,63 +264,37 @@ async function main(): Promise<void> {
           { type: 'LinkedIn', url: 'https://www.linkedin.com/in/sskutushev/', sortOrder: 4 },
         ],
       },
+      translations: {
+        create: (['ru', 'en'] as const).map((locale) => ({ locale, ...profileText[locale] })),
+      },
       experiences: {
-        create: [
-          {
-            companyLabel: 'Refty.ai',
-            role: 'Senior Fullstack Developer',
-            startDate: new Date('2026-01-01'),
-            summary:
-              'Международная proptech B2B/B2C-платформа рынка недвижимости ОАЭ; end-to-end ownership backend, frontend, data и production validation.',
-            sortOrder: 1,
-            highlights: {
-              create: [
-                {
-                  title: 'Ranking V3',
-                  description: 'three-mode ranking and honest availability contracts',
-                  sortOrder: 1,
-                },
-                {
-                  title: 'Image search',
-                  description: 'Redis, Wasabi, CLIP, Qdrant and BigQuery production pipeline',
-                  sortOrder: 2,
-                },
-                {
-                  title: 'Reliability',
-                  description: 'SWR, in-flight dedupe, E2E and incident regression coverage',
-                  sortOrder: 3,
-                },
-              ],
-            },
+        create: experiences.map((item, index) => ({
+          companyLabel: item.companyLabel,
+          role: item.role,
+          startDate: item.startDate,
+          ...(item.endDate ? { endDate: item.endDate } : {}),
+          summary: item.summary.ru,
+          sortOrder: index + 1,
+          translations: {
+            create: (['ru', 'en'] as const).map((locale) => ({
+              locale,
+              summary: item.summary[locale],
+            })),
           },
-          {
-            companyLabel: 'Investment Fund · NDA',
-            role: 'Trading Strategies / Fullstack Developer',
-            startDate: new Date('2021-03-01'),
-            endDate: new Date('2025-12-01'),
-            summary:
-              'Внутренние trading и analytics systems: realtime/historical data, crypto, copy trading и algorithmic components.',
-            sortOrder: 2,
+          highlights: {
+            create: item.highlights.map((highlight, position) => ({
+              title: highlight.ru.title,
+              description: highlight.ru.description,
+              sortOrder: position + 1,
+              translations: {
+                create: (['ru', 'en'] as const).map((locale) => ({
+                  locale,
+                  ...highlight[locale],
+                })),
+              },
+            })),
           },
-          {
-            companyLabel: 'TOT · NDA',
-            role: 'Sole Frontend Developer',
-            startDate: new Date('2024-12-01'),
-            endDate: new Date('2025-06-01'),
-            summary:
-              'Frontend-архитектура multi-product платформы, role-based UI и component system для сотен desktop/tablet/mobile состояний.',
-            sortOrder: 3,
-          },
-          {
-            companyLabel: 'Coca-Cola HBC Russia',
-            role: 'Senior Key Account Manager',
-            startDate: new Date('2015-02-01'),
-            endDate: new Date('2020-12-01'),
-            summary:
-              'Командное управление, KPI, продажи и бизнес-мышление, которое сегодня помогает проектировать продуктовые системы.',
-            sortOrder: 4,
-          },
-        ],
+        })),
       },
     },
   });
@@ -239,7 +313,7 @@ async function main(): Promise<void> {
               locale: 'ru',
               title: item.titleRu,
               problem: item.problemRu,
-              constraints: 'Production correctness, compatibility and observable failure states.',
+              constraints: 'Корректность в проде, совместимость и наблюдаемые состояния отказа.',
               approach: item.approachRu,
               architecture: item.tech.join(' → '),
               result: item.resultRu,

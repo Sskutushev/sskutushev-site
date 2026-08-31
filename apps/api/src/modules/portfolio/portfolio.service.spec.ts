@@ -3,6 +3,7 @@ import type { ConfigService } from '@nestjs/config';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CacheService } from '../../cache/cache.service';
 import type { PrismaService } from '../../database/prisma.service';
+import { Locale } from './portfolio.models';
 import { PortfolioService } from './portfolio.service';
 
 const storedProfile = {
@@ -17,6 +18,65 @@ const storedProfile = {
   updatedAt: new Date('2026-08-28T00:00:00.000Z'),
   socialLinks: [{ type: 'GitHub', url: 'https://github.com/Sskutushev' }],
 };
+
+/** A profile with one localised row and one experience that has none. */
+function readProfile(locale: string) {
+  const translated = locale === 'ru';
+  return {
+    ...storedProfile,
+    translations: translated
+      ? [
+          {
+            headline: 'Инженер продукта',
+            summary: 'Продуктовая инженерия с уклоном в backend.',
+            location: 'Санкт-Петербург',
+            availability: 'Открыт',
+          },
+        ]
+      : [],
+    skills: [{ name: 'NestJS', category: 'Backend' }],
+    experiences: [
+      {
+        companyLabel: 'Refty.ai',
+        role: 'Senior Fullstack Developer',
+        startDate: new Date('2026-01-01T00:00:00.000Z'),
+        endDate: null,
+        summary: 'Базовый текст.',
+        translations: translated ? [{ summary: 'Локализованный текст.' }] : [],
+        highlights: [
+          {
+            title: 'Base title',
+            description: 'base description',
+            translations: translated
+              ? [{ title: 'Ranking V3', description: 'три режима ранжирования' }]
+              : [],
+          },
+        ],
+      },
+    ],
+    caseStudies: [],
+  };
+}
+
+function createReadService(locale: string) {
+  const prisma = {
+    profile: { findUniqueOrThrow: vi.fn().mockResolvedValue(readProfile(locale)) },
+  };
+  const cache = {
+    getOrLoad: vi.fn(
+      async (_key: string, _fresh: number, _stale: number, load: () => Promise<unknown>) => ({
+        value: await load(),
+        stale: false,
+      }),
+    ),
+  };
+  const service = new PortfolioService(
+    { get: vi.fn(() => false) } as unknown as ConfigService,
+    prisma as unknown as PrismaService,
+    cache as unknown as CacheService,
+  );
+  return { service, prisma };
+}
 
 function createService(enabled = true) {
   const transaction = {
@@ -43,6 +103,36 @@ function createService(enabled = true) {
   );
   return { service, prisma, transaction, cache };
 }
+
+describe('PortfolioService read path', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('projects the requested locale across profile, summary and highlights', async () => {
+    // A Russian heading over an English summary is the defect these tables
+    // exist to remove; it is not enough for the case studies alone to translate.
+    const { service, prisma } = createReadService('ru');
+    const portfolio = await service.getPortfolio(Locale.RU);
+
+    expect(prisma.profile.findUniqueOrThrow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        include: expect.objectContaining({ translations: { where: { locale: 'ru' } } }),
+      }),
+    );
+    expect(portfolio.profile.headline).toBe('Инженер продукта');
+    expect(portfolio.experience[0]?.summary).toBe('Локализованный текст.');
+    expect(portfolio.experience[0]?.highlights).toEqual(['Ranking V3: три режима ранжирования']);
+  });
+
+  it('falls back to the base columns when a locale has no row', async () => {
+    // Adding a language stays a data change rather than a migration.
+    const { service } = createReadService('en');
+    const portfolio = await service.getPortfolio(Locale.EN);
+
+    expect(portfolio.profile.headline).toBe(storedProfile.headline);
+    expect(portfolio.experience[0]?.summary).toBe('Базовый текст.');
+    expect(portfolio.experience[0]?.highlights).toEqual(['Base title: base description']);
+  });
+});
 
 describe('PortfolioService write path', () => {
   beforeEach(() => vi.clearAllMocks());
