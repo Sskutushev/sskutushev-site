@@ -58,17 +58,25 @@ function readProfile(locale: string) {
   };
 }
 
+interface ReadQuery {
+  include?: { translations?: { where?: { locale?: string } } };
+}
+
 function createReadService(locale: string) {
   const prisma = {
-    profile: { findUniqueOrThrow: vi.fn().mockResolvedValue(readProfile(locale)) },
+    profile: {
+      findUniqueOrThrow: vi
+        .fn<(query: ReadQuery) => Promise<ReturnType<typeof readProfile>>>()
+        .mockResolvedValue(readProfile(locale)),
+    },
   };
+  // A plain function rather than a spy: nothing here asserts on the call, and
+  // the spy's signature widens the loader's result to `any`.
   const cache = {
-    getOrLoad: vi.fn(
-      async (_key: string, _fresh: number, _stale: number, load: () => Promise<unknown>) => ({
-        value: await load(),
-        stale: false,
-      }),
-    ),
+    getOrLoad: async <T>(_key: string, _fresh: number, _stale: number, load: () => Promise<T>) => ({
+      value: await load(),
+      stale: false,
+    }),
   };
   const service = new PortfolioService(
     { get: vi.fn(() => false) } as unknown as ConfigService,
@@ -113,11 +121,11 @@ describe('PortfolioService read path', () => {
     const { service, prisma } = createReadService('ru');
     const portfolio = await service.getPortfolio(Locale.RU);
 
-    expect(prisma.profile.findUniqueOrThrow).toHaveBeenCalledWith(
-      expect.objectContaining({
-        include: expect.objectContaining({ translations: { where: { locale: 'ru' } } }),
-      }),
-    );
+    // Read off the recorded argument rather than through a nested matcher:
+    // `expect.objectContaining` is typed as `any` and the assertion would be
+    // unchecked.
+    const [query] = prisma.profile.findUniqueOrThrow.mock.calls[0] ?? [];
+    expect(query?.include?.translations).toEqual({ where: { locale: 'ru' } });
     expect(portfolio.profile.headline).toBe('Инженер продукта');
     expect(portfolio.experience[0]?.summary).toBe('Локализованный текст.');
     expect(portfolio.experience[0]?.highlights).toEqual(['Ranking V3: три режима ранжирования']);
