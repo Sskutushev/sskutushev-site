@@ -110,10 +110,7 @@ export function EngineeringDrawer({
           </Metric>
           <Metric label="Portfolio data">{dataState}</Metric>
         </dl>
-        <p className="drawer__note t-small">
-          Values are measured in this browser session. Nothing here is a CI number presented as
-          runtime state.
-        </p>
+        <p className="drawer__note t-small">{copy.engineering.note}</p>
         <div className="drawer__panel">
           <GithubActivity locale={locale} />
         </div>

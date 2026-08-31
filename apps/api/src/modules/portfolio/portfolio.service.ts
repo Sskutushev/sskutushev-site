@@ -27,11 +27,18 @@ export class PortfolioService {
       const profile = await this.prisma.profile.findUniqueOrThrow({
         where: { slug: profileSlug },
         include: {
+          translations: { where: { locale } },
           skills: { orderBy: { priority: 'asc' } },
           socialLinks: { orderBy: { sortOrder: 'asc' } },
           experiences: {
             orderBy: { sortOrder: 'asc' },
-            include: { highlights: { orderBy: { sortOrder: 'asc' } } },
+            include: {
+              translations: { where: { locale } },
+              highlights: {
+                orderBy: { sortOrder: 'asc' },
+                include: { translations: { where: { locale } } },
+              },
+            },
           },
           caseStudies: {
             orderBy: { sortOrder: 'asc' },
@@ -42,13 +49,16 @@ export class PortfolioService {
           },
         },
       });
+      // Base columns are the fallback for a locale that has no row yet, so
+      // adding a language is a data change rather than a migration.
+      const text = profile.translations[0];
       return {
         profile: {
           fullName: profile.fullName,
-          headline: profile.headline,
-          summary: profile.summary,
-          location: profile.location,
-          availability: profile.availability,
+          headline: text?.headline ?? profile.headline,
+          summary: text?.summary ?? profile.summary,
+          location: text?.location ?? profile.location,
+          availability: text?.availability ?? profile.availability,
           yearsExperience: profile.yearsExperience,
           version: profile.version,
         },
@@ -57,8 +67,11 @@ export class PortfolioService {
           company: item.companyLabel,
           role: item.role,
           period: `${item.startDate.getUTCFullYear()} — ${item.endDate?.getUTCFullYear() ?? 'NOW'}`,
-          summary: item.summary,
-          highlights: item.highlights.map(({ title, description }) => `${title}: ${description}`),
+          summary: item.translations[0]?.summary ?? item.summary,
+          highlights: item.highlights.map((highlight) => {
+            const localised = highlight.translations[0] ?? highlight;
+            return `${localised.title}: ${localised.description}`;
+          }),
         })),
         socialLinks: profile.socialLinks.map(({ type, url }) => ({ type, url })),
         caseStudies: profile.caseStudies.flatMap((item) => {

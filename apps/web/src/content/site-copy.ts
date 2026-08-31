@@ -31,7 +31,7 @@ export interface SiteCopy {
     experience: string;
     contact: string;
   };
-  manifesto: { lines: string[]; body: string };
+  manifesto: { lines: string[]; body: string; stack: { label: string; value: string }[] };
   work: { note: string };
   architecture: {
     note: string;
@@ -40,7 +40,7 @@ export interface SiteCopy {
   };
   data: { live: string; stale: string; failed: string; simulated: string };
   theme: { toLight: string; toDark: string };
-  engineering: { open: string; close: string; title: string };
+  engineering: { open: string; close: string; title: string; note: string };
 }
 
 export const siteCopy: Record<Locale, SiteCopy> = {
@@ -90,6 +90,12 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     manifesto: {
       lines: ['Не коллекционирую', 'технологии.'],
       body: 'Проектирую границы, где каждая зависимость решает конкретную эксплуатационную задачу. Система должна оставаться честной, когда начинается реальная нагрузка: деньги не теряются, доступ не выдаётся по ошибке, а недостающие данные не превращаются в удобный ноль.',
+      stack: [
+        { label: 'Основное', value: 'TypeScript / NestJS' },
+        { label: 'Данные', value: 'CockroachDB / Prisma' },
+        { label: 'Кэш и очереди', value: 'Redis / BullMQ' },
+        { label: 'Доставка', value: 'Docker / CI / OTel' },
+      ],
     },
     work: { note: 'Каждый кейс — поведение под нагрузкой, а не список технологий.' },
     architecture: {
@@ -124,6 +130,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       open: 'Открыть инженерный режим',
       close: 'Закрыть',
       title: 'Инженерный режим',
+      note: 'Значения измерены в этой вкладке. Ни одно из них не является числом из CI, выданным за состояние рантайма.',
     },
   },
   EN: {
@@ -166,6 +173,12 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     manifesto: {
       lines: ['I do not collect', 'technologies.'],
       body: 'I design boundaries where every dependency solves a concrete operational problem. A system has to stay honest once real load arrives: money is not lost, access is not granted by mistake, and missing data does not quietly become a convenient zero.',
+      stack: [
+        { label: 'Primary', value: 'TypeScript / NestJS' },
+        { label: 'Data', value: 'CockroachDB / Prisma' },
+        { label: 'Cache and queues', value: 'Redis / BullMQ' },
+        { label: 'Delivery', value: 'Docker / CI / OTel' },
+      ],
     },
     work: { note: 'Each case is behaviour under load, not a list of technologies.' },
     architecture: {
@@ -196,6 +209,11 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       simulated: 'Simulated',
     },
     theme: { toLight: 'Switch to light theme', toDark: 'Switch to dark theme' },
-    engineering: { open: 'Open engineering mode', close: 'Close', title: 'Engineering mode' },
+    engineering: {
+      open: 'Open engineering mode',
+      close: 'Close',
+      title: 'Engineering mode',
+      note: 'Values are measured in this browser session. Nothing here is a CI number presented as runtime state.',
+    },
   },
 };
