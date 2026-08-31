@@ -51,7 +51,14 @@ export interface SiteCopy {
     buildMissing: string;
   };
   manifesto: { lines: string[]; body: string; stack: { label: string; value: string }[] };
-  work: { note: string };
+  work: { note: string; open: string };
+  caseNote: {
+    context: string;
+    decision: string;
+    consequence: string;
+    otherwise: string;
+    close: string;
+  };
   architecture: {
     note: string;
     title: string;
@@ -117,7 +124,17 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         { label: 'Доставка', value: 'Docker / CI / OTel' },
       ],
     },
-    work: { note: 'Каждый кейс — поведение под нагрузкой, а не список технологий.' },
+    work: {
+      note: 'Каждый кейс — поведение под нагрузкой, а не список технологий.',
+      open: 'Как это решено',
+    },
+    caseNote: {
+      context: 'Откуда задача',
+      decision: 'Что решает этот код',
+      consequence: 'Что из этого следует',
+      otherwise: 'Что было бы иначе',
+      close: 'Закрыть',
+    },
     engineeringSection: {
       note: 'Всё, что можно проверить, не веря на слово.',
       build: 'Эта сборка',
@@ -221,7 +238,17 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         { label: 'Delivery', value: 'Docker / CI / OTel' },
       ],
     },
-    work: { note: 'Each case is behaviour under load, not a list of technologies.' },
+    work: {
+      note: 'Each case is behaviour under load, not a list of technologies.',
+      open: 'How it is solved',
+    },
+    caseNote: {
+      context: 'Where it comes from',
+      decision: 'What this code decides',
+      consequence: 'What follows from it',
+      otherwise: 'What would happen without it',
+      close: 'Close',
+    },
     engineeringSection: {
       note: 'Everything here can be checked rather than taken on trust.',
       build: 'This build',

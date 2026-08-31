@@ -1,0 +1,134 @@
+/* Case note ----------------------------------------------------------------
+   A native <dialog>, so the focus trap, the inert background and Escape are the
+   platform's. Only the surface is ours. */
+
+.note {
+  width: min(64rem, calc(100% - var(--s-6)));
+  max-height: min(46rem, calc(100dvh - var(--s-7)));
+  padding: 0;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+  color: var(--text);
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+}
+
+.note::backdrop {
+  background: color-mix(in oklab, var(--bg) 72%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.note__panel {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+}
+
+.note__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  flex: none;
+  padding: var(--s-5) var(--s-4) var(--s-5) var(--s-6);
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* The dialog owns its scroll; the document behind it is inert. */
+.note__body {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+  gap: var(--s-6);
+  flex: 1;
+  min-height: 0;
+  padding: var(--s-6);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.note__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+}
+
+.note__rows dt {
+  margin-bottom: var(--s-2);
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.note__rows dd {
+  color: var(--text-secondary);
+  max-width: var(--measure-body);
+}
+
+.note__code {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+}
+
+.note__code figcaption {
+  margin-bottom: var(--s-3);
+}
+
+.note__code figcaption a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  min-height: 1.5rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.note__code figcaption a:hover {
+  color: var(--accent);
+}
+
+/* Code is the one place a horizontal scrollbar is the right answer: wrapping
+   an excerpt changes what it looks like, which is the thing being shown. */
+.note__code pre {
+  margin: 0;
+  padding: var(--s-5);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.note__code code {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  line-height: 1.7;
+  white-space: pre;
+  tab-size: 2;
+}
+
+@media (max-width: 1023px) {
+  .note__body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-5);
+  }
+}
+
+@media (max-width: 767px) {
+  .note {
+    width: calc(100% - var(--s-4));
+    max-height: calc(100dvh - var(--s-5));
+  }
+
+  .note__head {
+    padding: var(--s-4) var(--s-3) var(--s-4) var(--s-5);
+  }
+
+  .note__body {
+    padding: var(--s-5) var(--s-4);
+  }
+}

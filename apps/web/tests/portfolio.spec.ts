@@ -154,6 +154,30 @@ test.describe('reduced motion', () => {
     await expect(money.locator('.flow__node.is-skipped')).toHaveCount(2);
   });
 
+  test('a case opens the code that decides it, and closes on Escape', async ({ page }) => {
+    await reduceMotion(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'EN', exact: true }).click();
+    const chapter = page.locator('#case-search-cache-reliability');
+    await chapter.scrollIntoViewIfNeeded();
+    await chapter.getByRole('button', { name: 'How it is solved' }).click();
+
+    const note = page.locator('dialog.note');
+    await expect(note).toBeVisible();
+    // The excerpt is the claim: it names its file and shows the branch that
+    // makes a provider outage a degradation rather than an outage.
+    await expect(note).toContainText('apps/api/src/cache/cache.service.ts');
+    await expect(note.locator('pre code')).toContainText(
+      'return { value: cached.value, stale: true }',
+    );
+
+    // `close()` queues its event; a dialog that reopens on the same tick used
+    // to close itself a frame after opening.
+    await expect(note).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(note).toBeHidden();
+  });
+
   test('rows with no comparable basis stay on their own band in every projection', async ({
     page,
   }) => {
