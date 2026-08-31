@@ -21,6 +21,9 @@
 }
 
 .nav__mark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.05em;

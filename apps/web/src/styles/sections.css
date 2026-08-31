@@ -273,8 +273,11 @@
   color: var(--text-tertiary);
 }
 
+/* Two buttons with `white-space: nowrap` do not fit one row at 375px, and the
+   overflow pushed the whole column past the gutter. */
 .contact__resume {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--s-3);
   margin-top: var(--s-6);
 }
@@ -309,12 +312,28 @@
     margin-top: var(--s-7);
   }
 
-  .case__copy {
-    grid-column: 1 / 4;
+  /* Below 1024 the copy column cannot hold a two-word title beside a diagram:
+     "Financial Concurrency" was clipped mid-word. The chapter stacks instead. */
+  .case {
+    min-height: 0;
+  }
+
+  .case__copy,
+  .case__visual {
+    grid-column: 1 / -1;
+  }
+
+  .case__title {
+    max-width: 18ch;
   }
 
   .case__visual {
-    grid-column: 4 / -1;
+    grid-row: 3;
+  }
+
+  .case__copy {
+    grid-row: 4;
+    margin-top: var(--s-4);
   }
 
   .timeline__item {
@@ -337,6 +356,13 @@
     gap: var(--s-4);
   }
 
+  /* The two-column placement above forces a second, implicit track here and
+     collapses the first to zero: the period rendered at width 0 and the dates
+     were invisible on every phone. */
+  .timeline__item > :last-child {
+    grid-column: auto;
+  }
+
   /* Stacked: the visual keeps a reserved band above the copy rather than
      competing with it for a column that is no longer there. */
   .case {
@@ -344,24 +370,43 @@
     gap: var(--s-5);
   }
 
+  /* Stacked, and in reading order: number, tag, title, visual, then the copy
+     that describes it. `display: contents` lets the copy wrapper's children
+     take their own rows instead of travelling as one block below the visual. */
+  .case__copy {
+    display: contents;
+  }
+
   .case__index,
   .case__tag,
-  .case__copy,
-  .case__visual {
+  .case__title,
+  .case__visual,
+  .case__problem,
+  .case__result,
+  .case__stack {
     grid-column: 1 / -1;
   }
 
   .case__title {
+    grid-row: 2;
+    margin-bottom: 0;
     max-width: none;
   }
 
   .case__visual {
-    grid-row: 2;
+    grid-row: 3;
   }
 
-  .case__copy {
-    grid-row: 3;
-    margin-top: 0;
+  .case__problem {
+    grid-row: 4;
+  }
+
+  .case__result {
+    grid-row: 5;
+  }
+
+  .case__stack {
+    grid-row: 6;
   }
 
   .contact__foot {

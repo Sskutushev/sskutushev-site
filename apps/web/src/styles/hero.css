@@ -292,8 +292,12 @@
     height: auto;
   }
 
+  /* Relative, not static: the stage is absolutely positioned and deliberately
+     bleeds past the frame, and with no positioned ancestor here it resolved
+     against the section instead and escaped the clip — 46px of horizontal page
+     scroll on a tablet under reduced motion. */
   .hero__frame {
-    position: static;
+    position: relative;
     height: auto;
     min-height: 100svh;
   }
