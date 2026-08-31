@@ -33,20 +33,40 @@ vi.mock('@aws-sdk/s3-request-presigner', () => ({
   },
 }));
 
+const values: Record<string, unknown> = {
+  S3_BUCKET: 'portfolio',
+  S3_ENDPOINT: 'http://localhost:9000',
+  S3_REGION: 'us-east-1',
+  S3_ACCESS_KEY: 'access',
+  S3_SECRET_KEY: 'secret',
+  ASSET_MAX_BYTES: 10_485_760,
+};
+
 const config = {
-  getOrThrow: (key: string) =>
-    ({
-      S3_BUCKET: 'portfolio',
-      S3_ENDPOINT: 'http://localhost:9000',
-      S3_REGION: 'us-east-1',
-      S3_ACCESS_KEY: 'access',
-      S3_SECRET_KEY: 'secret',
-      ASSET_MAX_BYTES: 10_485_760,
-    })[key],
+  get: (key: string) => values[key],
+  getOrThrow: (key: string) => values[key],
+} as ConfigService;
+
+/** A deployment with mutations off, which is how the published API runs. */
+const unconfigured = {
+  get: (key: string) => (key === 'S3_REGION' ? 'us-east-1' : undefined),
+  getOrThrow: (key: string) => values[key],
 } as ConfigService;
 
 describe('StorageService', () => {
   beforeEach(() => vi.clearAllMocks());
+
+  it('refuses in the open when no store is configured', async () => {
+    const storage = new StorageService(unconfigured);
+
+    expect(storage.available).toBe(false);
+    // Refusing beats returning nothing: an unconfigured store that answers
+    // emptily is the false fallback this codebase argues against everywhere.
+    await expect(storage.download('resume/file.pdf')).rejects.toThrow(/not configured/i);
+    await expect(storage.inspect('resume/file.pdf')).rejects.toThrow(/not configured/i);
+    expect(() => storage.presignUpload('a', 'application/pdf', 'c=')).toThrow(/not configured/i);
+    expect(aws.send).not.toHaveBeenCalled();
+  });
 
   it('creates a short-lived upload URL with an explicit content type', async () => {
     aws.getSignedUrl.mockResolvedValue('https://storage.example/upload');
