@@ -1,0 +1,249 @@
+/* Verifiable engineering ---------------------------------------------------
+   Four panels of evidence about the system. Two are measured at build time and
+   are therefore always present; two are live and say so when they are not. */
+
+.evidence__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-4);
+}
+
+.evidence {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-6);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+}
+
+.evidence__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.evidence__head p {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.evidence__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.evidence__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+
+.evidence__row dt {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.evidence__row dd {
+  text-align: right;
+}
+
+.evidence__row a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  color: var(--text);
+}
+
+.evidence__row a:hover {
+  color: var(--accent);
+}
+
+.evidence__row code,
+.evidence code {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+}
+
+.evidence__socket {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+}
+
+.evidence__gates summary {
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.evidence__gates summary:hover {
+  color: var(--text);
+}
+
+.evidence__gates ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--s-1) var(--s-5);
+  margin-top: var(--s-4);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+}
+
+/* The two live panels carry a list rather than a pair of columns, so they run
+   the full width under the build evidence. */
+.evidence--wide {
+  grid-column: 1 / -1;
+}
+
+/* Measured delivery -------------------------------------------------------- */
+
+.quality-dashboard,
+.github-activity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.quality-dashboard header,
+.github-activity header,
+.assistant__status {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+
+.quality-dashboard header small,
+.github-activity header small {
+  display: block;
+  margin-bottom: var(--s-1);
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta-sm);
+  letter-spacing: 0.08em;
+}
+
+.quality-dashboard header strong,
+.github-activity header strong {
+  font-size: var(--t-body);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* The run state, in the same four-state vocabulary as everything else. */
+.quality-dashboard header > span,
+.github-activity header > span {
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-full);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta-sm);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.github-activity header > span.is-stale {
+  border-color: var(--state-degraded);
+  color: var(--state-degraded);
+}
+
+.quality-dashboard dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 1px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--hairline);
+  overflow: hidden;
+}
+
+.quality-dashboard dl div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-4);
+  background: var(--surface-1);
+}
+
+.quality-dashboard dt {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta-sm);
+  letter-spacing: 0.08em;
+}
+
+.quality-dashboard dd {
+  font-size: var(--t-body-lg);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.quality-dashboard > p,
+.github-activity > p {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+}
+
+.github-activity a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--hairline);
+  color: var(--text);
+}
+
+.github-activity a span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+}
+
+.github-activity a:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 1023px) {
+  .evidence__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .evidence--wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .evidence {
+    padding: var(--s-5) var(--s-4);
+  }
+
+  .evidence__row {
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .evidence__row dd {
+    text-align: left;
+  }
+}

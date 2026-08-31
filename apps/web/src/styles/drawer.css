@@ -89,7 +89,39 @@
   font-size: var(--t-meta-sm);
 }
 
-/* Assistant --------------------------------------------------------------- */
+/* Assistant ---------------------------------------------------------------
+   The class names here and in the component had drifted apart — the stylesheet
+   was BEM and the markup was not — so the assistant rendered entirely unstyled.
+   Guarded now by a unit test on the rendered class names. */
+
+.assistant {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.assistant__status {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+.assistant__status i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: var(--s-2);
+  border-radius: var(--r-full);
+  background: var(--state-ok);
+}
+
+.assistant__lead {
+  margin-bottom: var(--s-1);
+}
+
+.assistant__error {
+  color: var(--state-failed);
+}
 
 .assistant__suggestions {
   display: flex;

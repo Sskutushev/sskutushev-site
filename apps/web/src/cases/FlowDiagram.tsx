@@ -84,7 +84,7 @@ export function FlowDiagram({
       </div>
 
       <svg aria-describedby={groupId} className="flow__canvas" viewBox="0 0 100 60">
-        <g className="flow__edges">
+        <g>
           {flow.edges.map((edge) => (
             <path
               className={`flow__edge is-${edgeState(scenario, edge)}`}
@@ -97,7 +97,7 @@ export function FlowDiagram({
             so the request is seen travelling rather than the path being seen
             already coloured. Hidden under reduced motion: the route and its
             outcome are both stated in text. */}
-        <g className="flow__packets">
+        <g>
           {flow.edges.map((edge) => {
             const state = edgeState(scenario, edge);
             if (state !== 'active' && state !== 'degraded') return null;
@@ -116,7 +116,7 @@ export function FlowDiagram({
             );
           })}
         </g>
-        <g className="flow__nodes">
+        <g>
           {flow.nodes.map((node) => (
             <g className={`flow__node is-${nodeState(scenario, node.id)}`} key={node.id}>
               <rect

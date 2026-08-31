@@ -112,6 +112,10 @@
   align-self: center;
 }
 
+.case__result {
+  max-width: var(--measure-body);
+}
+
 .case__stack {
   display: flex;
   flex-wrap: wrap;

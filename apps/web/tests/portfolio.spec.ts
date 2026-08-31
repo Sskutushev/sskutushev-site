@@ -177,6 +177,34 @@ test.describe('reduced motion', () => {
     }
   });
 
+  test('the engineering section carries build evidence when the API is gone', async ({ page }) => {
+    // The published build has no API behind it, so every live panel on it is
+    // offline. Without something measured at build time the whole section would
+    // be a column of honest but useless labels.
+    await gotoOffline(page);
+    const section = page.locator('#engineering');
+    await section.scrollIntoViewIfNeeded();
+
+    await expect(section.getByText('measured at build time')).toBeVisible();
+    // A build with no repository behind it — a source archive, or this suite
+    // running from a copied tree — reports the commit as unknown. What it must
+    // never do is render an empty row.
+    await expect(section.locator('.evidence__row code').first()).toHaveText(
+      /^([0-9a-f]{7}|unknown)$/,
+    );
+
+    await section.getByText('Show the checks').click();
+    const gates = section.locator('.evidence__gates li');
+    await expect(gates.first()).toContainText('01 · Install');
+    expect(await gates.count()).toBeGreaterThan(10);
+
+    // The live panels state their own failure rather than showing a number.
+    await expect(section.getByText('API unavailable', { exact: false }).first()).toBeVisible();
+    await expect(section.locator('.evidence__row').filter({ hasText: 'Round trip' })).toContainText(
+      '—',
+    );
+  });
+
   for (const theme of ['dark', 'light'] as const) {
     test(`visual regression: desktop ${theme}`, async ({ page }) => {
       await gotoOffline(page, theme);

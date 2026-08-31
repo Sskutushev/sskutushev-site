@@ -1,8 +1,6 @@
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { AssistantChat } from '../components/AssistantChat';
-import { GithubActivity } from '../components/GithubActivity';
-import { QualityDashboard } from '../components/QualityDashboard';
 import type { SiteCopy } from '../content/site-copy';
 import { sparklinePoints } from '../lib/graphql-websocket-metrics';
 import type { Locale } from '../lib/portfolio';
@@ -111,12 +109,6 @@ export function EngineeringDrawer({
           <Metric label="Portfolio data">{dataState}</Metric>
         </dl>
         <p className="drawer__note t-small">{copy.engineering.note}</p>
-        <div className="drawer__panel">
-          <GithubActivity locale={locale} />
-        </div>
-        <div className="drawer__panel">
-          <QualityDashboard locale={locale} />
-        </div>
         <div className="drawer__panel">
           <AssistantChat locale={locale} />
         </div>

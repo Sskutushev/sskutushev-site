@@ -11,7 +11,7 @@ export function Experience({
   return (
     <section className="section" id="experience">
       <div className="section__head">
-        <p className="section__index t-meta">05 / {copy.sections.experience}</p>
+        <p className="section__index t-meta">06 / {copy.sections.experience}</p>
       </div>
       <div className="timeline">
         {items.map((item) => (

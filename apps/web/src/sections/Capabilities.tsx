@@ -22,7 +22,7 @@ export function Capabilities({
   return (
     <section className="section section--raised" id="capabilities">
       <div className="section__head">
-        <p className="section__index t-meta">04 / {copy.sections.capabilities}</p>
+        <p className="section__index t-meta">05 / {copy.sections.capabilities}</p>
       </div>
       <div className="capabilities__grid">
         {Array.from(groupByCategory(skills), ([category, names]) => {
