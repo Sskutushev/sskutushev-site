@@ -1,0 +1,172 @@
+/* Engineering mode. An easter egg for a reviewer who goes looking, not a
+   primary surface — the second and last place translucency is permitted. */
+.drawer {
+  position: fixed;
+  z-index: 60;
+  inset: 0 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: min(27rem, 100%);
+  border-left: 1px solid var(--hairline);
+  background: color-mix(in oklab, var(--surface-2) 88%, transparent);
+  backdrop-filter: blur(20px) saturate(130%);
+  box-shadow: var(--shadow-3);
+}
+
+.drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  padding: var(--s-5) var(--s-5) var(--s-4);
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* The drawer owns its scroll. Document smooth-scrolling is suspended while it
+   is open, so wheel events are not intercepted before reaching this element. */
+.drawer__body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--s-5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.drawer__metrics div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.drawer__metrics dt {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.drawer__metrics dd {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  text-align: right;
+}
+
+.drawer__note {
+  margin: var(--s-5) 0;
+  color: var(--text-tertiary);
+}
+
+.drawer__panel {
+  margin-top: var(--s-6);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hairline);
+}
+
+.drawer__panel h3 {
+  margin-bottom: var(--s-4);
+  color: var(--text-secondary);
+}
+
+.websocket-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--s-1);
+}
+
+.websocket-metric polyline {
+  fill: none;
+  stroke: var(--accent-quiet);
+  stroke-width: 1.5;
+}
+
+.websocket-metric small {
+  color: var(--text-tertiary);
+  font-size: var(--t-meta-sm);
+}
+
+/* Assistant --------------------------------------------------------------- */
+
+.assistant__suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: var(--s-4) 0;
+}
+
+.assistant__suggestions button {
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-full);
+  color: var(--text-secondary);
+  font-size: var(--t-small);
+  text-align: left;
+  transition:
+    border-color var(--d-micro) var(--ease-micro),
+    color var(--d-micro) var(--ease-micro);
+}
+
+.assistant__suggestions button:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.assistant__form {
+  display: flex;
+  gap: var(--s-2);
+}
+
+.assistant__form input {
+  flex: 1;
+  min-width: 0;
+  height: 2.75rem;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.assistant__form button {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-sm);
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.assistant__form button:disabled {
+  background: var(--surface-3);
+  color: var(--text-tertiary);
+  cursor: progress;
+}
+
+.assistant__answer {
+  margin-top: var(--s-4);
+  padding: var(--s-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--bg);
+}
+
+.assistant__answer summary {
+  margin-top: var(--s-3);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--t-meta-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.assistant__answer article {
+  margin-top: var(--s-3);
+  color: var(--text-secondary);
+}

@@ -1,0 +1,193 @@
+.section {
+  position: relative;
+  z-index: 2;
+  padding: var(--s-10) var(--gutter);
+}
+
+.section--raised {
+  background: var(--surface-1);
+}
+
+.section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-6);
+  margin-bottom: var(--s-8);
+  padding-bottom: var(--s-5);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.section__index {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  color: var(--text-secondary);
+}
+
+.section__index::before {
+  content: '';
+  width: 2rem;
+  height: 1px;
+  background: var(--hairline-strong);
+}
+
+.section__note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s-2);
+  max-width: 24em;
+  text-align: right;
+  color: var(--text-tertiary);
+}
+
+/* Path arrows read as direction, not punctuation: they carry the same weight
+   as the hairlines and never compete with the step names. */
+.section__note svg,
+.simulation__path svg {
+  flex: none;
+  color: var(--text-tertiary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s-6);
+  max-width: var(--content-max);
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+
+  .section__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-3);
+  }
+
+  .section__note {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+/* Controls ---------------------------------------------------------------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 2.875rem;
+  padding: 0 var(--s-5);
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-size: var(--t-small);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition:
+    background var(--d-micro) var(--ease-micro),
+    border-color var(--d-micro) var(--ease-micro),
+    color var(--d-micro) var(--ease-micro);
+}
+
+.button--primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.button--primary:hover {
+  background: color-mix(in oklab, var(--accent) 88%, var(--text));
+}
+
+.button--quiet {
+  border-color: var(--hairline-strong);
+  color: var(--text);
+}
+
+.button--quiet:hover {
+  border-color: var(--text);
+  background: var(--surface-2);
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--r-sm);
+  color: var(--text-secondary);
+  transition:
+    color var(--d-micro) var(--ease-micro),
+    background var(--d-micro) var(--ease-micro);
+}
+
+.icon-button:hover {
+  color: var(--text);
+  background: var(--surface-3);
+}
+
+.segmented {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+}
+
+.segmented button {
+  min-width: 2.25rem;
+  height: 2.125rem;
+  padding: 0 var(--s-2);
+  border-radius: 4px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta-sm);
+  letter-spacing: 0.08em;
+  transition:
+    background var(--d-micro) var(--ease-micro),
+    color var(--d-micro) var(--ease-micro);
+}
+
+.segmented button.is-active {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.status-dot {
+  display: inline-block;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-right: var(--s-2);
+  border-radius: var(--r-full);
+  background: var(--text-tertiary);
+  vertical-align: 0.05em;
+}
+
+.status-dot--ok {
+  background: var(--state-ok);
+}
+
+.status-dot--degraded {
+  background: var(--state-degraded);
+}
+
+.status-dot--failed {
+  background: var(--state-failed);
+}
+
+.status-dot--simulated {
+  background: var(--accent-quiet);
+}

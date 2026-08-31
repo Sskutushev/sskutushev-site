@@ -20,11 +20,22 @@ describe('render quality', () => {
     expect(selectRenderQuality({ ...capable, maxTextureSize: 0 })).toBe('STATIC');
   });
 
+  it('refuses the scene on a CPU-emulated renderer', () => {
+    expect(selectRenderQuality({ ...capable, softwareRenderer: true })).toBe('STATIC');
+    expect(selectRenderQuality({ ...capable, softwareRenderer: false })).toBe('ULTRA');
+  });
+
   it('degrades one level on slow-frame evidence', () => {
     expect(lowerRenderQuality('ULTRA', 30)).toBe('HIGH');
     expect(lowerRenderQuality('BALANCED', 23)).toBe('LOW');
     expect(lowerRenderQuality('LOW', 16)).toBe('LOW');
     expect(lowerRenderQuality('STATIC', 30)).toBe('STATIC');
+  });
+
+  it('never degrades to STATIC on slow frames', () => {
+    let quality = lowerRenderQuality('ULTRA', 40);
+    for (let step = 0; step < 6; step += 1) quality = lowerRenderQuality(quality, 40);
+    expect(quality).toBe('LOW');
   });
 
   it('keeps declared point budgets', () => {

@@ -1,55 +1,122 @@
-import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { Fragment, useState } from 'react';
+import type { Locale } from '../lib/portfolio';
+import { StatusDot } from '../ui/StatusDot';
+import type { DataState } from '../ui/StatusDot';
 
-const scenarios = {
-  NORMAL: { status: '200 · LIVE', path: 'cache hit → GraphQL response', tone: 'ok' },
-  'CACHE MISS': { status: '200 · REFRESHED', path: 'database → cache fill → response', tone: 'ok' },
-  'PROVIDER TIMEOUT': {
+interface Scenario {
+  id: string;
+  label: Record<Locale, string>;
+  status: string;
+  path: Record<Locale, string[]>;
+  tone: Exclude<DataState, 'simulated'>;
+}
+
+/**
+ * A named set of degradation paths, not live traffic. The label states that
+ * explicitly: an unlabelled simulation presented next to real telemetry would
+ * be exactly the invented-metric problem the site argues against.
+ */
+const SCENARIOS: Scenario[] = [
+  {
+    id: 'normal',
+    label: { RU: 'Норма', EN: 'Normal' },
+    status: '200 · LIVE',
+    path: { RU: ['попадание в кэш', 'ответ'], EN: ['cache hit', 'response'] },
+    tone: 'ok',
+  },
+  {
+    id: 'miss',
+    label: { RU: 'Промах кэша', EN: 'Cache miss' },
+    status: '200 · REFRESHED',
+    path: {
+      RU: ['база', 'заполнение кэша', 'ответ'],
+      EN: ['database', 'cache fill', 'response'],
+    },
+    tone: 'ok',
+  },
+  {
+    id: 'timeout',
+    label: { RU: 'Таймаут провайдера', EN: 'Provider timeout' },
     status: '200 · DEGRADED',
-    path: 'timeout budget → stale provider snapshot',
-    tone: 'warn',
+    path: {
+      RU: ['бюджет таймаута', 'устаревший снимок провайдера'],
+      EN: ['timeout budget', 'stale provider snapshot'],
+    },
+    tone: 'degraded',
   },
-  'STALE FALLBACK': {
+  {
+    id: 'stale',
+    label: { RU: 'Отдача из снимка', EN: 'Stale fallback' },
     status: '200 · STALE',
-    path: 'source unavailable → labelled snapshot',
-    tone: 'warn',
+    path: {
+      RU: ['источник недоступен', 'помеченный снимок'],
+      EN: ['source unavailable', 'labelled snapshot'],
+    },
+    tone: 'degraded',
   },
-  INCIDENT: {
+  {
+    id: 'incident',
+    label: { RU: 'Инцидент', EN: 'Incident' },
     status: '503 · FAIL CLOSED',
-    path: 'dependency failure → no false success',
-    tone: 'error',
+    path: {
+      RU: ['отказ зависимости', 'отказ вместо ложного успеха'],
+      EN: ['dependency failure', 'refusal instead of false success'],
+    },
+    tone: 'failed',
   },
-} as const;
+];
 
-type Scenario = keyof typeof scenarios;
+const TITLE: Record<Locale, string> = {
+  RU: 'Пути отказоустойчивости',
+  EN: 'Resilience paths',
+};
 
-export function CaseSimulation(): React.JSX.Element {
-  const [active, setActive] = useState<Scenario>('NORMAL');
-  const result = scenarios[active];
+const SIMULATED: Record<Locale, string> = {
+  RU: 'Симуляция · не боевой трафик',
+  EN: 'Simulation · not live traffic',
+};
+
+export function CaseSimulation({ locale }: { locale: Locale }): React.JSX.Element {
+  const [activeId, setActiveId] = useState(SCENARIOS[0]!.id);
+  const active = SCENARIOS.find((scenario) => scenario.id === activeId) ?? SCENARIOS[0]!;
+
   return (
-    <section className="case-simulation mt-8 p-4 lg:p-7" aria-labelledby="simulation-title">
-      <header className="flex items-end justify-between gap-4">
-        <p className="section-no">SIMULATION · NOT LIVE TRAFFIC</p>
-        <h3 id="simulation-title">RESILIENCE PATH EXPLORER</h3>
+    <section aria-labelledby="simulation-title" className="simulation">
+      <header className="simulation__head">
+        <h3 className="t-h3" id="simulation-title">
+          {TITLE[locale]}
+        </h3>
+        <p className="t-meta-sm text-tertiary">
+          <StatusDot state="simulated" />
+          {SIMULATED[locale]}
+        </p>
       </header>
-      <div
-        className="simulation-controls my-5 flex flex-wrap gap-2"
-        role="group"
-        aria-label="Simulated request condition"
-      >
-        {(Object.keys(scenarios) as Scenario[]).map((scenario) => (
+      <div aria-label={TITLE[locale]} className="simulation__controls" role="group">
+        {SCENARIOS.map((scenario) => (
           <button
-            aria-pressed={active === scenario}
-            className={active === scenario ? 'active' : ''}
-            key={scenario}
-            onClick={() => setActive(scenario)}
+            aria-pressed={scenario.id === activeId}
+            key={scenario.id}
+            onClick={() => setActiveId(scenario.id)}
+            type="button"
           >
-            {scenario}
+            {scenario.label[locale]}
           </button>
         ))}
       </div>
-      <output className={`simulation-result ${result.tone}`} aria-live="polite">
-        <strong>{result.status}</strong>
-        <span>{result.path}</span>
+      <output
+        aria-live="polite"
+        className={`simulation__result simulation__result--${active.tone}`}
+      >
+        <strong className="t-meta">{active.status}</strong>
+        <span className="simulation__path t-small text-secondary">
+          {active.path[locale].map((step, index) => (
+            <Fragment key={step}>
+              {index > 0 && <ArrowRight aria-hidden size={14} strokeWidth={1.5} />}
+              {step}
+            </Fragment>
+          ))}
+        </span>
       </output>
     </section>
   );

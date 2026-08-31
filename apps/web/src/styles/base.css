@@ -1,0 +1,214 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+/* Single 1.5% noise layer. It exists to stop large flat areas from banding and
+   is the only decorative overlay on the page. */
+body::after {
+  content: '';
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+dl,
+dd {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: inherit;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+/* Type roles ------------------------------------------------------------- */
+
+.t-display {
+  margin: 0;
+  font-size: var(--t-display);
+  font-weight: 720;
+  line-height: 0.86;
+  letter-spacing: -0.055em;
+  hyphens: none;
+}
+
+.t-h1 {
+  font-size: var(--t-h1);
+  font-weight: 680;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  hyphens: none;
+}
+
+.t-h2 {
+  font-size: var(--t-h2);
+  font-weight: 650;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  hyphens: none;
+}
+
+.t-h3 {
+  font-size: var(--t-h3);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.t-lead {
+  max-width: var(--measure-lead);
+  font-size: var(--t-lead);
+  font-weight: 400;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+}
+
+.t-body-lg {
+  max-width: var(--measure-body);
+  font-size: var(--t-body-lg);
+  line-height: 1.5;
+  letter-spacing: -0.012em;
+}
+
+.t-body {
+  max-width: var(--measure-body);
+  font-size: var(--t-body);
+}
+
+.t-small {
+  font-size: var(--t-small);
+  letter-spacing: 0;
+}
+
+.t-meta {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.t-meta-sm {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta-sm);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-tertiary {
+  color: var(--text-tertiary);
+}
+
+/* Utilities -------------------------------------------------------------- */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 90;
+  top: var(--s-4);
+  left: var(--s-4);
+  padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-sm);
+  background: var(--accent);
+  color: var(--accent-fg);
+  transform: translateY(calc(-100% - var(--s-6)));
+  transition: transform var(--d-micro) var(--ease-micro);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -7,6 +7,8 @@ export interface RenderCapabilities {
   hardwareConcurrency?: number;
   devicePixelRatio: number;
   maxTextureSize?: number;
+  /** True when WebGL is being emulated on the CPU rather than a GPU. */
+  softwareRenderer?: boolean;
 }
 
 const order: RenderQuality[] = ['STATIC', 'LOW', 'BALANCED', 'HIGH', 'ULTRA'];
@@ -18,8 +20,12 @@ export function selectRenderQuality({
   hardwareConcurrency,
   devicePixelRatio,
   maxTextureSize,
+  softwareRenderer,
 }: RenderCapabilities): RenderQuality {
-  if (reducedMotion || maxTextureSize === 0) return 'STATIC';
+  // A CPU-emulated renderer runs the scene as a slideshow and holds the main
+  // thread for the whole session. The designed static composition is the better
+  // result on such a device, not a degraded object.
+  if (reducedMotion || maxTextureSize === 0 || softwareRenderer) return 'STATIC';
   if (
     width < 760 ||
     (deviceMemory !== undefined && deviceMemory <= 2) ||
@@ -45,9 +51,15 @@ export function selectRenderQuality({
   return 'HIGH';
 }
 
+/**
+ * Runtime degradation floors at LOW. STATIC means "this device cannot or must
+ * not render the scene" — reduced motion, or no WebGL — and is decided by
+ * capability detection. Dropping to it because a few frames ran long removes
+ * the object entirely, which is a design failure rather than a saving.
+ */
 export function lowerRenderQuality(quality: RenderQuality, frameMs: number): RenderQuality {
-  if (quality === 'STATIC' || frameMs <= 22) return quality;
-  return order[Math.max(0, order.indexOf(quality) - 1)]!;
+  if (quality === 'STATIC' || quality === 'LOW' || frameMs <= 22) return quality;
+  return order[Math.max(order.indexOf('LOW'), order.indexOf(quality) - 1)]!;
 }
 
 export function pointBudget(quality: RenderQuality): number {

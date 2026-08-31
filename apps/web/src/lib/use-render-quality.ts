@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { afterPaint } from './after-paint';
 import type { RenderMetrics } from '../scenes/RuntimeProfiler';
 import {
   lowerRenderQuality,
@@ -11,6 +12,20 @@ interface NavigatorCapabilities extends Navigator {
   deviceMemory?: number;
 }
 
+const SOFTWARE_RENDERERS = /swiftshader|llvmpipe|software|microsoft basic render/i;
+
+/**
+ * Reads the renderer string. Chrome exposes the real adapter through
+ * `RENDERER` directly; the debug extension is checked as well because older
+ * browsers still mask that value.
+ */
+function isSoftwareRenderer(gl: WebGLRenderingContext | WebGL2RenderingContext): boolean {
+  const names: unknown[] = [gl.getParameter(gl.RENDERER)];
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  if (info) names.push(gl.getParameter(info.UNMASKED_RENDERER_WEBGL));
+  return names.some((name) => typeof name === 'string' && SOFTWARE_RENDERERS.test(name));
+}
+
 function detectCapabilities(reducedMotion: boolean): RenderCapabilities {
   const canvas = document.createElement('canvas');
   const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
@@ -21,20 +36,38 @@ function detectCapabilities(reducedMotion: boolean): RenderCapabilities {
     hardwareConcurrency: browser.hardwareConcurrency,
     devicePixelRatio: window.devicePixelRatio,
     maxTextureSize: gl ? (gl.getParameter(gl.MAX_TEXTURE_SIZE) as number) : 0,
+    softwareRenderer: gl ? isSoftwareRenderer(gl) : true,
   };
   if (browser.deviceMemory !== undefined) capabilities.deviceMemory = browser.deviceMemory;
+  // The probe context is never drawn into. Releasing it immediately keeps the
+  // GPU process from holding a second context alongside the scene's own.
+  gl?.getExtension('WEBGL_lose_context')?.loseContext();
   return capabilities;
 }
 
+/**
+ * Reports how much scene a device should be asked to render.
+ *
+ * Detection creates a WebGL context, and creating one is not cheap: on a
+ * software renderer it costs hundreds of milliseconds and it holds the main
+ * thread while it happens. Running it during the first render — which is where
+ * it used to live — pushed the hero's own paint behind it and was what
+ * Lighthouse measured as the largest contentful paint. The answer is therefore
+ * resolved once the page is idle, and the hero shows its designed static
+ * composition until then, which is what it must show on the devices that end
+ * up staying static anyway.
+ */
 export function useRenderQuality(reducedMotion: boolean): RenderQuality {
-  const [quality, setQuality] = useState(() =>
-    selectRenderQuality(detectCapabilities(reducedMotion)),
-  );
+  const [quality, setQuality] = useState<RenderQuality>('STATIC');
 
-  useEffect(
-    () => setQuality(selectRenderQuality(detectCapabilities(reducedMotion))),
-    [reducedMotion],
-  );
+  useEffect(() => {
+    if (reducedMotion) {
+      setQuality('STATIC');
+      return;
+    }
+    return afterPaint(() => setQuality(selectRenderQuality(detectCapabilities(reducedMotion))));
+  }, [reducedMotion]);
+
   useEffect(() => {
     let slowSamples = 0;
     const onMetrics = (event: Event): void => {

@@ -1,0 +1,313 @@
+/* Pinned cinematic hero — see docs/design/HERO_STORYBOARD.md.
+   The pin is a sticky frame inside a taller track; no scroll library is
+   involved, so nothing contends with the render loop (ADR-017). */
+.hero {
+  position: relative;
+  z-index: 2;
+}
+
+/* The sequence is published here as custom properties by the pinned-progress
+   hook. The opening values are declared in CSS so the hero is complete before
+   a single line of script has run. */
+.hero__pin {
+  height: 240vh;
+  --hero-type-opacity: 1;
+  --hero-type-scale: 1;
+  --hero-aside-opacity: 1;
+  --hero-layer-opacity: 0;
+}
+
+.hero__frame {
+  position: sticky;
+  top: 0;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto 1fr auto;
+  align-content: center;
+  gap: var(--s-5) var(--s-6);
+  height: 100svh;
+  padding: calc(var(--nav-height) + var(--s-7)) var(--gutter) var(--s-7);
+  overflow: hidden;
+}
+
+/* The canvas sits between two type layers. `.hero__title` deliberately creates
+   no stacking context, so its lines compete with the stage on z-index. */
+.hero__stage {
+  position: absolute;
+  z-index: 2;
+  inset: 0 2% 2% 42%;
+  pointer-events: none;
+}
+
+.hero__stage canvas {
+  width: 100%;
+  height: 100%;
+  animation: stage-in 700ms var(--ease-editorial) both;
+}
+
+/* The object is mounted after load, so it arrives rather than pops. */
+@keyframes stage-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.hero__stage--static {
+  background:
+    radial-gradient(
+      42% 38% at 62% 46%,
+      color-mix(in oklab, var(--prism-violet) 26%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      30% 26% at 74% 62%,
+      color-mix(in oklab, var(--prism-cyan) 20%, transparent),
+      transparent 70%
+    );
+}
+
+.hero__eyebrow {
+  z-index: 3;
+  opacity: var(--hero-aside-opacity);
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  color: var(--text-secondary);
+}
+
+.hero__title {
+  z-index: 3;
+  grid-column: 1 / -1;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hero__line {
+  position: relative;
+  z-index: 3;
+  display: block;
+  overflow: hidden;
+  transform-origin: 0 50%;
+  opacity: var(--hero-type-opacity);
+  scale: var(--hero-type-scale);
+}
+
+/* One line passes behind the object. Its own stacking context sits below the
+   canvas, which is what makes the composition read as spatial. */
+.hero__line--behind {
+  z-index: 1;
+}
+
+.hero__line-inner {
+  display: block;
+  animation: hero-line-in var(--d-editorial) var(--ease-editorial) both;
+}
+
+@keyframes hero-line-in {
+  from {
+    transform: translateY(24%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.hero__aside {
+  z-index: 3;
+  opacity: var(--hero-aside-opacity);
+  grid-column: 1 / 6;
+  align-self: end;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.hero__availability {
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+}
+
+.hero__actions {
+  z-index: 3;
+  opacity: var(--hero-aside-opacity);
+  grid-column: 7 / -1;
+  align-self: end;
+  justify-self: end;
+  display: flex;
+  gap: var(--s-3);
+}
+
+/* Layer names revealed as the object separates. Their meaning is content, so
+   they remain in the DOM and readable when the sequence never runs. */
+.hero__layers {
+  position: absolute;
+  z-index: 3;
+  opacity: var(--hero-layer-opacity);
+  top: 50%;
+  left: var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+  width: min(22rem, 34vw);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.hero__layers li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding-left: var(--s-4);
+  border-left: 1px solid var(--hairline-strong);
+}
+
+@media (max-width: 1023px) {
+  .hero__frame {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  .hero__stage {
+    inset: 4% -6% 6% 36%;
+  }
+
+  .hero__aside {
+    grid-column: 1 / 6;
+  }
+
+  .hero__actions {
+    grid-column: 6 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero__pin {
+    height: 200vh;
+  }
+
+  /* Rows are assigned explicitly so the object gets a reserved band instead of
+     sitting under the copy. `align-content: stretch` keeps the first row below
+     the floating nav when the content is taller than the viewport. */
+  .hero__frame {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: auto auto auto minmax(10rem, 1fr) auto;
+    align-content: stretch;
+    gap: var(--s-4);
+    padding-top: calc(var(--nav-height) + var(--s-5));
+  }
+
+  .hero__eyebrow,
+  .hero__title,
+  .hero__aside,
+  .hero__actions {
+    grid-column: 1 / -1;
+  }
+
+  .hero__eyebrow {
+    grid-row: 1;
+  }
+
+  .hero__title {
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .hero__aside {
+    grid-row: 3;
+    align-self: start;
+  }
+
+  .hero__stage {
+    position: relative;
+    inset: auto;
+    grid-row: 4;
+    grid-column: 1 / -1;
+    margin: 0 calc(var(--gutter) * -1);
+  }
+
+  .hero__layers {
+    position: relative;
+    grid-row: 4;
+    grid-column: 1 / -1;
+    align-self: center;
+    width: auto;
+    padding: var(--s-4);
+    border-radius: var(--r-md);
+    background: color-mix(in oklab, var(--bg) 72%, transparent);
+    backdrop-filter: blur(6px);
+    transform: none;
+  }
+
+  .hero__layers li {
+    padding-left: var(--s-4);
+  }
+
+  .hero__actions {
+    grid-row: 5;
+    flex-direction: column;
+    justify-self: stretch;
+  }
+
+  .hero__actions .button {
+    justify-content: space-between;
+  }
+}
+
+/* Reduced motion and the static profile share one composition: the hero is a
+   single screen, and the layer descriptions are simply present. */
+@media (prefers-reduced-motion: reduce) {
+  .hero__pin {
+    height: auto;
+  }
+
+  .hero__frame {
+    position: static;
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .hero__line-inner {
+    animation: none;
+  }
+
+  /* The layer names are content here, not an overlay revealed by scrolling, so
+     they take their own column beside the lead instead of sitting over the
+     headline. */
+  .hero__layers {
+    position: static;
+    grid-column: 1 / 5;
+    width: auto;
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero__aside {
+    grid-column: 5 / 9;
+  }
+
+  .hero__actions {
+    grid-column: 9 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 767px) {
+  .hero__layers,
+  .hero__aside,
+  .hero__actions {
+    grid-column: 1 / -1;
+  }
+
+  .hero__layers {
+    grid-row: 4;
+  }
+}
