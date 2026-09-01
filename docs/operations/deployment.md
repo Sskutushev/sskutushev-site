@@ -35,6 +35,19 @@ Two accounts. Neither can be created on someone's behalf.
    - `DATABASE_URL` — the CockroachDB connection string
    - `GEMINI_API_KEY` — a key from Google AI Studio
    - `GEMINI_PROJECT_ID` — the project the key belongs to
+   - `GITHUB_TOKEN` — a token with no scopes, for the activity panel
+
+The token is worth a sentence, because "no scopes" reads like a mistake. The
+panel lists public repositories, so nothing is being unlocked; what the token
+buys is rate limit. GitHub counts unauthenticated calls per IP address, a shared
+host spends that allowance on its other tenants, and the panel answered 403 on
+the first deployment while every other query on the same service was fine. A
+scopeless token raises the ceiling without granting a single permission, which
+is the least authority that solves it.
+
+Without it the panel degrades honestly — it says `OFFLINE` and the rest of the
+page is unaffected — so this is the difference between a working feature and a
+visibly missing one, not between a working site and a broken one.
 
 `REDIS_URL` is wired to the Key Value instance by the blueprint. `WEB_ORIGIN` is
 already `https://sskutushev.github.io` — the exact origin the browser sends, with

@@ -55,6 +55,13 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+      # The activity panel reads a public repository list, so the token buys
+      # nothing but quota — and quota is the whole problem. Unauthenticated
+      # calls are rate-limited per IP, a shared host burns that allowance on
+      # its other tenants, and the first deployment answered every request
+      # with 403. A token with no scopes at all is enough.
+      - key: GITHUB_TOKEN
+        sync: false
       - key: GEMINI_PROJECT_ID
         sync: false
 

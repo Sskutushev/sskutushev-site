@@ -18,13 +18,29 @@ export function Work({
   copy,
   locale,
   cases,
+  onNote,
 }: {
   copy: SiteCopy;
   locale: Locale;
   cases: Portfolio['caseStudies'];
+  /**
+   * Reported upward because the dialog scrolls its own body, and the document
+   * wheel smoother has to let go of the wheel while it does. See ADR-017.
+   */
+  onNote: (open: boolean) => void;
 }): React.JSX.Element {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
-  const closeNote = useCallback(() => setOpenSlug(null), []);
+  const openNoteFor = useCallback(
+    (slug: string) => {
+      setOpenSlug(slug);
+      onNote(true);
+    },
+    [onNote],
+  );
+  const closeNote = useCallback(() => {
+    setOpenSlug(null);
+    onNote(false);
+  }, [onNote]);
   // Resolved from the notes rather than from `cases`: the portfolio query can
   // resolve, fail or switch locale while the dialog is open, and a lookup into
   // the data would make it vanish mid-read on whichever of those happens first.
@@ -56,7 +72,7 @@ export function Work({
               {caseNotes[item.slug] && (
                 <button
                   className="button button--quiet case__open"
-                  onClick={() => setOpenSlug(item.slug)}
+                  onClick={() => openNoteFor(item.slug)}
                   type="button"
                 >
                   {copy.work.open}
