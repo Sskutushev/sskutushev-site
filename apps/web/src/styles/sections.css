@@ -10,8 +10,26 @@
   margin: 0;
 }
 
+/* The image is the button's whole content, so the button carries no chrome of
+   its own beyond the pointer it deserves for being one. */
+.manifesto__portrait-open {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  cursor: zoom-in;
+}
+
+/* `height: auto` is load-bearing. The element carries `height="640"` so the
+   browser can reserve the box before the file arrives, and a presentational
+   height is a used value: `aspect-ratio` only governs when one axis is auto,
+   so without this the picture was 640px tall at every width and the ratio
+   below was decoration. */
 .manifesto__portrait img {
+  display: block;
   width: 100%;
+  height: auto;
   aspect-ratio: 4 / 5;
   border-radius: var(--r-md);
   object-fit: cover;
@@ -363,9 +381,29 @@
 }
 
 @media (max-width: 767px) {
-  .manifesto__portrait,
   .manifesto__stack {
     grid-column: 1 / -1;
+  }
+
+  /* A thumbnail, beside its own caption. At full column width the photograph
+     was a screen of its own that a reader scrolled past to reach the text it
+     belongs to; the detail is a tap away instead. */
+  .manifesto__portrait {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+  }
+
+  .manifesto__portrait-open {
+    flex: 0 0 auto;
+    width: 6.5rem;
+  }
+
+  .manifesto__portrait figcaption {
+    flex-direction: column;
+    gap: var(--s-1);
+    margin-top: 0;
   }
 
   .timeline__item {
@@ -381,10 +419,43 @@
   }
 
   /* Stacked: the visual keeps a reserved band above the copy rather than
-     competing with it for a column that is no longer there. */
+     competing with it for a column that is no longer there.
+
+     The padding is the section's own rule at desktop scale, and at this width
+     it put roughly a screen of nothing between the section rule and the first
+     chapter's rule — two hairlines with a void between them, which reads as a
+     block that failed to render rather than as breathing room. */
   .case {
     min-height: 0;
-    gap: var(--s-5);
+    gap: var(--s-3);
+    padding: var(--s-6) 0 var(--s-7);
+  }
+
+  /* The section's rule and the first chapter's rule are the same line drawn
+     twice, with a band of nothing between them — which is what made the top of
+     this section read as a block that had failed to render. The rule between
+     chapters is the one worth keeping. */
+  .section--work .case:first-of-type {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  /* The number and the tag are one line of metadata, not two blocks. Side by
+     side they cost one row instead of two and stop the tag reading as a
+     heading of its own above the real title. */
+  .case__index {
+    grid-column: 1 / 2;
+    grid-row: 1;
+    align-self: baseline;
+  }
+
+  .case__tag {
+    grid-column: 2 / -1;
+    align-self: baseline;
+  }
+
+  .case__title {
+    margin-top: var(--s-2);
   }
 
   /* Stacked, and in reading order: number, tag, title, visual, then the copy
@@ -396,8 +467,6 @@
 
   /* Every child of the dissolved copy wrapper needs its own placement: one
      left off the list lands in a one-column implicit track and clips. */
-  .case__index,
-  .case__tag,
   .case__title,
   .case__visual,
   .case__problem,
@@ -407,37 +476,30 @@
     grid-column: 1 / -1;
   }
 
-  /* The tag keeps the row it is given above, where it sits beside the index in
-     its own column. Here every child is full width, so it needs a row of its
-     own: without this it stayed on row 1 and printed straight over the number. */
-  .case__tag {
-    grid-row: 2;
-  }
-
   .case__title {
-    grid-row: 3;
+    grid-row: 2;
     margin-bottom: 0;
     max-width: none;
   }
 
   .case__visual {
-    grid-row: 4;
+    grid-row: 3;
   }
 
   .case__problem {
-    grid-row: 5;
+    grid-row: 4;
   }
 
   .case__result {
-    grid-row: 6;
+    grid-row: 5;
   }
 
   .case__stack {
-    grid-row: 7;
+    grid-row: 6;
   }
 
   .case__open {
-    grid-row: 8;
+    grid-row: 7;
     justify-self: start;
   }
 

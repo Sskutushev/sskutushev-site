@@ -1,4 +1,5 @@
 import type { SiteCopy } from '../content/site-copy';
+import { Portrait } from './Portrait';
 
 export function Manifesto({ copy }: { copy: SiteCopy }): React.JSX.Element {
   return (
@@ -15,19 +16,7 @@ export function Manifesto({ copy }: { copy: SiteCopy }): React.JSX.Element {
             </span>
           ))}
         </h2>
-        <figure className="manifesto__portrait">
-          <img
-            alt="Сергей Кутушев"
-            height="640"
-            loading="lazy"
-            src={`${import.meta.env.BASE_URL}profile.jpg`}
-            width="512"
-          />
-          <figcaption className="t-meta-sm">
-            <span>Sergey Kutushev</span>
-            <span>Saint Petersburg · UTC+3</span>
-          </figcaption>
-        </figure>
+        <Portrait copy={copy} />
         <p className="manifesto__body t-body-lg">{copy.manifesto.body}</p>
         <dl className="manifesto__stack">
           {copy.manifesto.stack.map((entry) => (

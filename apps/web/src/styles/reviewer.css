@@ -148,12 +148,14 @@
 @media (max-width: 767px) {
   /* Below the copy rather than behind it: at this width it would sit under the
      closing sentence and take the contrast out of it. */
+  /* Gone on a phone. It is decoration — `aria-hidden`, the same object the
+     hero opened with, drawn once more at rest — and at this width it stopped
+     reading as that: a faint 14rem outline alone in a band of empty page looks
+     like an image that failed to load, which is worse than no image. The
+     closing composition is the words and the channels; on a small screen those
+     are the whole of it. */
   .contact__core {
-    position: static;
-    width: 14rem;
-    margin: var(--s-6) 0 0;
-    opacity: 0.28;
-    transform: none;
+    display: none;
   }
 
   .reviewer__steps {

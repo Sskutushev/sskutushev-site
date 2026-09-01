@@ -47,6 +47,28 @@ test.describe('responsive', () => {
       );
       // The hero stage bleeds past the frame on purpose and the frame clips it.
       expect(clipped.filter((name) => !name.startsWith('div.hero__frame'))).toEqual([]);
+
+      // A flow-diagram label is centred in a box drawn from its own length, and
+      // nothing clips an SVG text node: too wide and it simply prints out
+      // through both sides of the rounded rect it is supposed to sit in. That
+      // is what a media query raising the label size on phones did, while the
+      // box was still measured for the old one, so the box and the type are
+      // measured against each other here rather than trusted to agree.
+      const spilling = await page.evaluate(() =>
+        [...document.querySelectorAll('.flow__node')]
+          .map((node) => {
+            const text = node.querySelector('text');
+            const rect = node.querySelector('rect');
+            if (!text || !rect) return null;
+            const label = text.getBoundingClientRect();
+            const box = rect.getBoundingClientRect();
+            return label.width > box.width - 1
+              ? `${text.textContent ?? ''} ${Math.round(label.width)}>${Math.round(box.width)}`
+              : null;
+          })
+          .filter((entry) => entry !== null),
+      );
+      expect(spilling).toEqual([]);
     });
   }
 });

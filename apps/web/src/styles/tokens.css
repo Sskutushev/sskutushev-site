@@ -65,6 +65,11 @@
   --t-meta: 0.75rem;
   --t-meta-sm: 0.6875rem;
 
+  /* Flow-diagram node labels, in the diagram's own units. Read by the box that
+     holds them as well as by the type, so there is one number rather than two
+     that can drift apart. */
+  --flow-label: 2.6px;
+
   /* Space — 4px base */
   --s-1: 0.25rem;
   --s-2: 0.5rem;
