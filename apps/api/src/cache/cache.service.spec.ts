@@ -63,6 +63,47 @@ describe('CacheService', () => {
     ).resolves.toEqual({ value: 'last-known-good', stale: true });
   });
 
+  it('gives back the dates it was given, not the strings JSON made of them', async () => {
+    // The failure this pins reached production. `JSON.stringify` turns a Date
+    // into a string, so a warm cache handed the GraphQL layer a string where
+    // the schema promised a DateTime, and the field resolved to an error
+    // instead of a value. A cold cache never showed it: the loader's own Date
+    // went straight through.
+    const observedAt = new Date('2026-09-01T13:15:00.000Z');
+    await cache.getOrLoad('weather', 30, 60, () => Promise.resolve({ city: 'SPB', observedAt }));
+    const written = JSON.parse(redis.set.mock.calls[0]![1] as string) as { value: unknown };
+    expect(written).toMatchObject({ value: { observedAt: '2026-09-01T13:15:00.000Z' } });
+
+    redis.get.mockResolvedValue(
+      JSON.stringify({ value: { city: 'SPB', observedAt }, freshUntil: Date.now() + 60_000 }),
+    );
+    const { value } = await cache.getOrLoad('weather', 30, 60, () => {
+      throw new Error('the cache should have answered');
+    });
+    expect((value as { observedAt: unknown }).observedAt).toBeInstanceOf(Date);
+    expect((value as { observedAt: Date }).observedAt.toISOString()).toBe(
+      '2026-09-01T13:15:00.000Z',
+    );
+    // A string is not promoted just for looking like a timestamp in passing.
+    expect((value as { city: unknown }).city).toBe('SPB');
+  });
+
+  it('leaves a string that is merely date-shaped alone', async () => {
+    redis.get.mockResolvedValue(
+      JSON.stringify({
+        value: { period: '2026-09-01', label: '2026-09-01T13:15:00Z' },
+        freshUntil: Date.now() + 60_000,
+      }),
+    );
+    const { value } = await cache.getOrLoad('shape', 30, 60, () => {
+      throw new Error('the cache should have answered');
+    });
+    // Neither is what `Date.prototype.toJSON` writes, so neither is a date the
+    // cache put there, and reviving them would be the same class of mistake in
+    // the other direction.
+    expect(value).toEqual({ period: '2026-09-01', label: '2026-09-01T13:15:00Z' });
+  });
+
   it('invalidates multiple cache keys without failing the write path', async () => {
     await cache.delete('portfolio:v2:ru', 'portfolio:v2:en');
     expect(redis.del).toHaveBeenCalledWith('portfolio:v2:ru', 'portfolio:v2:en');

@@ -110,6 +110,11 @@ jobs:
           uploadArtifacts: true
       - name: Copy Lighthouse evidence
         run: cp .lighthouseci/*.report.json artifacts/lighthouse/
+      # `QUALITY_ENVIRONMENT` used to sit on the import step below, where the
+      # report had already been written and nothing read it. Setting it here
+      # would work and would also be a lie: these numbers come off a CI runner,
+      # not out of production, and the panel exists to say what was actually
+      # measured. So the report keeps its own default of `ci`.
       - run: node scripts/build-quality-report.mjs
       - uses: actions/upload-artifact@v4
         with: { name: quality-report, path: artifacts/quality-report.json }
@@ -134,5 +139,4 @@ jobs:
         env:
           QUALITY_IMPORT_URL: '${{ vars.QUALITY_IMPORT_URL }}'
           QUALITY_IMPORT_TOKEN: '${{ secrets.QUALITY_IMPORT_TOKEN }}'
-          QUALITY_ENVIRONMENT: production
         run: node scripts/import-quality-report.mjs

@@ -18,6 +18,11 @@ jobs:
       # The k6 job measures application throughput. Rate limiting is covered by
       # dedicated middleware tests and must not turn this into a 429 test.
       RATE_LIMIT_PER_MINUTE: 100000
+      # The workflow's own token, which reads public repositories and nothing
+      # else. It is here so the activity query below is a real answer rather
+      # than a rate-limited 403, because that query is the one contract that
+      # carries a date through the cache.
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - name: Start database and cache
@@ -72,6 +77,17 @@ jobs:
           curl --fail http://127.0.0.1:4417/graphql \
             -H 'content-type: application/json' \
             --data '{"query":"query { portfolioData(locale: EN) { profile { fullName version } } latestQualityRun { sha } systemEvents(limit: 1) { type } }"}'
+          # Twice, and the second time is the point: the first call fills the
+          # cache and the second is served from it. A value that has been
+          # through Redis has been through JSON, and every date in it comes back
+          # a string unless something puts the type back. Asking once never
+          # showed that, which is how it reached production.
+          for attempt in 1 2; do
+            activity=$(curl --fail --silent --show-error http://127.0.0.1:4417/graphql \
+              -H 'content-type: application/json' \
+              --data '{"query":"query { githubActivity { capturedAt repositories { name pushedAt } } }"}')
+            node -e "const r=JSON.parse(process.argv[1]); if (r.errors) { console.error(r.errors); process.exit(1) } if (!r.data?.githubActivity?.capturedAt) process.exit(1)" "$activity"
+          done
           K6_BASE_URL=http://127.0.0.1:4417 k6 run --summary-export=k6-summary.json performance/k6/api.js
       - uses: actions/upload-artifact@v4
         if: always()
