@@ -4,6 +4,32 @@ import Redis from 'ioredis';
 
 type Envelope<T> = { value: T; freshUntil: number; staleUntil: number };
 
+/**
+ * Exactly what `Date.prototype.toJSON` produces, and nothing looser.
+ *
+ * The pattern is narrow on purpose. A reviver that accepted anything
+ * date-shaped would turn genuine strings into dates on the way out of the
+ * cache, which is a subtler version of the bug it exists to fix.
+ */
+const SERIALISED_DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
+/**
+ * Put back the one type JSON cannot carry.
+ *
+ * `JSON.stringify` turns every `Date` into a string, so a value read back from
+ * Redis is not the value that was written — and the cast below said it was.
+ * On a cache miss the GraphQL layer received real dates and served them; on a
+ * hit it received strings, and `DateTime.serialize` refuses a string, so the
+ * whole field resolved to an error. That failed only with a warm cache, which
+ * is why it reached production: nothing in CI ever asked for a cached date
+ * twice.
+ *
+ * The cache is what erased the type, so the cache is what restores it.
+ */
+function reviveDates(_key: string, value: unknown): unknown {
+  return typeof value === 'string' && SERIALISED_DATE.test(value) ? new Date(value) : value;
+}
+
 @Injectable()
 export class CacheService implements OnModuleDestroy {
   private readonly redis: Redis;
@@ -81,7 +107,7 @@ export class CacheService implements OnModuleDestroy {
     try {
       if (this.redis.status === 'wait') await this.redis.connect();
       const raw = await this.redis.get(key);
-      return raw ? (JSON.parse(raw) as Envelope<T>) : null;
+      return raw ? (JSON.parse(raw, reviveDates) as Envelope<T>) : null;
     } catch {
       return null;
     }
