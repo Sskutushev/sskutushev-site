@@ -18,19 +18,28 @@ const root = fileURLToPath(new URL('../../../../', import.meta.url));
 describe('case notes', () => {
   it('quote their file verbatim', () => {
     for (const [slug, note] of Object.entries(caseNotes)) {
-      const source = readFileSync(root + note.code.file, 'utf8');
       const excerpt = note.code.lines.join('\n');
       expect(excerpt.length, slug).toBeGreaterThan(0);
+      // A note from another repository is not on this disk. It is checked over
+      // the network at its pinned commit by `scripts/check-quoted-code.mjs`,
+      // which runs as its own step rather than inside a unit test: a test that
+      // reaches GitHub fails for reasons that have nothing to do with the code.
+      if (note.code.repository) continue;
+      const source = readFileSync(root + note.code.file, 'utf8');
       expect(source.includes(excerpt), `${slug} → ${note.code.file}`).toBe(true);
     }
   });
 
-  it('quote only this repository', () => {
-    // Nothing from a private codebase is copied here. A public implementation
-    // elsewhere is linked, not pasted, because only this repository's files can
-    // be held to the assertion above.
+  it('pin every excerpt to something that cannot move', () => {
+    // Nothing from a private codebase is copied here. A public repository of
+    // Sergey's is quoted at a commit, never at a branch: the whole point of
+    // showing code is that a reviewer can check it, and a branch link stops
+    // being a check the moment the branch moves.
     for (const [slug, note] of Object.entries(caseNotes)) {
       expect(note.code.file, slug).not.toMatch(/^(\.\.|\/|[a-zA-Z]:)/);
+      if (!note.code.repository) continue;
+      expect(note.code.repository.name, slug).toMatch(/^[A-Za-z0-9._-]+$/);
+      expect(note.code.repository.commit, slug).toMatch(/^[0-9a-f]{40}$/);
     }
   });
 

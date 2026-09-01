@@ -4,7 +4,38 @@ import type { SiteCopy } from '../content/site-copy';
 import type { Locale } from '../lib/portfolio';
 import type { CaseNote } from './case-notes';
 
-const REPOSITORY = 'https://github.com/Sskutushev/sskutushev-site/blob/main/';
+const OWNER = 'https://github.com/Sskutushev';
+
+/**
+ * Drop the indentation every line shares.
+ *
+ * The excerpt is stored exactly as the file has it, which is what the checks
+ * assert and what the link goes to. Displayed that way, a slice from three
+ * levels deep spends a third of the panel on empty margin and pushes the
+ * comments — the most informative lines in it — off the right edge. Removing
+ * only the common prefix keeps the shape of the code, which is the part that
+ * carries meaning, and costs nothing a reader was using.
+ */
+function dedent(lines: string[]): string {
+  const indents = lines
+    .filter((line) => line.trim().length > 0)
+    .map((line) => line.length - line.trimStart().length);
+  const common = indents.length ? Math.min(...indents) : 0;
+  return lines.map((line) => line.slice(common)).join('\n');
+}
+
+/**
+ * Where the excerpt can be read in full.
+ *
+ * A note from another repository is pinned to a commit rather than to a
+ * branch: the point of showing code is that a reviewer can check it, and a
+ * branch link stops being a check the moment the branch moves.
+ */
+function sourceUrl(code: CaseNote['code']): string {
+  return code.repository
+    ? `${OWNER}/${code.repository.name}/blob/${code.repository.commit}/${code.file}`
+    : `${OWNER}/sskutushev-site/blob/main/${code.file}`;
+}
 
 /**
  * The reasoning behind one case, with the code that carries it.
@@ -104,13 +135,15 @@ export function CaseDialog({
 
           <figure className="note__code">
             <figcaption className="t-meta-sm">
-              <a href={`${REPOSITORY}${note.code.file}`} rel="noreferrer" target="_blank">
-                {note.code.file}
+              <a href={sourceUrl(note.code)} rel="noreferrer" target="_blank">
+                {note.code.repository
+                  ? `${note.code.repository.name} · ${note.code.file}`
+                  : note.code.file}
                 <ArrowUpRight aria-hidden size={13} strokeWidth={1.5} />
               </a>
             </figcaption>
             <pre>
-              <code>{note.code.lines.join('\n')}</code>
+              <code>{dedent(note.code.lines)}</code>
             </pre>
           </figure>
         </div>

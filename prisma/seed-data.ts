@@ -90,7 +90,7 @@ export const cases = [
     resultRu: 'Search V2 и виртуализация выдачи сняли с браузера примерно 75% работы.',
     resultEn:
       'Search V2 and a virtualised result list took roughly 75% of the work off the browser.',
-    tech: ['Redis', 'React', 'TanStack Query', 'TypeScript'],
+    tech: ['Redis', 'React', 'TanStack Query', 'TypeScript', '.NET'],
   },
   {
     slug: 'image-similarity',
@@ -124,7 +124,7 @@ export const cases = [
       'Money in decimal, a daily invariant, optimistic locking, and the recalculation inside a single transaction.',
     resultRu: 'Конкурирующие правки отклоняются явно. Начисления не пропадают молча.',
     resultEn: 'Competing edits are rejected out loud. Accruals do not disappear quietly.',
-    tech: ['TypeScript', 'CockroachDB', 'Prisma', 'C#'],
+    tech: ['TypeScript', 'CockroachDB', 'Prisma', 'C#', 'MongoDB'],
   },
   {
     slug: 'production-migration',

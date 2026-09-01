@@ -156,12 +156,18 @@ test.describe('reduced motion', () => {
 
     const note = page.locator('dialog.note');
     await expect(note).toBeVisible();
-    // The excerpt is the claim: it names its file and shows the branch that
-    // makes a provider outage a degradation rather than an outage.
-    await expect(note).toContainText('apps/api/src/cache/cache.service.ts');
-    await expect(note.locator('pre code')).toContainText(
-      'return { value: cached.value, stale: true }',
+    // The excerpt is the claim, so it names the repository it comes from and
+    // shows the branch that makes a provider outage a degradation rather than
+    // an outage. The link beside it is pinned to a commit; a branch link stops
+    // being checkable the moment the branch moves.
+    await expect(note).toContainText(
+      'Power-Test · src/Weather.Infrastructure/WeatherApi/CachingWeatherProvider.cs',
     );
+    await expect(note.getByRole('link')).toHaveAttribute(
+      'href',
+      /^https:\/\/github\.com\/Sskutushev\/Power-Test\/blob\/[0-9a-f]{40}\//,
+    );
+    await expect(note.locator('pre code')).toContainText('return stale with { IsStale = true };');
 
     // `close()` queues its event; a dialog that reopens on the same tick used
     // to close itself a frame after opening.

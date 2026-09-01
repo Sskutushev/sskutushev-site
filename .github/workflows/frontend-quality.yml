@@ -10,6 +10,11 @@ jobs:
       - run: pnpm --filter @sskutushev/web lint
       - run: pnpm --filter @sskutushev/web typecheck
       - run: pnpm --filter @sskutushev/web test
+      # Reaches GitHub, which is why it is a step rather than a unit test: a
+      # suite that needs the network fails for reasons unrelated to the code
+      # under it. Here a failure means one thing — an excerpt shown to a
+      # reviewer is no longer the code it claims to be.
+      - run: pnpm quality:quoted-code
       - run: pnpm --filter @sskutushev/web build
       - run: pnpm --filter @sskutushev/web exec playwright install --with-deps chromium
       - run: pnpm --filter @sskutushev/web test:e2e
