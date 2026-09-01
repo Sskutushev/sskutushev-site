@@ -313,10 +313,51 @@
      the floating nav when the content is taller than the viewport. */
   .hero__frame {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-rows: auto auto auto minmax(10rem, 1fr) auto;
+    /* The object's band is the one row worth having: it is the subject, and at
+       10rem it was a letterbox the object rendered small inside while the
+       layer panel that shares the row lost its third entry off the bottom. */
+    grid-template-rows: auto auto auto minmax(15rem, 1fr) auto;
     align-content: stretch;
-    gap: var(--s-4);
-    padding-top: calc(var(--nav-height) + var(--s-5));
+    gap: var(--s-3);
+    padding-top: calc(var(--nav-height) + var(--s-4));
+    padding-bottom: var(--s-5);
+  }
+
+  /* The three lines are authored for a wide screen, where one of them passes
+     behind the object. Here the object has a band of its own below the type,
+     so nothing passes behind anything and the authored breaks buy nothing —
+     they only leave a ragged edge with a third of the width unused. Set
+     inline, the heading breaks where this screen actually runs out of room. */
+  .hero__title {
+    display: block;
+  }
+
+  .hero__line {
+    display: inline;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    overflow: visible;
+  }
+
+  .hero__line + .hero__line::before {
+    content: ' ';
+  }
+
+  /* Inline boxes cannot be translated, so the entrance is opacity alone here.
+     It reads the same at this size and it is the half that was doing the work. */
+  .hero__line-inner {
+    display: inline;
+    animation-name: hero-line-fade;
+  }
+
+  @keyframes hero-line-fade {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   .hero__eyebrow,
@@ -348,11 +389,18 @@
     margin: 0 calc(var(--gutter) * -1);
   }
 
+  /* Over the whole frame, not inside the object's row. The panel appears as
+     the type fades out, so by the time it is legible there is nothing else on
+     the screen to share the height with — and confined to that one row it did
+     not fit: the frame clips rather than scrolls, and the third layer was cut
+     in half by the section below. */
   .hero__layers {
-    position: relative;
-    grid-row: 4;
-    grid-column: 1 / -1;
-    align-self: center;
+    position: absolute;
+    inset: calc(var(--nav-height) + var(--s-4)) var(--gutter) var(--s-5);
+    grid-row: auto;
+    grid-column: auto;
+    justify-content: center;
+    gap: var(--s-4);
     width: auto;
     padding: var(--s-4);
     border-radius: var(--r-md);
@@ -363,6 +411,24 @@
 
   .hero__layers li {
     padding-left: var(--s-4);
+  }
+
+  /* Three entries have to fit a band this tall, and the frame clips rather
+     than scrolls: the third used to be cut in half by the section below. The
+     claim is what a reader needs here, so the chips and the gain step down
+     with it rather than being dropped — a layer that says less than the one
+     above it reads as unfinished. */
+  .hero__layers > li {
+    gap: var(--s-1) var(--s-4);
+  }
+
+  .hero__layer-body {
+    font-size: var(--t-small);
+  }
+
+  .hero__layer-gain,
+  .hero__layer-stack li {
+    font-size: var(--t-meta-sm);
   }
 
   .hero__actions {

@@ -107,8 +107,17 @@
   font-family: var(--font-mono);
   font-size: var(--t-meta);
   line-height: 1.7;
-  white-space: pre;
   tab-size: 2;
+}
+
+/* A blank line in the excerpt is a blank line on the page: an empty block
+   collapses to nothing and the shape of the code goes with it. The indentation
+   arrives as `--indent`, in characters, rather than as leading spaces. */
+.note__code-line {
+  display: block;
+  min-height: 1lh;
+  padding-left: calc(var(--indent, 0) * 1ch);
+  white-space: pre;
 }
 
 @media (max-width: 1023px) {
@@ -131,4 +140,54 @@
   .note__body {
     padding: var(--s-5) var(--s-4);
   }
+
+  /* On a phone the horizontal scrollbar above is the wrong answer. A reader
+     holding the device in one hand cannot pan a code block and follow it at
+     the same time, and half of every line — including the comments that carry
+     the argument — sits off-screen until they do. So the excerpt wraps here.
+     Wrapping does change what the code looks like, which is why the hanging
+     indent exists: a continuation line is set in from the line it belongs to,
+     so a wrap never reads as a new statement. */
+  .note__code pre {
+    padding: var(--s-4);
+    overflow-x: visible;
+  }
+
+  .note__code code {
+    font-size: var(--t-meta-sm);
+    line-height: 1.6;
+  }
+
+  .note__code-line {
+    padding-left: calc((var(--indent, 0) + 2) * 1ch);
+    text-indent: -2ch;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* The portrait at full size, over an inert page. Sized to the viewport rather
+   than to the image so a tall photograph on a short screen is still whole. */
+.portrait-view {
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.portrait-view img {
+  display: block;
+  width: auto;
+  max-width: 92vw;
+  height: auto;
+  max-height: 88dvh;
+  border-radius: var(--r-md);
+  cursor: zoom-out;
+  object-fit: contain;
+}
+
+.portrait-view::backdrop {
+  backdrop-filter: blur(6px);
+  background: color-mix(in oklab, var(--bg) 78%, transparent);
 }

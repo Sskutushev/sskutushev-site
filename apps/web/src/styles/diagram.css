@@ -124,10 +124,15 @@
     stroke var(--d-interface) var(--ease-interface);
 }
 
+/* The size is `--flow-label`, declared once, because the box a label sits in is
+   drawn from the same number in `FlowDiagram.tsx`. They were two numbers: a
+   media query raised the label to 2.8 for legibility on a phone while the box
+   was still measured at 2.4, so every long label — ALREADY APPLIED, COCKROACHDB
+   — printed out through both sides of its own rounded rect. */
 .flow__node text {
   fill: var(--text-secondary);
   font-family: var(--font-mono);
-  font-size: 2.4px;
+  font-size: var(--flow-label);
   letter-spacing: 0.1px;
   transition: fill var(--d-interface) var(--ease-interface);
 }
@@ -259,10 +264,6 @@
   .flow,
   .projection {
     padding: var(--s-5) var(--s-4);
-  }
-
-  .flow__node text {
-    font-size: 2.8px;
   }
 }
 

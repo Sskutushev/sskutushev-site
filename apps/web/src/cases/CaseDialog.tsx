@@ -16,12 +16,12 @@ const OWNER = 'https://github.com/Sskutushev';
  * only the common prefix keeps the shape of the code, which is the part that
  * carries meaning, and costs nothing a reader was using.
  */
-function dedent(lines: string[]): string {
+function dedent(lines: string[]): string[] {
   const indents = lines
     .filter((line) => line.trim().length > 0)
     .map((line) => line.length - line.trimStart().length);
   const common = indents.length ? Math.min(...indents) : 0;
-  return lines.map((line) => line.slice(common)).join('\n');
+  return lines.map((line) => line.slice(common));
 }
 
 /**
@@ -143,7 +143,29 @@ export function CaseDialog({
               </a>
             </figcaption>
             <pre>
-              <code>{dedent(note.code.lines)}</code>
+              {/* One element per line of the file. On a phone the excerpt
+                  wraps rather than scrolling sideways, and a wrapped line has
+                  to stay recognisable as a continuation of the one above it —
+                  which needs a hanging indent, and a hanging indent needs each
+                  line to be a block of its own. */}
+              <code>
+                {dedent(note.code.lines).map((line, index) => {
+                  // The line's own indentation becomes padding rather than
+                  // leading spaces, so a wrapped line can be set two characters
+                  // deeper than the line it continues instead of falling back
+                  // to the left edge and reading as a new statement.
+                  const indent = line.length - line.trimStart().length;
+                  return (
+                    <span
+                      className="note__code-line"
+                      key={`${String(index)}:${line}`}
+                      style={{ '--indent': indent } as React.CSSProperties}
+                    >
+                      {line.trimStart()}
+                    </span>
+                  );
+                })}
+              </code>
             </pre>
           </figure>
         </div>

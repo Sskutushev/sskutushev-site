@@ -52,7 +52,12 @@ export interface SiteCopy {
     loading: string;
     buildMissing: string;
   };
-  manifesto: { lines: string[]; body: string; stack: { label: string; value: string }[] };
+  manifesto: {
+    lines: string[];
+    body: string;
+    portrait: string;
+    stack: { label: string; value: string }[];
+  };
   work: { note: string; open: string };
   reviewer: {
     label: string;

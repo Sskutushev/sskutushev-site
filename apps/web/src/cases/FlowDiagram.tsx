@@ -12,8 +12,16 @@ import {
 } from './flow-diagram';
 
 const NODE_H = 9;
-/** Diagram units per character at the label's font size, plus padding. */
-const NODE_CH = 1.55;
+/**
+ * Diagram units per character at `--flow-label`, plus padding.
+ *
+ * The two numbers are one decision: a label wider than the box it is centred
+ * in prints out through both of its sides, and nothing clips it. This held
+ * until a media query raised the label size on phones and left the box
+ * measured for the old one. `responsive.spec.ts` now measures the drawn text
+ * against the drawn box, so a change to either is caught by the other.
+ */
+const NODE_CH = 1.68;
 const NODE_PAD = 5;
 
 function nodeWidth(label: string): number {

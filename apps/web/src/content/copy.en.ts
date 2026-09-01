@@ -56,6 +56,7 @@ export const copyEn: SiteCopy = {
     contact: 'Contact',
   },
   manifesto: {
+    portrait: 'Open the photograph',
     lines: ['I do not collect', 'technologies.'],
     body: 'Eleven years of work, five of them writing code. Before that, sales at Coca-Cola HBC — which is why I still explain a system through its consequences rather than its stack. Every dependency here is present because it solves a specific problem, not because it reads well in a list. Under load only one thing matters: money is not lost, access is not granted by accident, and a missing value does not quietly become a convenient zero.',
     stack: [
