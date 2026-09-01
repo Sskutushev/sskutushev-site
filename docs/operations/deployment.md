@@ -36,6 +36,7 @@ Two accounts. Neither can be created on someone's behalf.
    - `GEMINI_API_KEY` — a key from Google AI Studio
    - `GEMINI_PROJECT_ID` — the project the key belongs to
    - `GITHUB_TOKEN` — a token with no scopes, for the activity panel
+   - `MANAGEMENT_TOKEN` — at least 32 characters, for the quality import below
 
 The token is worth a sentence, because "no scopes" reads like a mistake. The
 panel lists public repositories, so nothing is being unlocked; what the token
@@ -74,6 +75,27 @@ Settings → Secrets and variables → Actions → **Variables** (not Secrets):
 ```
 PUBLIC_GRAPHQL_URL = https://<service>.onrender.com/graphql
 ```
+
+And, so the quality panel shows the numbers rather than `NO RUN`:
+
+```
+QUALITY_IMPORT_URL = https://<service>.onrender.com/graphql   (variable)
+QUALITY_IMPORT_TOKEN = <the same MANAGEMENT_TOKEN>            (secret)
+```
+
+`16 · Quality evidence` measures the tests, the coverage, the bundle and
+Lighthouse on the commit it is running, and it has always written those numbers
+into the throwaway database it starts for itself. With these two set it also
+posts them to the deployed API, but only from a push to `main`: a pull request
+measures a branch that may never land, and publishing it would leave the panel
+describing code that is not deployed.
+
+The write needs `ENABLE_MUTATIONS=true` on the service, which used to demand S3
+credentials for a deployment that never touches an object. `ENABLE_MUTATIONS`
+was answering two questions at once — may this be written to, and does it have
+an object store — so the second moved to `ENABLE_ASSET_MUTATIONS`, which the
+blueprint leaves off. Without either token the panel says `NO RUN` and nothing
+else on the page is affected.
 
 It is a variable because `ci.yml` reads `vars.PUBLIC_GRAPHQL_URL`, and because a
 URL a browser is about to request is not a secret. The next build bakes it into

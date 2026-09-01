@@ -123,8 +123,14 @@ jobs:
           aws s3 cp artifacts/quality-report.json
           "s3://${{ vars.QUALITY_S3_BUCKET }}/quality/${GITHUB_SHA}.json"
           --endpoint-url "${{ vars.QUALITY_S3_ENDPOINT }}"
+      # Only from a merged commit. A pull request measures a branch that may
+      # never land, and publishing it would leave the dashboard describing code
+      # that is not deployed — the exact drift the panel exists to rule out.
       - name: Import measured dashboard data
-        if: env.QUALITY_IMPORT_TOKEN != ''
+        if: >-
+          env.QUALITY_IMPORT_TOKEN != '' &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main'
         env:
           QUALITY_IMPORT_URL: '${{ vars.QUALITY_IMPORT_URL }}'
           QUALITY_IMPORT_TOKEN: '${{ secrets.QUALITY_IMPORT_TOKEN }}'
