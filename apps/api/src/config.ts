@@ -8,10 +8,10 @@ const schema = z
     DB_SLOW_QUERY_MS: z.coerce.number().int().nonnegative().default(250),
     DATABASE_URL: z.string().min(1),
     REDIS_URL: z.string().url(),
-    // Object storage is only written on the mutation path, and the deployed
-    // read surface has mutations off. Requiring credentials to boot meant a
-    // read-only deployment could not start without an account it never uses;
-    // `superRefine` below still demands them wherever they are actually needed.
+    // Object storage is written by the asset path alone. Requiring credentials
+    // to boot meant a deployment that never touches an object could not start
+    // without an account it never uses; `superRefine` below demands them from
+    // the flag that actually reaches storage.
     S3_ENDPOINT: z.string().url().optional(),
     S3_REGION: z.string().default('us-east-1'),
     S3_BUCKET: z.string().min(1).optional(),
@@ -29,6 +29,15 @@ const schema = z
       .enum(['true', 'false'])
       .default('false')
       .transform((value) => value === 'true'),
+    // Split from `ENABLE_MUTATIONS` because that flag was answering two
+    // independent questions at once: may this deployment be written to, and
+    // does it have an object store. They came apart the moment a deployment
+    // had to accept its own measured quality from CI while having no S3
+    // account at all — see `docs/operations/deployment.md`.
+    ENABLE_ASSET_MUTATIONS: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
     MANAGEMENT_TOKEN: z.string().min(32).optional(),
     GEMINI_API_KEY: z.string().min(20).optional(),
     GEMINI_MODEL: z.string().min(1).default('gemini-2.5-flash'),
@@ -42,13 +51,20 @@ const schema = z
         message: 'MANAGEMENT_TOKEN is required when mutations are enabled',
       });
     }
-    if (!value.ENABLE_MUTATIONS) return;
+    if (value.ENABLE_ASSET_MUTATIONS && !value.ENABLE_MUTATIONS) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['ENABLE_MUTATIONS'],
+        message: 'ENABLE_MUTATIONS is required when asset mutations are enabled',
+      });
+    }
+    if (!value.ENABLE_ASSET_MUTATIONS) return;
     for (const key of ['S3_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY', 'S3_SECRET_KEY'] as const) {
       if (value[key]) continue;
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: [key],
-        message: `${key} is required when mutations are enabled`,
+        message: `${key} is required when asset mutations are enabled`,
       });
     }
   });

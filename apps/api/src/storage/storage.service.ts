@@ -11,11 +11,11 @@ import { ConfigService } from '@nestjs/config';
 /**
  * Object storage, which a read-only deployment does not have.
  *
- * Everything that writes here is behind `ENABLE_MUTATIONS`, and the published
- * site turns that off. Building the client in the constructor meant the whole
- * API refused to boot without credentials for a service it would never call —
- * so the client is built when there is something to build it from, and every
- * method refuses in the open when there is not.
+ * Everything that writes here is behind `ENABLE_ASSET_MUTATIONS`, and the
+ * published site turns that off. Building the client in the constructor meant
+ * the whole API refused to boot without credentials for a service it would
+ * never call — so the client is built when there is something to build it
+ * from, and every method refuses in the open when there is not.
  *
  * Refusing is the point. An unconfigured store that silently returns nothing
  * is the false-fallback failure this codebase argues against everywhere else.

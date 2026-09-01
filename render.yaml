@@ -38,10 +38,19 @@ services:
       # string; `https://sskutushev.github.io/sskutushev-site` never matches.
       - key: WEB_ORIGIN
         value: https://sskutushev.github.io
-      # The published surface is read-only. With mutations off, object storage
-      # is never written, which is why no S3 credentials appear here.
+      # The one thing this deployment accepts a write for is its own measured
+      # quality, which CI posts after a green run on `main`. That write is
+      # behind `MANAGEMENT_TOKEN`, and it never touches an object, which is why
+      # no S3 credentials appear here.
       - key: ENABLE_MUTATIONS
+        value: true
+      # The asset path is the only one that reaches object storage, and the
+      # flag that gates it is the only one that makes S3 credentials a boot
+      # requirement. The published surface never uploads anything.
+      - key: ENABLE_ASSET_MUTATIONS
         value: false
+      - key: MANAGEMENT_TOKEN
+        sync: false
       # Background workers need a queue and something to put in it. Neither is
       # part of what a reviewer sees, and both cost the free instance memory.
       - key: ENABLE_WORKERS

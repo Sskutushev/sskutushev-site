@@ -74,5 +74,11 @@ export class AssetsService {
   private assertMutationsEnabled(): void {
     if (!this.config.get<boolean>('ENABLE_MUTATIONS'))
       throw new ForbiddenException('Mutations are disabled in this environment');
+    // The asset path is the only one that reaches object storage, and it is the
+    // only one whose flag makes S3 credentials a boot requirement. A deployment
+    // that accepts writes without an object store refuses here rather than
+    // failing later inside the storage client.
+    if (!this.config.get<boolean>('ENABLE_ASSET_MUTATIONS'))
+      throw new ForbiddenException('Asset mutations are disabled in this environment');
   }
 }
