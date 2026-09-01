@@ -285,6 +285,25 @@ test.describe('with motion enabled', () => {
     await expect(page.locator('canvas')).toHaveCount(0);
   });
 
+  test('a case note owns its scroll', async ({ page }) => {
+    // The counterpart of the drawer test below, and it has to live here rather
+    // than beside the other case-note assertions: those run under reduced
+    // motion, where Lenis never starts, so the wheel reaches the note whether
+    // or not anything suspends the scheduler.
+    await page.goto('/');
+    // Everything below the hero is a lazy chunk mounted after first paint.
+    await expect(page.locator('#work')).toBeAttached();
+    const chapter = page.locator('#case-search-cache-reliability');
+    await chapter.scrollIntoViewIfNeeded();
+    await chapter.getByRole('button', { name: 'Как это решено' }).click();
+
+    const body = page.locator('dialog.note .note__body');
+    await expect(body).toBeVisible();
+    await body.hover();
+    await page.mouse.wheel(0, 2000);
+    await expect.poll(() => body.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
+  });
+
   test('engineering drawer owns its scroll and closes on Escape', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: /engineering mode|инженерный режим/i }).click();

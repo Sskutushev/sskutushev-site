@@ -36,6 +36,44 @@ function seeded(seed: number): () => number {
 /** Shared with the renderer so the band line and the parked points agree. */
 export const UNKNOWN_BAND_Y = 54;
 
+/**
+ * Where a point may land: the full width of the diagram, and everything above
+ * the unknown band and the label that names it. Wider than any projection
+ * actually uses, because it is a limit rather than a layout.
+ */
+const PLOT = { minX: 3, maxX: 97, minY: 3, maxY: 46 };
+
+/**
+ * Move a point away from `from` by `factor`, stopping at the edge of the plot.
+ *
+ * `.projection__canvas` sets `overflow: visible`, so a position outside the
+ * `viewBox` is not clipped — it is drawn outside the bordered panel, over
+ * whatever the page has there. The direction of the push is what carries the
+ * meaning, so the ray is shortened rather than the coordinates squashed: a
+ * point that would land past an edge stops on it, still pointing the way it
+ * was pushed.
+ */
+function pushedFrom(
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  factor: number,
+): { x: number; y: number } {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const reach = (delta: number, low: number, high: number, origin: number): number =>
+    delta > 0
+      ? (high - origin) / delta
+      : delta < 0
+        ? (low - origin) / delta
+        : Number.POSITIVE_INFINITY;
+  const scale = Math.min(
+    factor,
+    reach(dx, PLOT.minX, PLOT.maxX, from.x),
+    reach(dy, PLOT.minY, PLOT.maxY, from.y),
+  );
+  return { x: from.x + dx * scale, y: from.y + dy * scale };
+}
+
 /** Rows with no basis sit on their own band, spread evenly along it. */
 function unknownPosition(index: number, total: number): { x: number; y: number } {
   return { x: 12 + (index / Math.max(total - 1, 1)) * 76, y: UNKNOWN_BAND_Y };
@@ -146,11 +184,7 @@ export function embeddingProjection(): ProjectionCase {
     // Neighbours of the query converge; everything else is pushed outward, so
     // the answer is a distance and not a highlight colour.
     const selected = clusterIndex === 1 && spread < 0.45;
-    const pull = selected ? 0.3 : 1.5;
-    const nearest = {
-      x: query.x + (embedded.x - query.x) * pull,
-      y: query.y + (embedded.y - query.y) * pull,
-    };
+    const nearest = pushedFrom(query, embedded, selected ? 0.3 : 1.25);
     return { id: `v${index}`, known: true, selected, positions: [catalogue, embedded, nearest] };
   });
 

@@ -40,6 +40,9 @@ function useHeroVisible(): { ref: React.RefObject<HTMLDivElement | null>; visibl
 export default function App(): React.JSX.Element {
   const [locale, setLocale] = useState<Locale>('RU');
   const [engineering, setEngineering] = useState(false);
+  // An open case note is the second overlay with its own scroll container. It
+  // suspends document smooth scrolling for the same reason the drawer does.
+  const [caseNote, setCaseNote] = useState(false);
   // The realtime socket opens only while the evidence section is on screen, or
   // while the drawer is open. Neither is owed a connection on first paint.
   const [evidenceVisible, setEvidenceVisible] = useState(false);
@@ -50,9 +53,9 @@ export default function App(): React.JSX.Element {
   const hero = useHeroVisible();
   const copy = siteCopy[locale];
 
-  // Document smooth scrolling is suspended while the drawer is open, so its own
-  // scroll container receives wheel events. See ADR-017.
-  useSmoothScroll(reduced || engineering);
+  // Document smooth scrolling is suspended while an overlay with its own scroll
+  // container is open, so that container receives wheel events. See ADR-017.
+  useSmoothScroll(reduced || engineering || caseNote);
 
   // Nothing below the hero, and no network call, is owed to the first paint:
   // the first screen is a 240vh pin and the page renders from the bundled
@@ -105,6 +108,7 @@ export default function App(): React.JSX.Element {
               dataDetail={dataDetail}
               dataState={dataState}
               locale={locale}
+              onCaseNote={setCaseNote}
               onEngineering={() => setEngineering(true)}
               onEvidenceVisible={setEvidenceVisible}
               runtime={runtime}

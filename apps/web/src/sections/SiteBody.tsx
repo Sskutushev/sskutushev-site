@@ -25,6 +25,7 @@ export function SiteBody({
   dataState,
   locale,
   runtime,
+  onCaseNote,
   onEvidenceVisible,
   onEngineering,
 }: {
@@ -34,13 +35,14 @@ export function SiteBody({
   dataState: DataState;
   locale: Locale;
   runtime: EngineeringMetrics;
+  onCaseNote: (open: boolean) => void;
   onEvidenceVisible: (visible: boolean) => void;
   onEngineering: () => void;
 }): React.JSX.Element {
   return (
     <>
       <Manifesto copy={copy} />
-      <Work cases={data.caseStudies} copy={copy} locale={locale} />
+      <Work cases={data.caseStudies} copy={copy} locale={locale} onNote={onCaseNote} />
       <Architecture copy={copy} detail={dataDetail} locale={locale} state={dataState} />
       <Engineering
         copy={copy}

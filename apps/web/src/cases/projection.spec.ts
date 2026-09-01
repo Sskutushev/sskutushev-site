@@ -29,6 +29,23 @@ describe('projections', () => {
     }
   });
 
+  it('keep every point inside the frame it is drawn in', () => {
+    // `.projection__canvas` sets `overflow: visible`, so a position outside the
+    // `viewBox` is drawn outside the bordered panel rather than clipped. The
+    // nearest-to-query projection pushes non-neighbours away from the query and
+    // used to send the outer clusters past the top and right edges.
+    for (const data of [rankingProjection(), embeddingProjection()]) {
+      for (const point of data.points) {
+        for (const position of point.positions) {
+          expect(position.x, `x of ${point.id}`).toBeGreaterThanOrEqual(2);
+          expect(position.x, `x of ${point.id}`).toBeLessThanOrEqual(98);
+          expect(position.y, `y of ${point.id}`).toBeGreaterThanOrEqual(2);
+          expect(position.y, `y of ${point.id}`).toBeLessThanOrEqual(58);
+        }
+      }
+    }
+  });
+
   it('gives every point one position per projection', () => {
     for (const data of [rankingProjection(), embeddingProjection()]) {
       for (const point of data.points) {
