@@ -175,7 +175,7 @@ const caseStudies: Record<Locale, readonly CaseRow[]> = {
       'Показать старые данные и показать выдуманные — это разные вещи, и путать их нельзя.',
       'Версионированный кэш, предсказуемые ключи, параллельные запросы схлопываются в один. Устарело — так и помечено.',
       'Search V2 и виртуализация выдачи сняли с браузера примерно 75% работы.',
-      ['Redis', 'React', 'TanStack Query', 'TypeScript'],
+      ['Redis', 'React', 'TanStack Query', 'TypeScript', '.NET'],
     ],
     [
       'image-similarity',
@@ -191,7 +191,7 @@ const caseStudies: Record<Locale, readonly CaseRow[]> = {
       'Округление ниже одного филса — это не погрешность. Это потерянные деньги, просто их не видно сразу.',
       'Деньги в decimal, дневной инвариант, оптимистичные блокировки и пересчёт внутри одной транзакции.',
       'Конкурирующие правки отклоняются явно. Начисления не пропадают молча.',
-      ['TypeScript', 'CockroachDB', 'Prisma', 'C#'],
+      ['TypeScript', 'CockroachDB', 'Prisma', 'C#', 'MongoDB'],
     ],
     [
       'production-migration',
@@ -225,7 +225,7 @@ const caseStudies: Record<Locale, readonly CaseRow[]> = {
       'Showing old data and showing invented data are different things, and they must not be confused.',
       'A versioned cache, predictable keys, concurrent requests collapsed into one. Stale is labelled stale.',
       'Search V2 and a virtualised result list took roughly 75% of the work off the browser.',
-      ['Redis', 'React', 'TanStack Query', 'TypeScript'],
+      ['Redis', 'React', 'TanStack Query', 'TypeScript', '.NET'],
     ],
     [
       'image-similarity',
@@ -241,7 +241,7 @@ const caseStudies: Record<Locale, readonly CaseRow[]> = {
       'Rounding below one fils is not a rounding error. It is lost money — it just does not look like it at first.',
       'Money in decimal, a daily invariant, optimistic locking, and the recalculation inside a single transaction.',
       'Competing edits are rejected out loud. Accruals do not disappear quietly.',
-      ['TypeScript', 'CockroachDB', 'Prisma', 'C#'],
+      ['TypeScript', 'CockroachDB', 'Prisma', 'C#', 'MongoDB'],
     ],
     [
       'production-migration',

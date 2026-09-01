@@ -10,12 +10,30 @@ export interface CaseNote {
   /** What happens without it. */
   otherwise: Record<Locale, string>;
   code: {
+    /**
+     * Which of Sergey's public repositories the excerpt is from. Omitted for
+     * this one, whose files the unit test reads from disk. Anything else is
+     * pinned to a commit, so the link a reviewer follows shows the same lines
+     * however far that repository moves afterwards, and
+     * `scripts/check-quoted-code.mjs` fetches it at that commit to prove it.
+     */
+    repository?: { name: string; commit: string };
     /** Repository-relative path. Asserted to contain the excerpt verbatim. */
     file: string;
     language: string;
     lines: string[];
   };
 }
+
+/**
+ * The commits the quoted repositories are pinned at. Named here rather than
+ * repeated per note: two excerpts from one repository must be read at the same
+ * revision, or the page shows two states of a codebase that never coexisted.
+ */
+const PINNED = {
+  'PM-GROWTH': '51a3455c9bacdadb0fbaa6d496e5f257f7b2e740',
+  'Power-Test': 'f8185713e3e9cb0dc88a3fdef75b13ff78577da2',
+} as const;
 
 /**
  * What each case actually decided, and the code that decides it.
@@ -26,7 +44,9 @@ export interface CaseNote {
  * reads as evidence while being decoration.
  *
  * Nothing from a private codebase is quoted. Where a case has a public
- * implementation elsewhere it is linked rather than copied.
+ * implementation in another of Sergey's repositories, that is what is shown:
+ * an excerpt written for this site to illustrate work done elsewhere argues
+ * the same point with weaker evidence.
  */
 export const caseNotes: Record<string, CaseNote> = {
   'money-entitlement': {
@@ -111,42 +131,53 @@ export const caseNotes: Record<string, CaseNote> = {
   },
   'search-cache-reliability': {
     context: {
-      RU: 'Дорогой внешний провайдер и всплески одинаковых запросов: без защиты сотня одновременных промахов по одному ключу превращается в сотню вызовов.',
-      EN: 'An expensive external provider and bursts of identical requests: unprotected, a hundred concurrent misses on one key become a hundred calls.',
+      RU: 'Дорогой внешний провайдер с квотой и всплески одинаковых запросов: без защиты сотня одновременных промахов по одному ключу превращается в сотню вызовов.',
+      EN: 'An expensive external provider on a quota, and bursts of identical requests: unprotected, a hundred concurrent misses on one key become a hundred calls.',
     },
     decision: {
-      RU: 'Свежее из кэша, иначе один загрузчик на все параллельные промахи, иначе устаревший снимок — и только если его нет, отказ.',
-      EN: 'Fresh from the cache; otherwise one loader for all concurrent misses; otherwise the stale snapshot — and only if there is none, a refusal.',
+      RU: 'Свежее из кэша, иначе один загрузчик на все параллельные промахи, иначе последний удачный снимок — и только если его нет, отказ.',
+      EN: 'Fresh from the cache; otherwise one loader for all concurrent misses; otherwise the last good snapshot — and only if there is none, a refusal.',
     },
     consequence: {
-      RU: 'Результат помечен полем stale. Вызывающая сторона видит не только данные, но и то, насколько им можно верить, и передаёт это в интерфейс.',
-      EN: 'The result carries a stale flag. The caller sees not only the data but how far it can be trusted, and passes that on to the interface.',
+      RU: 'Снимок возвращается с поднятым IsStale, а не молча. Вызывающая сторона видит не только данные, но и то, насколько им можно верить, и доносит это до интерфейса. Отдельный счётчик считает, как часто это происходит.',
+      EN: 'The snapshot comes back with IsStale raised rather than silently. The caller sees not only the data but how far it can be trusted, and carries that to the interface. A counter says how often it happens.',
     },
     otherwise: {
-      RU: 'Без последней ветки отказ провайдера становится отказом продукта. Без флага stale устаревшие данные выдаются за свежие, а это хуже честной ошибки.',
-      EN: 'Without the last branch a provider outage becomes a product outage. Without the stale flag, old data is served as if it were fresh, which is worse than an honest error.',
+      RU: 'Без ветки со снимком отказ провайдера становится отказом продукта. Без флага устаревшие данные выдаются за свежие, а это хуже честной ошибки. Без throw в конце пустой кэш притворился бы ответом.',
+      EN: 'Without the snapshot branch a provider outage becomes a product outage. Without the flag, old data is served as if it were fresh, which is worse than an honest error. Without the throw at the end an empty cache would pass itself off as an answer.',
     },
     code: {
-      file: 'apps/api/src/cache/cache.service.ts',
-      language: 'typescript',
+      repository: { name: 'Power-Test', commit: PINNED['Power-Test'] },
+      file: 'src/Weather.Infrastructure/WeatherApi/CachingWeatherProvider.cs',
+      language: 'csharp',
       lines: [
-        '  async getOrLoad<T>(',
-        '    key: string,',
-        '    freshSeconds: number,',
-        '    staleSeconds: number,',
-        '    load: () => Promise<T>,',
-        '  ): Promise<{ value: T; stale: boolean }> {',
-        '    const cached = await this.read<T>(key);',
-        '    const now = Date.now();',
-        '    if (cached && cached.freshUntil > now) return { value: cached.value, stale: false };',
+        '        try',
+        '        {',
+        '            return await cache.GetOrCreateAsync(',
+        '                cacheKey,',
+        '                async token =>',
+        '                {',
+        '                    WeatherTelemetry.CacheMisses.Add(1, new KeyValuePair<string, object?>("cache", "dashboard"));',
+        '                    return await RefreshAsync(location, forecastDays, token);',
+        '                },',
+        '                entryOptions,',
+        '                tags: ["weather"],',
+        '                cancellationToken);',
+        '        }',
+        '        catch (WeatherProviderException exception)',
+        '        {',
+        '            WeatherSnapshot? stale = await cache.TryGetAsync<WeatherSnapshot>(StaleKeyFor(location), CancellationToken.None);',
         '',
-        '    try {',
-        '      const value = await this.deduplicate(key, load);',
-        '      await this.write(key, value, freshSeconds, staleSeconds);',
-        '      return { value, stale: false };',
-        '    } catch (error: unknown) {',
-        '      if (cached && cached.staleUntil > now) return { value: cached.value, stale: true };',
-        '      throw error;',
+        '            if (stale is null)',
+        '            {',
+        '                throw;',
+        '            }',
+        '',
+        '            WeatherTelemetry.StaleServed.Add(1, new KeyValuePair<string, object?>("cache", "dashboard"));',
+        '            logger.LogWarning(exception, "weather_stale_served {StaleSince}", stale.StaleSince);',
+        '',
+        '            return stale with { IsStale = true };',
+        '        }',
       ],
     },
   },
@@ -179,33 +210,55 @@ export const caseNotes: Record<string, CaseNote> = {
   },
   'financial-concurrency': {
     context: {
-      RU: 'Два процесса читают одно состояние и пишут по очереди. Без проверки версии второй молча затирает первого, и потеря видна только в сверке.',
-      EN: 'Two processes read one state and write in turn. Without a version check the second silently overwrites the first, and the loss shows up only in reconciliation.',
+      RU: 'Две правки одной записи в системе, где часы превращаются в деньги. Обе прочитали одно состояние, пишут по очереди — и без проверки версии вторая молча затирает первую. Потеря видна только в сверке.',
+      EN: 'Two edits to one record in a system where hours become money. Both read the same state and write in turn, and without a version check the second silently overwrites the first. The loss shows up only in reconciliation.',
     },
     decision: {
-      RU: 'Запись выполняется только против той версии, которую читал клиент. Ноль затронутых строк — это конфликт, а не успех.',
-      EN: 'The write only applies against the version the client read. Zero affected rows is a conflict, not a success.',
+      RU: 'Версия стоит в самом фильтре, поэтому проверка и запись атомарны. Ноль совпавших документов — это конфликт, а не успех, и вызывающая сторона превращает его в 409.',
+      EN: 'The version sits in the filter itself, so the check and the write are one atomic step. Zero matched documents is a conflict, not a success, and the caller turns it into a 409.',
     },
     consequence: {
-      RU: 'Конфликт возвращается кодом CONFLICT и статусом 409 — вызывающая сторона может перечитать и повторить. Ретраится сериализационный конфликт, но не ошибка домена.',
-      EN: 'The conflict comes back as CONFLICT with a 409, so the caller can re-read and retry. A serialization conflict is retried; a domain error is not.',
+      RU: 'Дневной инвариант держится через ту же транзакцию: прежние часы освобождаются до того, как забронированы новые, поэтому правка внутри одного дня не удваивает бронь на одном и том же документе-счётчике.',
+      EN: 'The daily invariant holds through the same transaction: the old hours are released before the new ones are booked, so an edit inside one day does not double-book against the same counter document.',
     },
     otherwise: {
-      RU: 'Тихо потерянная запись в денежном контуре не даёт ни ошибки, ни алерта. Она обнаруживается через недели, когда сходиться уже не с чем.',
-      EN: 'A silently lost write in a money path raises no error and no alert. It surfaces weeks later, when there is nothing left to reconcile against.',
+      RU: 'Тихо потерянная запись в денежном контуре не даёт ни ошибки, ни алерта. Она обнаруживается через недели, когда сходиться уже не с чем. А бронь без освобождения переполнила бы день на правке, которая часов не добавляла.',
+      EN: 'A silently lost write in a money path raises no error and no alert. It surfaces weeks later, when there is nothing left to reconcile against. And booking without releasing would overflow the day on an edit that added no hours at all.',
     },
     code: {
-      file: 'apps/api/src/modules/portfolio/portfolio.service.ts',
-      language: 'typescript',
+      repository: { name: 'PM-GROWTH', commit: PINNED['PM-GROWTH'] },
+      file: 'backend/src/Timesheet.Infrastructure/MongoTimesheetStore.cs',
+      language: 'csharp',
       lines: [
-        '      const result = await transaction.profile.updateMany({',
-        '        where: { id: profile.id, version: input.expectedVersion },',
-        '        data: { ...data, version: { increment: 1 } },',
-        '      });',
-        '      if (result.count !== 1) {',
-        "        throw new GraphQLError('Profile was updated by another request', {",
-        "          extensions: { code: 'CONFLICT', http: { status: 409 } },",
-        '        });',
+        '        // The version sits in the filter, so the check and the write are atomic in Mongo.',
+        '        var filter = Builders<BsonDocument>.Filter.Eq("_id", entry.Id)',
+        '            & Builders<BsonDocument>.Filter.Eq("version", expectedVersion);',
+        '',
+        '        TimeEntry? replaced = null;',
+        '',
+        '        await InTransaction(async session =>',
+        '        {',
+        '            var current = await Entries.Find(session, filter).FirstOrDefaultAsync(ct);',
+        '',
+        '            if (current is null)',
+        '            {',
+        '                // Somebody else got there first: the caller turns this into a 409.',
+        '                replaced = null;',
+        '                return;',
+        '            }',
+        '',
+        '            // Release what the entry used to hold before booking what it holds now: the day may',
+        '            // be the same one, and then both operations land on the same guard document.',
+        '            await MongoDailyHoursGuard.Release(database, session, MongoMapping.Entry(current), ct);',
+        '            await MongoDailyHoursGuard.Reserve(database, session, entry, ct);',
+        '',
+        '            var result = await Entries.ReplaceOneAsync(',
+        '                session,',
+        '                filter,',
+        '                MongoMapping.Entry(entry),',
+        '                cancellationToken: ct);',
+        '',
+        '            replaced = result.MatchedCount == 1 ? entry : null;',
       ],
     },
   },

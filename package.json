@@ -21,6 +21,7 @@
     "quality:file-size": "node scripts/check-file-size.mjs",
     "quality:duplicates": "jscpd apps services scripts --min-lines 10 --min-tokens 50 --threshold 5 --reporters console",
     "quality:dead-code": "knip",
+    "quality:quoted-code": "node scripts/check-quoted-code.mjs",
     "quality:static": "pnpm quality:file-size && pnpm quality:duplicates && pnpm quality:dead-code",
     "lint": "pnpm -r lint",
     "check:repo": "node scripts/check-repository-hygiene.mjs",
