@@ -50,21 +50,30 @@ const experience: Record<Locale, Portfolio['experience']> = {
       role: 'Senior Fullstack Developer',
       period: '2026 — NOW',
       summary:
-        'Proptech-платформа для рынка недвижимости ОАЭ. На мне бэкенд, данные и проверка того, что уехало в прод. Фронтенд — там, где он упирается в данные.',
+        'Международная proptech-платформа для рынка недвижимости ОАЭ с 230 000+ активных объявлений. Веду полный цикл B2B/B2C-функций: backend, API, данные, платежи, безопасность, frontend и production validation.',
       highlights: [
-        'Ranking V3: три явных режима — absolute, adjusted, category — под одним контрактом доступности',
-        'Поиск по фотографии: Redis → Wasabi → CLIP → Qdrant → BigQuery; закрыл инцидент с нулевой выдачей',
-        'Аналитика: перенос с Looker на TypeScript и SQL: обращений к BigQuery примерно на 65% меньше',
-        'Search V2: виртуализация выдачи снизила нагрузку на браузер примерно на 75%',
-        'Надёжность: Redis SWR, схлопывание параллельных запросов, E2E на Playwright с API-авторизацией',
+        'Building View и My Home: продукты полного цикла с ClickHouse, Stripe, entitlements, приватными документами и production-проверкой',
+        'Целостность данных и доступа: разделил DLD/Ejari, добавил basis и nullable-состояния, закрыл обходы платного API и защитил покупки',
+        'Производительность Building View: сократил рендер с 994 карточек и 119 000 DOM-узлов до 45–50; добавил виртуализацию и Safari scroll anchoring',
+        'Ranking V3 и аналитика: три режима под явным контрактом доступности; перенос с Looker на TypeScript/SQL сократил обращения к BigQuery примерно на 65%',
+        'Поиск по фотографии: Redis → Wasabi → CLIP → Qdrant → BigQuery; устранил production-инцидент с нулевой выдачей',
+        'Надёжность и выкат: Redis SWR, in-flight deduplication, Playwright E2E, Kubernetes, CronJob и проверка API и данных после выката',
       ],
+    },
+    {
+      company: 'Частная практика / Freelance',
+      role: 'Fullstack Developer',
+      period: '2024 — 2025',
+      summary:
+        'Веб-продукты и внутренние системы от требований до MVP, запуска и поддержки: backend, REST API, авторизация, базы данных, интеграции, React/Vue-интерфейсы, UI/UX, производительность и техническое SEO.',
+      highlights: [],
     },
     {
       company: 'Investment Fund · NDA',
       role: 'Trading Strategies / Fullstack Developer',
       period: '2021 — 2025',
       summary:
-        'Внутренние торговые и аналитические системы: данные в реальном времени и исторические, crypto и copy trading. Алгоритмические части на MQL, Python, Go и Rust — язык выбирался под то, насколько быстро должна отработать конкретная операция.',
+        'Алгоритмические торговые системы для криптовалют, валют, металлов и сырьевых инструментов: Go/Rust-сервисы, MQL-стратегии, Python-аналитика, real-time и исторические наборы до 1 млн строк, WebSocket и React-интерфейсы инвестора.',
       highlights: [],
     },
     {
@@ -72,7 +81,7 @@ const experience: Record<Locale, Portfolio['experience']> = {
       role: 'Sole Frontend Developer',
       period: '2024 — 2025',
       summary:
-        'Единственный фронтенд-разработчик мультипродуктовой платформы: семь типов пользователей, у каждого свой интерфейс, и компонентная система на сотни экранных состояний.',
+        'Единственный frontend-разработчик многофункциональной платформы: архитектура на React, Next.js и TypeScript, role-based интерфейсы, onboarding, социальная лента, подписки, marketplace, образовательные кабинеты и интеграция с UNA CMS.',
       highlights: [],
     },
     {
@@ -90,21 +99,30 @@ const experience: Record<Locale, Portfolio['experience']> = {
       role: 'Senior Fullstack Developer',
       period: '2026 — NOW',
       summary:
-        'A proptech platform for the UAE property market. The backend, the data and checking what actually shipped are mine. The frontend where it runs into the data.',
+        'An international proptech platform for the UAE property market with 230,000+ active listings. I own B2B/B2C features end to end: backend, APIs, data, payments, security, frontend and production validation.',
       highlights: [
-        'Ranking V3: three explicit modes — absolute, adjusted, category — under one availability contract',
-        'Photo search: Redis → Wasabi → CLIP → Qdrant → BigQuery; closed a zero-result incident',
-        'Analytics: moved off Looker onto TypeScript and SQL: roughly 65% fewer BigQuery calls',
-        'Search V2: a virtualised result list cut browser load by roughly 75%',
-        'Reliability: Redis SWR, in-flight dedupe, Playwright E2E with API authentication',
+        'Building View and My Home: end-to-end products with ClickHouse, Stripe, entitlements, private documents and production validation',
+        'Data and access integrity: separated DLD/Ejari, added basis and nullable states, closed paid-API bypasses and protected purchases',
+        'Building View performance: cut rendering from 994 cards and 119,000 DOM nodes to 45–50; added virtualisation and Safari scroll anchoring',
+        'Ranking V3 and analytics: three modes under an explicit availability contract; moving from Looker to TypeScript/SQL cut BigQuery calls by roughly 65%',
+        'Photo search: Redis → Wasabi → CLIP → Qdrant → BigQuery; fixed a zero-result production incident',
+        'Reliability and rollout: Redis SWR, in-flight deduplication, Playwright E2E, Kubernetes, CronJobs and post-deploy API/data checks',
       ],
+    },
+    {
+      company: 'Private Practice / Freelance',
+      role: 'Fullstack Developer',
+      period: '2024 — 2025',
+      summary:
+        'Web products and internal systems from requirements through MVP, launch and support: backend, REST APIs, authentication, databases, integrations, React/Vue interfaces, UI/UX, performance and technical SEO.',
+      highlights: [],
     },
     {
       company: 'Investment Fund · NDA',
       role: 'Trading Strategies / Fullstack Developer',
       period: '2021 — 2025',
       summary:
-        'Internal trading and analytics systems: realtime and historical data, crypto and copy trading. The algorithmic parts in MQL, Python, Go and Rust, with the language picked for how fast that particular operation had to run.',
+        'Algorithmic trading systems for crypto, currencies, metals and commodities: Go/Rust services, MQL strategies, Python analytics, real-time and historical datasets up to one million rows, WebSockets and React investor interfaces.',
       highlights: [],
     },
     {
@@ -112,7 +130,7 @@ const experience: Record<Locale, Portfolio['experience']> = {
       role: 'Sole Frontend Developer',
       period: '2024 — 2025',
       summary:
-        'The only frontend engineer on a multi-product platform: seven user types, each with its own interface, and a component system covering hundreds of screen states.',
+        'The sole frontend engineer for a multi-product platform: React, Next.js and TypeScript architecture, role-based interfaces, onboarding, social feed, subscriptions, marketplace, learning portals and UNA CMS integration.',
       highlights: [],
     },
     {
