@@ -157,66 +157,94 @@ export const experiences = [
     startDate: new Date('2026-01-01'),
     endDate: null,
     summary: {
-      ru: 'Proptech-платформа для рынка недвижимости ОАЭ. На мне бэкенд, данные и проверка того, что уехало в прод. Фронтенд — там, где он упирается в данные.',
-      en: 'A proptech platform for the UAE property market. The backend, the data and checking what actually shipped are mine. The frontend where it runs into the data.',
+      ru: 'Международная proptech-платформа для рынка недвижимости ОАЭ с 230 000+ активных объявлений. Веду полный цикл B2B/B2C-функций: backend, API, данные, платежи, безопасность, frontend и production validation.',
+      en: 'An international proptech platform for the UAE property market with 230,000+ active listings. I own B2B/B2C features end to end: backend, APIs, data, payments, security, frontend and production validation.',
     },
     highlights: [
       {
         ru: {
-          title: 'Ranking V3',
+          title: 'Building View и My Home',
           description:
-            'три явных режима — absolute, adjusted, category — под одним контрактом доступности',
+            'инвесторский и owner-продукты полного цикла: ClickHouse-аналитика, тарифы, Stripe, entitlements, приватные документы и production-проверка',
         },
         en: {
-          title: 'Ranking V3',
+          title: 'Building View and My Home',
           description:
-            'three explicit modes — absolute, adjusted, category — under one availability contract',
+            'end-to-end investor and owner products: ClickHouse analytics, pricing, Stripe, entitlements, private documents and production validation',
+        },
+      },
+      {
+        ru: {
+          title: 'Целостность данных и доступа',
+          description:
+            'разделил DLD/Ejari, добавил basis и nullable-состояния, закрыл обходы платного API и защитил одиночные и массовые покупки',
+        },
+        en: {
+          title: 'Data and access integrity',
+          description:
+            'separated DLD/Ejari markets, added basis and nullable states, closed paid-API bypasses and protected single and bulk purchases',
+        },
+      },
+      {
+        ru: {
+          title: 'Производительность Building View',
+          description:
+            'сократил одновременный рендер с 994 карточек и 119 000 DOM-узлов до 45–50; добавил динамическую виртуализацию и Safari scroll anchoring',
+        },
+        en: {
+          title: 'Building View performance',
+          description:
+            'cut concurrent rendering from 994 cards and 119,000 DOM nodes to 45–50; added dynamic virtualisation and Safari scroll anchoring',
+        },
+      },
+      {
+        ru: {
+          title: 'Ranking V3 и аналитика',
+          description:
+            'absolute, adjusted и category ranking под явным контрактом доступности; перенос с Looker на TypeScript/SQL сократил обращения к BigQuery примерно на 65%',
+        },
+        en: {
+          title: 'Ranking V3 and analytics',
+          description:
+            'absolute, adjusted and category ranking under an explicit availability contract; moving analytics from Looker to TypeScript/SQL cut BigQuery calls by roughly 65%',
         },
       },
       {
         ru: {
           title: 'Поиск по фотографии',
           description:
-            'Redis → Wasabi → CLIP → Qdrant → BigQuery; закрыл инцидент с нулевой выдачей',
+            'Redis → Wasabi → CLIP → Qdrant → BigQuery; диагностировал и устранил production-инцидент с нулевой выдачей',
         },
         en: {
           title: 'Photo search',
-          description: 'Redis → Wasabi → CLIP → Qdrant → BigQuery; closed a zero-result incident',
-        },
-      },
-      {
-        ru: {
-          title: 'Аналитика',
           description:
-            'перенос с Looker на TypeScript и SQL: обращений к BigQuery примерно на 65% меньше',
-        },
-        en: {
-          title: 'Analytics',
-          description: 'moved off Looker onto TypeScript and SQL: roughly 65% fewer BigQuery calls',
+            'Redis → Wasabi → CLIP → Qdrant → BigQuery; diagnosed and fixed a zero-result production incident',
         },
       },
       {
         ru: {
-          title: 'Search V2',
-          description: 'виртуализация выдачи снизила нагрузку на браузер примерно на 75%',
-        },
-        en: {
-          title: 'Search V2',
-          description: 'a virtualised result list cut browser load by roughly 75%',
-        },
-      },
-      {
-        ru: {
-          title: 'Надёжность',
+          title: 'Надёжность и выкат',
           description:
-            'Redis SWR, схлопывание параллельных запросов, E2E на Playwright с API-авторизацией',
+            'Redis SWR, in-flight deduplication, Playwright API-auth/multi-server/cross-browser E2E, Kubernetes, CronJob и проверка API и данных после выката',
         },
         en: {
-          title: 'Reliability',
-          description: 'Redis SWR, in-flight dedupe, Playwright E2E with API authentication',
+          title: 'Reliability and rollout',
+          description:
+            'Redis SWR, in-flight deduplication, Playwright API-auth/multi-server/cross-browser E2E, Kubernetes, CronJobs and post-deploy API/data checks',
         },
       },
     ],
+  },
+  {
+    companyLabel: 'Private Practice / Freelance',
+    role: 'Fullstack Developer',
+    startDate: new Date('2024-01-01'),
+    endDate: new Date('2025-12-01'),
+    summary: {
+      ru: 'Заказная разработка веб-продуктов и внутренних систем от требований до MVP, запуска и поддержки: backend, REST API, авторизация, базы данных, интеграции, React/Vue-интерфейсы, UI/UX, производительность и техническое SEO.',
+      en: 'Client web products and internal systems from requirements through MVP, launch and support: backend, REST APIs, authentication, databases, integrations, React/Vue interfaces, UI/UX, performance and technical SEO.',
+    },
+    highlights: [],
   },
   {
     companyLabel: 'Investment Fund · NDA',
@@ -224,8 +252,8 @@ export const experiences = [
     startDate: new Date('2021-03-01'),
     endDate: new Date('2025-12-01'),
     summary: {
-      ru: 'Внутренние торговые и аналитические системы: данные в реальном времени и исторические, crypto и copy trading. Алгоритмические части на MQL, Python, Go и Rust — язык выбирался под то, насколько быстро должна отработать конкретная операция.',
-      en: 'Internal trading and analytics systems: realtime and historical data, crypto and copy trading. The algorithmic parts in MQL, Python, Go and Rust, with the language picked for how fast that particular operation had to run.',
+      ru: 'Алгоритмические торговые системы для криптовалют, валют, металлов и сырьевых инструментов: Go/Rust-сервисы, MQL-стратегии, Python-аналитика, real-time и исторические наборы до 1 млн строк, WebSocket и React-интерфейсы инвестора.',
+      en: 'Algorithmic trading systems for crypto, currencies, metals and commodities: Go/Rust services, MQL strategies, Python analytics, real-time and historical datasets up to one million rows, WebSockets and React investor interfaces.',
     },
     highlights: [],
   },
@@ -235,8 +263,8 @@ export const experiences = [
     startDate: new Date('2024-12-01'),
     endDate: new Date('2025-06-01'),
     summary: {
-      ru: 'Единственный фронтенд-разработчик мультипродуктовой платформы: семь типов пользователей, у каждого свой интерфейс, и компонентная система на сотни экранных состояний.',
-      en: 'The only frontend engineer on a multi-product platform: seven user types, each with its own interface, and a component system covering hundreds of screen states.',
+      ru: 'Единственный frontend-разработчик многофункциональной платформы: архитектура на React, Next.js и TypeScript, role-based интерфейсы, onboarding, социальная лента, подписки, marketplace, образовательные кабинеты и интеграция с UNA CMS.',
+      en: 'The sole frontend engineer for a multi-product platform: React, Next.js and TypeScript architecture, role-based interfaces, onboarding, social feed, subscriptions, marketplace, learning portals and UNA CMS integration.',
     },
     highlights: [],
   },
