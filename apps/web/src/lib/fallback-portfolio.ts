@@ -277,7 +277,7 @@ export const fallbackPortfolio: Record<Locale, Portfolio> = {
     ...common,
     profile: {
       fullName: 'Сергей Кутушев',
-      headline: 'Senior+ Fullstack / Product Engineer · Backend 60% / Frontend 40%',
+      headline: 'Senior Fullstack Developer · Backend-leaning Product Engineer',
       summary: 'Беру продуктовую задачу целиком: модель, база, API, интерфейс, интеграции и выкат.',
       location: 'Санкт-Петербург · Remote · UTC+3',
       availability: 'Открыт к senior+ backend-работе',
@@ -290,7 +290,7 @@ export const fallbackPortfolio: Record<Locale, Portfolio> = {
     ...common,
     profile: {
       fullName: 'Sergey Kutushev',
-      headline: 'Senior+ Fullstack / Product Engineer · Backend 60% / Frontend 40%',
+      headline: 'Senior Fullstack Developer · Backend-leaning Product Engineer',
       summary:
         'I take a product problem end to end: the model, the database, the API, the interface, the integrations and the rollout.',
       location: 'Saint Petersburg · Remote · UTC+3',

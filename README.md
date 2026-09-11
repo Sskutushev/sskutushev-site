@@ -1,6 +1,6 @@
 # sskutushev-site
 
-A production-shaped digital portfolio for a Senior+ Fullstack / Product Engineer with 60% backend and 40% frontend focus, plus strong data, DevOps, security and production ownership. It is a real vertical slice, not a static mock: React/R3F reads portfolio content from a NestJS code-first GraphQL API backed by Prisma and CockroachDB. Redis provides cache resilience; S3-compatible storage is an explicit asset boundary.
+A production-shaped digital portfolio for a Senior Fullstack Developer and backend-leaning product engineer, plus strong data, DevOps, security and production ownership. It is a real vertical slice, not a static mock: React/R3F reads portfolio content from a NestJS code-first GraphQL API backed by Prisma and CockroachDB. Redis provides cache resilience; S3-compatible storage is an explicit asset boundary.
 
 ## Reviewer in 10 minutes
 
