@@ -289,7 +289,7 @@ export const fallbackPortfolio: Record<Locale, Portfolio> = {
   EN: {
     ...common,
     profile: {
-      fullName: 'Sergey Kutushev',
+      fullName: 'Sergei Kutushev',
       headline: 'Senior Fullstack Developer · Backend-leaning Product Engineer',
       summary:
         'I take a product problem end to end: the model, the database, the API, the interface, the integrations and the rollout.',

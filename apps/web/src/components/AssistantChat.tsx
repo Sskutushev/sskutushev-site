@@ -46,7 +46,7 @@ export function AssistantChat({ locale }: { locale: Locale }): React.JSX.Element
           maxLength={500}
           value={question}
           onChange={(event) => setQuestion(event.target.value)}
-          placeholder={locale === 'RU' ? 'Спросить о Сергее…' : 'Ask about Sergey…'}
+          placeholder={locale === 'RU' ? 'Спросить о Сергее…' : 'Ask about Sergei…'}
           aria-label="Question"
         />
         <button type="submit" disabled={mutation.isPending}>

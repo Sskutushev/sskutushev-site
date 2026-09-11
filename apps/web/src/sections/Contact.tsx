@@ -111,7 +111,7 @@ export function Contact({
         </div>
       </div>
       <div className="contact__foot t-meta-sm">
-        <span>© 2026 Sergey Kutushev</span>
+        <span>© 2026 Sergei Kutushev</span>
         <span>Saint Petersburg · UTC+3</span>
       </div>
     </footer>

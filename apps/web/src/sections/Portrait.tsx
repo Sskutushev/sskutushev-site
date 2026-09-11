@@ -43,7 +43,7 @@ export function Portrait({ copy }: { copy: SiteCopy }): React.JSX.Element {
         <img alt="Сергей Кутушев" height="640" loading="lazy" src={SOURCE} width="512" />
       </button>
       <figcaption className="t-meta-sm">
-        <span>Sergey Kutushev</span>
+        <span>Sergei Kutushev</span>
         <span>Saint Petersburg · UTC+3</span>
       </figcaption>
 
